@@ -1,0 +1,189 @@
+.appendix AS740 Assembler
+
+
+.header level 1;Acknowledgment
+
+Thanks  to  Uwe Steller  for his contribution of the AS740
+cross assembler.  
+.skip 1
+.literal
+	Uwe Stellar
+	Uwe dot Steller at t-online dot de
+.end literal
+.skip 2
+
+The  instruction  syntax  of  this  cross assembler  uses the
+square  brackets  [] to denote addressing indirection.
+
+
+.header level 1;740 Register Set
+
+.break
+The following is a list of the 740 registers used by AS740:  
+.skip
+.literal
+        a       -       8-bit accumulator
+        x,y     -       index registers
+.end literal
+
+
+.header level 1;740 Instruction Set
+
+The  following  tables  list all 740 family mnemonics recog-
+nized by the AS740 assembler.  The designation [] refers  to  a
+required addressing mode argument.  The following list specifies
+the format for each addressing mode supported by AS740:  
+.skip
+.literal
+        #data           immediate data byte
+
+        #data,*zp       immediate data to zero page
+
+        a               accumulator addressing
+
+        *zp             zero page addressing
+                        (see .setdp directive)
+                        0 <= dir <= 255 
+
+        *zp,x           zero page x addressing
+        *zp,y           zero page y addressing
+                        address = (offset + (x or y))
+
+        [*zp,x]         indirect x addressing
+                        0 <= offset <= 255
+                        address = 2 bytes at location
+                            [(offset + (x or y)) mod 256]
+
+        [*zp],y         indirect y addressing
+                        address = 2 byte value at offset
+                            plus the value of the y register
+
+        abs             absolute addressing (2 byte)
+        abs,x           absolute x addressing (2 byte + x)
+        abs,y           absolute y addressing (2 byte + y)
+
+        [abs]           indirect addressing (2 byte)
+
+        label           branch label
+
+        \special        low order byte of address 0xFFnn
+
+        BIT#,*zp        bit set/clear zero page
+        BIT#,A          bit set/clear accumulator
+
+        BIT#,*zp,label  branch on bit set/clear in zero page
+        BIT#,A,label    branch on bit set/clear in accumulator
+.end literal
+
+.skip
+The  terms data, zp, abs, BIT#, special, and label may all be
+expressions.  
+
+Note  that  not all addressing modes are valid with every in-
+struction, refer to the 740 technical data for valid modes.  
+
+
+.test page 20
+.header level 2;Inherent Instructions
+
+.literal
+        brk                     clc
+        cld                     cli
+        clt                     clv
+        dex                     dey
+        inx                     iny
+        nop                     pha
+        php                     pla
+        plp                     rti
+        rts                     sec
+        sed                     sei
+        set                     stp
+        tax                     tay
+        tsx                     txa
+        txs                     tya
+        wit
+.end literal
+
+
+.test page 11
+.header level 2;Branch Instructions
+
+.literal
+        bcc     label           bhs     label
+        bcs     label           blo     label
+        beq     label           bmi     label
+        bne     label           bpl     label
+        bvc     label           bvs     label
+        bra     label
+.end literal
+
+
+.test page 11
+.header level 2;Single Operand Instructions
+
+.literal
+        asl     []
+        dec     []
+        inc     []
+        lsr     []
+        rol     []
+        ror     []
+.end literal
+
+
+.test page 16
+.header level 2;Double Operand Instructions
+
+.literal
+        adc     []
+        and     []
+        bit     []
+        cmp     []
+        eor     []
+        lda     []
+        ora     []
+        sbc     []
+        sta     []
+.end literal
+
+
+.test page 6
+.header level 2;Jump and Jump to Subroutine Instructions
+
+.literal
+        jmp     []              jsr     []
+.end literal
+
+
+.test page 11
+.header level 2;Miscellaneous X and Y Register Instructions
+
+.literal
+        cpx     []
+        cpy     []
+        ldx     []
+        stx     []
+        ldy     []
+        sty     []
+.end literal
+
+
+.test page 8
+.header level 2;Bit Instructions
+
+.literal
+        bit     []
+        bbc     BIT#,[],label           bbs     BIT#,[],label
+        clb     BIT#,[]                 seb     BIT#,[]
+.end literal
+
+
+.test page 8
+.header level 2;Other Instructions
+
+.literal
+        div     []                      mul     []
+        ldm     #imm,[]                 com     []
+        tst     []                      rrf     []
+.end literal
+

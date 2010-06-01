@@ -1,0 +1,323 @@
+.comment;asmbld.rno
+
+.chapter;Building ASxxxx and ASlink
+
+The assemblers and linker have been successfully compiled for
+Linux, DOS, and various flavors of Windows using the Linux GCC,
+the Cygwin environment, the DJGPP environment, the MS#Visual#C++#V6.0
+graphical user interface (gui) and command line environment,
+the Symantec#C/C++#V7.2 gui and command line environment,
+and the Turbo#C#3.0 gui and command line environment.
+
+A Linux makefile, Turbo#C make file, Symantec project and
+batch files, DJGPP makefile, Cygwin makefile, and VC6 project
+and batch files are available to build all the assemblers
+and the linker.
+
+Unpack the asxv4p10.zip file into an appropriate directory using
+the utility appropriate to your environment.  For DOS or Windows
+the following command line will unpack the distribution zip file:
+.skip 1
+.literal
+	pkunzip -d asxv4p10.zip
+.end literal
+
+.skip 2
+The distribution file has been packed with DOS style end of lines
+(CR/LF), and UPPER CASE file names.  The Linux make file assumes
+all lower case directories and file names.  For Linux the unpacking
+utility you choose should have an option to force all lower case
+directories / file names and convert the ascii files to local
+format.  On most systems the following command should do the trick:
+.skip 1
+.literal
+	unzip -L -a asxv4p10.zip
+.end literal
+.skip 1
+Some systems may require a -LL option to force all lower case.
+
+The distribution will be unpacked into the base directory
+'asxv4pxx' which will contain source directories for each
+supported processor (as6800, asz80, ...), the machine independent
+source (asxxsrc), the linker source (linksrc), and the miscellaneous
+sources (asxxmisc).  Other directories include the documentation
+(asxdoc), test file directory (asxtst), html documentation
+(asxhtml), NoICE support files (noice), various debug monitors
+that can be assembled with the ASxxxx assemblers (asmasm),
+project files for an application that uses the AS6809 assembler
+and ASlink linker (project), and the packaging directory (zipper).
+
+.header level 1;Building ASxxxx and ASlink With Linux
+
+The Linux build directory is /asxv4pxx/asxmak/linux/build.
+The makefile in this directory is compatible with the Linux
+GNU make and GCC.  The command
+.skip 1
+.literal
+	make clean
+.end literal
+.skip 1
+will remove all the current executable files in directory
+/asxv4pxx/asxmak/linux/exe and all the compiled object modules
+from the /asxv4pxx/asxmak/linux/build directory.
+
+The command
+.skip 1
+.literal
+	make all
+.end literal
+.skip
+will compile and link all the ASxxxx assemblers, the ASlink program, and
+the utility programs asxscn and asxcnv.  The make file can make a
+single program by invoking make with the specific assembler, linker,
+or utility you wish to build:
+.skip 1
+.literal
+	make aslink
+.end literal
+
+
+.header level 1;Building ASxxxx and ASlink Under Cygwin
+
+The Cygwin build directory is _\asxv4pxx_\asxmak_\cygwin_\build.
+The makefile in this directory is compatible with the Cygwin
+GNU make and GCC.  The command
+.skip 1
+.literal
+	make clean
+.end literal
+.skip 1
+will remove all the current executable files in directory
+_\asxv4pxx_\asxmak_\cygwin_\exe and all the compiled object modules
+from the _\asxv4pxx_\asxmak_\cygwin_\build directory.
+The command
+.skip 1
+.literal
+	make all
+.end literal
+.skip
+will compile and link all the ASxxxx assemblers, the ASlink program, and
+the utility programs asxscn and asxcnv.  The make file can make a
+single program by invoking make with the specific assembler, linker,
+or utility you wish to build:
+.skip 1
+.literal
+	make aslink
+.end literal
+
+
+.header level 1;Building ASxxxx and ASlink With DJGPP
+
+The DJGPP build directory is _\asxv4pxx_\asxmak_\djgpp_\build.
+The makefile in this directory is compatible with the DJGPP
+GNU make and GCC.  The command
+.skip 1
+.literal
+	make clean
+.end literal
+.skip 1
+will remove all the current executable files in directory
+_\asxv4pxx_\asxmak_\djgpp_\exe and all the compiled object modules
+from the _\asxv4pxx_\asxmak_\djgpp_\build directory.
+The command
+.skip 1
+.literal
+	make all
+.end literal
+.skip
+will compile and link all the ASxxxx assemblers, the ASlink program, and
+the utility programs asxscn and asxcnv.  The make file can make a
+single program by invoking make with the specific assembler, linker,
+or utility you wish to build:
+.skip 1
+.literal
+	make aslink
+.end literal
+
+
+.header level 1;Building ASxxxx and ASlink With MS Visual C++ 6.0
+
+.header level 2;Graphical User Interface
+
+Each ASxxxx Assembler has a VC6 project file (*.dsw) located
+in a subdirectory of _\asxv4pxx_\asxmak_\vc6_\build.  Simply
+enter this project filename into the VC6 IDE and build/rebuild
+the assembler.
+
+.header level 2;Command Line Interface
+
+Open a command prompt window in the _\asxv4pxx_\asxmak_\vc6_\build
+directory.  The file make.bat found in the directory can be used
+to invoke the VC6 command line compiler.  The make.bat file assumes
+that the Visual C++ compiler has been installed in the default location.
+If this is not the case then the line
+.skip 1
+.literal
+SET MS$DEV="C:\Program Files\Microsoft Visual Studio\Common\MSDev98\Bin\msdev.exe"
+.end literal
+.skip 1
+must be changed to match your environment.  The compiled object code modules
+will be placed in the _\asxv4pxx_\asxmak_\vc6_\build_\as----_\release
+directory and the executable files will be placed in
+the _\asxv4pxx_\asxmak_\vc6_\exe directory.
+.skip 2
+
+The command
+.skip 1
+.literal
+	make all
+.end literal
+.skip 1
+will compile and link all the ASxxxx assemblers, the ASlink program, and
+the utility programs asxscn and asxcnv.  The make file can make a
+single program by invoking make with the specific assembler, linker,
+or utility you wish to build:
+.skip 1
+.literal
+	make aslink
+.end literal
+
+.skip 2
+The VC6 command line compiler uses the information in the
+corresponding .dsw/.dsp files to compile and link the programs.
+
+The command 'make clean' is not required or valid as a make
+of anything does a complete rebuild of the program.
+
+
+.header level 1;Building ASxxxx and ASlink With Borland's Turbo#C++#3.0
+
+The Borland product is available in the Borland Turbo#C++ Suite
+which contains C++ Builder 1.0, Turbo#C++#4.5 for Windows
+and Turbo#C++#3.0 for DOS.  The DOS IDE will install and run
+on any version of Windows (including Windows Vista [Longhorn]).
+
+.header level 2;Graphical User Interface
+
+Each ASxxxx Assembler has two project specific files
+(*.dsk#and#*.prj) located in
+the subdirectory _\asxv4pxx_\asxmak_\turboc30_\build.
+You must enter the .prj filename into the Turbo#C++ IDE:
+enter Options->Directories and change the include and
+output directories to match your configuration.  After
+these changes have been made you will be able to compile
+the selected project.  These changes must be manually
+entered for each project.
+
+
+.header level 2;Command Line Interface
+
+Before the command line interface can be used you must perform
+the steps outlined in the 'Graphical User Interface' instructions
+above for each project you wish to build.
+
+Open a command prompt window in the _\asxv4pxx_\asxmak_\turboc30_\build
+directory.  The file make.bat found in the directory can be used
+to invoke the Turbo#C command line compiler.  The make.bat file assumes
+that the path to the compiler directories has been set in the environment
+variable PATH.  Assuming the Turbo#C compiler has been installed in the
+default location (C:_\TC) the file __setpath.bat will set the PATH variable.
+If this is not the case then the line
+.skip 1
+.literal
+PATH=C:\TC;C:\TC\BIN;C:\TC\INCLUDE
+.end literal
+.skip 1
+must be changed to match your environment.  The compiled object code
+modules will be placed in the _\asxv4pxx_\asxmak_\turboc30_\build_\
+directory and the executable files will be placed in
+the _\asxv4pxx_\asxmak_\turboc30_\exe directory.
+.skip 2
+
+The command
+.skip 1
+.literal
+	make all
+.end literal
+.skip 1
+will compile and link all the ASxxxx assemblers, the ASlink program, and
+the utility programs asxscn and asxcnv.  The make file can make a
+single program by invoking make with the specific assembler, linker,
+or utility you wish to build:
+.skip 1
+.literal
+	make aslink
+.end literal
+
+.skip 2
+The Turbo#C make utility uses the information in the
+corresponding .prj and .dsk files to compile and link the programs.
+
+The command file __clean.bat may be used to remove all compiled .obj files
+and linked .exe executables.
+
+
+.header level 1;Building ASxxxx and ASlink With Symantec C/C++ V7.2
+
+The Symantec product is no longer available but is included for
+historical reasons (the final version, 7.5, was introduced in 1996).
+The product had an excellent graphical user
+interface, built in editor, project manager, and supported DOS,
+Extended DOS (the executable contained a built in DOS extender which
+was rendered unusable in Windows 2000 after service pack 2 or in
+Windows XP), Win95, and Windows NT.
+
+.header level 2;Graphical User Interface
+
+Each ASxxxx Assembler has a series of project specific files
+(*.bro, *.def, *.dpd, *.lnk, *.mak, *.opn, and *.prj) located in
+in the subdirectory _\asxv4pxx_\asxmak_\symantec_\build.  You must
+enter the .prj filename into the Symantec IDE and then select
+Project->Settings->Directories and change the include, target,
+and compiler output directories to match your configuration.
+After these changes have been made you will be able to compile
+the selected project.  These changes must be manually
+entered for each project.
+
+.header level 2;Command Line Interface
+
+Before the command line interface can be used you must perform
+the steps outlined in the 'Graphical User Interface' instructions
+above for each project you wish to build.
+
+Open a command prompt window in the _\asxv4pxx_\asxmak_\symantec_\build
+directory.  The file make.bat found in the directory can be used
+to invoke the Symantec command line compiler.  The make.bat file assumes
+that the path to the compiler directories has been set in the environment
+variable PATH.  Assuming the Symantec compiler has been installed in the
+default location (C:_\SC) the file __setpath.bat will set the PATH variable.
+If this is not the case then the line
+.skip 1
+.literal
+PATH=C:\SC;C:\SC\BIN;C:\SC\INCLUDE;C:\SC\LIB
+.end literal
+.skip 1
+must be changed to match your environment.  The compiled object code
+modules will be placed in the _\asxv4pxx_\asxmak_\symantec_\build
+directory and the executable files will be placed in
+the _\asxv4pxx_\asxmak_\symantec_\exe directory.
+.skip 2
+
+The command
+.skip 1
+.literal
+	make all
+.end literal
+.skip 1
+will compile and link all the ASxxxx assemblers, the ASlink program, and
+the utility programs asxscn and asxcnv.  The make file can make a
+single program by invoking make with the specific assembler, linker,
+or utility you wish to build:
+.skip 1
+.literal
+	make aslink
+.end literal
+
+.skip 2
+The Symantec make utility , smake.exe, uses the information in the
+corresponding .mak files to compile and link the programs.
+
+The command file __clean.bat may be used to remove all compiled .obj files
+and linked .exe executables.
+
+

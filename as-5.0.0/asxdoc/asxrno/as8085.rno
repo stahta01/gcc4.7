@@ -1,0 +1,149 @@
+.appendix AS8085 Assembler
+
+
+.header level 1;8085 Register Set
+
+.break
+The following is a list of the 8080/8085 registers used by AS8085:
+.skip
+.literal
+	a,b,c,d,e,h,l	-	8-bit accumulators
+	m		-	memory through (hl)
+	sp		-	stack pointer
+	psw		-	status word
+.end literal	
+
+
+.header level 1;8085 Instruction Set
+
+The following tables list all 8080/8085 mnemonics recognized by the
+AS8085 assembler. The following list specifies the format for
+each addressing mode supported by AS8085:
+
+.skip
+.literal
+	#data		immediate data
+			byte or word data
+
+	r,r1,r2		register or register pair
+			psw,a,b,c,d,e,h,l
+			bc,de,hl,sp,pc
+
+	m		memory address using (hl)
+
+	addr		direct memory addressing
+
+	label		call or jump label
+.end literal
+
+.skip
+The terms data, m, addr, and label may be expressions.
+
+Note that not all addressing modes are valid with every instruction,
+refer to the 8080/8085 technical data for valid modes.
+
+
+.test page 17
+.header level 2;Inherent Instructions
+
+.literal
+	cma		cmc
+	daa		di
+	ei		hlt
+	nop		pchl
+	ral		rar
+	ret		rim
+	rrc		rlc
+	sim		sphl
+	stc		xchg
+	xthl
+.end literal
+
+
+.test page 15
+.header level 2;Register_/Memory_/Immediate Instructions
+
+.literal
+	adc	r	adc	m	aci	#data
+	add	r	add	m	adi	#data
+	ana	r	ana	m	ani	#data
+	cmp	r	cmp	m	cpi	#data
+	ora	r	ora	m	ori	#data
+	sbb	r	sbb	m	sbi	#data
+	sub	r	sub	m	sui	#data
+	xra	r	xra	m	xri	#data
+.end literal
+
+
+.test page 9
+.header level 2;Call and Return Instructions
+
+.literal
+	cc	label		rc
+	cm	label		rm
+	cnc	label		rnc
+	cnz	label		rnz
+	cp	label		rp
+	cpe	label		rpe
+	cpo	label		rpo
+	cz	label		rz
+	call	label
+.end literal
+
+
+.test page 15
+.header level 2;Jump Instructions
+
+.literal
+	jc	label
+	jm	label
+	jnc	label
+	jnz	label
+	jp	label
+	jpe	label
+	jpo	label
+	jz	label
+	jmp	label
+.end literal
+
+
+.test page 10
+.header level 2;Input_/Output_/Reset Instructions
+
+.literal
+	in	data
+	out	data
+	rst	data
+.end literal
+
+
+.test page 15
+.header level 2;Move Instructions
+
+.literal
+	mov	r1,r2
+	mov	r,m
+	mov	m,r
+
+	mvi	r,#data
+	mvi	m,#data
+.end literal
+
+
+.test page 19
+.header level 2;Other Instructions
+
+.literal
+	dcr	r		dcr	m
+	inr	r		inr	m
+
+	dad	r		dcx	r
+	inx	r		ldax	r
+	pop	r		push	r
+	stax	r
+
+	lda	addr		lhld	addr
+	shld	addr		sta	addr
+
+	lxi	r,#data
+.end literal

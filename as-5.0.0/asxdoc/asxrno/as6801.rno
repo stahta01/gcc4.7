@@ -1,0 +1,228 @@
+.appendix AS6801 Assembler
+
+
+.header level 1;.\h\d6303 Directive
+
+.break
+Format:
+.skip;.indent 8
+_.hd6303
+.skip
+The .hd6303 directive enables processing of the HD6303 specific
+mnemonics not included in the 6801 instruction set. HD6303 mnemonics
+encountered without the .hd6303 directive will be flagged with
+an 'o' error.
+
+
+.header level 1;6801 Register Set
+
+.break
+The following is a list of the 6801 registers used by AS6801:
+.skip
+.literal
+	a,b	-	8-bit accumulators
+	d	-	16-bit accumulator <a:b>
+	x	-	index register
+.end literal	
+
+
+.header level 1;6801 Instruction Set
+
+The following tables list all 6801/6303 mnemonics recognized by the
+AS6801 assembler. The designation [] refers to a required addressing mode
+argument. The following list specifies the format for
+each addressing mode supported by AS6801:
+
+.skip
+.literal
+	#data		immediate data
+			byte or word data
+
+	*dir		direct page addressing
+			(see .setdp directive)
+			0 <= dir <= 255 
+
+	,x		register indirect addressing
+			zero offset
+
+	offset,x	register indirect addressing
+			0 <= offset <= 255
+
+	ext		extended addressing
+
+	label		branch label
+.end literal
+
+.skip
+The terms data, dir, offset, ext, and label may all be expressions.
+
+Note that not all addressing modes are valid with every instruction,
+refer to the 6801/6303 technical data for valid modes.
+
+
+.test page 22
+.header level 2;Inherent Instructions
+
+.literal
+	aba		abx
+	cba		clc
+	cli		clv
+	daa		des
+	dex		ins
+	inx		mul
+	nop		rti
+	rts		sba
+	sec		sei
+	sev		swi
+	tab		tap
+	tba		tpa
+	tsx		txs
+	wai
+.end literal
+
+
+.test page 18
+.header level 2;Branch Instructions
+
+.literal
+	bra	label		brn	label
+	bhi	label		bls	label
+	bcc	label		bhs	label
+	bcs	label		blo	label
+	bne	label		beq	label
+	bvc	label		bvs	label
+	bpl	label		bmi	label
+	bge	label		blt	label
+	bgt	label		ble	label
+	bsr	label
+.end literal
+
+
+.test page 14
+.header level 2;Single Operand Instructions
+
+.literal
+	asla		aslb		asld
+	asl a		asl b		asl d
+	asl	[]
+
+	asra		asrb
+	asr a		asr b
+	asr	[]
+
+	clra		clrb
+	clr a		clr b
+	clr	[]
+
+	coma		comb
+	com a		com b
+	com	[]
+
+	deca		decb
+	dec a		dec b
+	dec	[]
+
+	eora		eorb
+	eor a		eor b
+	eor	[]
+
+	inca		incb
+	inc a		inc b
+	inc	[]
+
+	lsla		lslb		lsld
+	lsl a		lsl b		lsl d
+	lsl	[]
+
+	lsra		lsrb		lsrd
+	lsr a		lsr b		lsr d
+	lsr	[]
+
+	nega		negb
+	neg a		neg b
+	neg	[]
+
+	psha		pshb		pshx
+	psh a		psh b		psh x
+
+	pula		pulb		pulx
+	pul a		pul b		pul x
+
+	rola		rolb
+	rol a		rol b
+	rol	[]
+
+	rora		rorb
+	ror a		ror b
+	ror	[]
+
+	tsta		tstb
+	tst a		tst b
+	tst	[]
+.end literal
+
+
+.test page 36
+.header level 2;Double Operand Instructions
+
+.literal
+	adca	[]	adcb	[]
+	adc a	[]	adc b	[]
+
+	adda	[]	addb	[]	addd	[]
+	add a	[]	add b	[]	add d	[]
+
+	anda	[]	andb	[]
+	and a	[]	and b	[]
+
+	bita	[]	bitb	[]
+	bit a	[]	bit b	[]
+
+	cmpa	[]	cmpb	[]
+	cmp a	[]	cmp b	[]
+
+	ldaa	[]	ldab	[]
+	lda a	[]	lda b	[]
+
+	oraa	[]	orab	[]
+	ora a	[]	ora b	[]
+
+	sbca	[]	sbcb	[]
+	sbc a	[]	sbc b	[]
+
+	staa	[]	stab	[]
+	sta a	[]	sta b	[]
+
+	suba	[]	subb	[]	subd	[]
+	sub a	[]	sub b	[]	sub d	[]
+.end literal
+
+
+.test page 8
+.header level 2;Jump and Jump to Subroutine Instructions
+
+.literal
+	jmp	[]	jsr	[]
+.end literal
+
+
+.test page 11
+.header level 2;Long Register Instructions
+
+.literal
+	cpx	[]	ldd	[]
+	lds	[]	ldx	[]
+	std	[]	sts	[]
+	stx	[]
+.end literal
+
+
+.test page 11
+.header level 2;6303 Specific Instructions
+
+.literal
+	aim	#data, []	eim	#data, []
+	oim	#data, []	tim	#data, []
+
+	xgdx		slp
+.end literal

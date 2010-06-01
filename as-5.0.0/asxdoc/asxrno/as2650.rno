@@ -1,0 +1,172 @@
+.appendix AS2650 Assembler
+
+
+.header level 1;2650 Register Set
+
+.break
+The following is a list of the 2650 registers used by AS2650:
+.skip
+.literal
+	r0,r1	-	8-bit accumulators
+	r2,r3
+.end literal	
+
+
+.header level 1;2650 Instruction Set
+
+The following tables list all 2650 mnemonics recognized by the
+AS2650 assembler. The designation [] refers to a required addressing mode
+argument. The designation CC refers to a required condition code
+argument: .eq., .gt., .lt., .un., or value of 0-3.
+The following list specifies the format for
+each addressing mode supported by AS2650:
+
+.skip
+.literal
+	#data		immediate byte data
+
+	r0,r1,r2,r3	registers
+
+	addr		location/branch address
+
+	[addr]     or	indirect addressing
+	@addr
+
+	[addr,r0]  or	register indexed
+	@addr,r0	indirect addressing
+
+	[addr,-r0] or	autodecrement register indexed
+	@addr,-r0	indirect addressing
+
+	[addr,r0+] or	autoincrement register indexed
+	@addr,r0+	indirect addressing
+
+	.eq.		CC: equal		(== 0)
+	.gt.		CC: greater than	(== 1)
+	.lt.		CC: less than		(== 2)
+	.un.		CC: unconditional	(== 3)
+.end literal
+
+.skip
+The terms data, label, and addr may all be expressions.
+
+Note that not all addressing modes are valid with every instruction,
+refer to the 2650 technical data for valid modes.
+
+
+.test page 8
+.header level 2;Load / Store Instructions
+
+.literal
+	lodz	r		lodi	#data
+	lodr	[]		loda	[]
+
+	stoz	r
+	stor	[]		stoa	[]
+.end literal
+
+
+.test page 13
+.header level 2;Arithmetic / Compare Instructions
+
+.literal
+	addz	r		addi	#data
+	addr	[]		adda	[]
+
+	subz	r		subi	#data
+	subr	[]		suba	[]
+
+	comz	r		comi	#data
+	comr	[]		coma	[]
+
+	dar	r
+.end literal
+
+
+.test page 14
+.header level 2;Logical / Rotate Instructions
+
+.literal
+	andz	r		andi	#data
+	andr	[]		anda	[]
+
+	iorz	r		iori	#data
+	iorr	[]		iora	[]
+
+	eorz	r		eori	#data
+	eorr	[]		eora	[]
+
+	rrr	r
+	rrl	r
+.end literal
+
+
+.test page 10
+.header level 2;Condition Code Branches
+
+.literal
+	bctr	CC,[]		bcta	CC,[]
+
+	bcfr	CC,[]		bcfa	CC,[]
+
+	bstr	CC,[]		bsta	CC,[]
+
+	bsfr	CC,[]		bsta	CC,[]
+.end literal
+
+
+.test page 10
+.header level 2;Register Test Branches
+
+.literal
+	brnr	r,[]		brna	r,[]
+
+	birr	r,[]		bira	r,[]
+
+	bdrr	r,[]		bdra	r,[]
+
+	bsnr	r,[]		bsna	r,[]
+.end literal
+
+
+.test page 8
+.header level 2;Branches (to Subroutines) / Returns
+
+.literal
+	bxa	[]		bsxa	[]
+
+	zbrr	[]		zbsr	[]
+
+	retc	CC		rete	CC
+.end literal
+
+
+.test page 6
+.header level 2;Input / Output
+
+.literal
+	redc	r		wrtc	r
+	redd	r		wrtd	r
+	rede	r,addr		wrte	r,addr
+.end literal
+
+
+.test page 5
+.header level 2;Miscellaneos
+
+.literal
+	halt			nop
+	tmi	r,#data
+.end literal
+
+
+.test page 8
+.header level 2;Program Status
+
+.literal
+	lpsl			lpsu
+	spsl			spsu
+	cpsl	#data		cpsu	#data
+	ppsl	#data		ppsu	#data
+	tpsl	#data		tpsu	#data
+.end literal

@@ -1,0 +1,393 @@
+.appendix AS68(HC[S])12 Assembler
+
+
+.header level 1;Processor Specific Directives
+
+The AS6812 assembler supports the 68HC(S)12 series of
+microprocessors which includes the 68HC(S)8xx and
+68HC(S)9xx series.
+
+.header level 2;.\h\c12 Directive
+
+.break
+Format:
+.skip;.indent 8
+_.hc12
+.skip
+The .hc12 directive selects the HC12 core specific
+cycles count output when the -c command line option is specified.
+
+
+.header level 2;.\h\c\s12 Directive
+
+.break
+Format:
+.skip;.indent 8
+_.hcs12
+.skip
+The .hcs12 directive selects the HCS12 core specific
+cycles count output when the -c command line option is specified.
+
+
+.header level 2;The .____.CPU. Variable
+
+The value of the pre-defined symbol '.____.CPU.' corresponds
+to the selected processor type.  The default value is 0
+which corresponds to the default processor type.  The
+following table lists the processor types and associated
+values for the AS6812 assembler:
+
+.skip 1
+.literal
+	Processor Type		  .__.CPU. Value
+	--------------		  --------------
+	    .hc12			 0
+	    .hcs12			 1
+.end literal
+
+.skip 1
+  The variable '.____.CPU.' is by default defined as local
+and will not be output to the created .rel file.  The
+assembler command line options -g or -a will not cause the
+local symbol to be output to the created .rel file.
+
+  The assembler .globl directive may be used to change the
+variable type to global causing its definition to be
+output to the .rel file.  The inclusion of the definition
+of the variable '.____.CPU.' might be a useful means of
+validating that seperately assembled files have been
+compiled for the same processor type.  The linker will
+report an error for variables with multiple non equal
+definitions.
+
+
+.header level 1;68HC(S)12 Register Set
+
+.break
+The following is a list of the 68HC(S)12 registers used by AS6812:
+.skip
+.literal
+	a,b	-	8-bit accumulators
+	d	-	16-bit accumulator <a:b>
+	x,y	-	index registers
+	sp,s	-	stack pointer
+	pc	-	program counter
+	ccr,cc	-	condition code register
+.end literal	
+
+
+.header level 1;68HC(S)12 Instruction Set
+
+The following tables list all 68HC(S)12 mnemonics recognized by the
+AS6812 assembler. The designation [] refers to a required addressing mode
+argument. The following list specifies the format for
+each addressing mode supported by AS6812:
+
+.skip
+.literal
+	#data		immediate data
+			byte or word data
+
+	ext		extended addressing
+
+	pg		memory page number
+
+	*dir		direct page addressing
+			(see .setdp directive)
+			0 <= dir <= 255 
+
+	label		branch label
+
+	r,r1,r2		registers
+			ccr,a,b,d,x,y,sp,pc
+
+	-x	x-	register indexed, pre or
+	,-x	,x-	post autodecrement by 1
+
+	n,-x	n,x-	register indexed, pre or
+			post autodecrement by 1 - 8
+
+	+x	x+	register indexed, pre or
+	,+x	,x+	post autoincrement by 1
+
+	n,+x	n,x+	register indexed, pre or
+			post autoincrement by 1 - 8
+
+	offset,x	register indexed addressing
+			   -16 <= offset <= 15    ---  5-bit
+			  -256 <= offset <= -17   ---  9-bit
+			    16 <= offset <= 255   ---  9-bit
+			-32768 <= offset <= -257  --- 16-bit
+			   256 <= offset <= 32767 --- 16-bit
+			(external definition of offset
+			 uses 16-bit mode)
+
+	[offset,x]	register indexed indirect addressing
+			-32768 <= offset <= 32767 --- 16-bit
+
+	[,x]		register indexed indirect addressing
+			zero offset
+
+	a,x		accumulator offset indexed addressing
+
+	[d,x]		d accumulator offset indexed
+			indirect addressing
+.end literal
+
+.skip
+The terms data, dir, label, offset, and ext may all be expressions.
+
+Note that not all addressing modes are valid with every instruction,
+refer to the 68HC(S)12 technical data for valid modes.
+
+
+.test page 22
+.header level 2;Inherent Instructions
+
+.literal
+	aba		bgnd		cba
+	daa		dex		dey
+	ediv		edivs		emul
+	emuls		fdiv		idiv
+	idivs		inx		iny
+	mem		mul		nop
+	psha		pshb		pshc
+	pshd		pshx		pshy
+	pula		pulb		pulc
+	puld		pulx		puly
+	rev		revw		rtc
+	rti		rts		sba
+	stop		swi		tab
+	tba		wai		wav
+	wavr
+.end literal
+
+
+.test page 18
+.header level 2;Short Branch Instructions
+
+.literal
+	bcc	label		bcs	label
+	beq	label		bge	label
+	bgt	label		bhi	label
+	bhis	label		bhs	label
+	ble	label		blo	label
+	blos	label		bls	label
+	blt	label		bmi	label
+	bne	label		bpl	label
+	bra	label		brn	label
+	bvc	label		bvs	label
+	bsr	label
+.end literal
+
+
+.test page 17
+.header level 2;Long Branch Instructions
+
+.literal
+	lbcc	label		lbcs	label
+	lbeq	label		lbge	label
+	lbgt	label		lbhi	label
+	lbhis	label		lbhs	label
+	lble	label		lblo	label
+	lblos	label		lbls	label
+	lblt	label		lbmi	label
+	lbne	label		lbpl	label
+	lbra	label		lbrn	label
+	lbvc	label		lbvs	label
+.end literal
+
+
+.test page 10
+.header level 2;Branch on Decrement, Test, or Increment
+
+.literal
+	dbeq	r,label		dbne	r,label
+	ibeq	r,label		ibne	r,label
+	tbeq	r,label		tbne	r,label
+.end literal
+
+
+.test page 9
+.header level 2;Bit Clear and Set Instructions
+
+.literal
+	bclr	[],#data
+	bset	[],#data
+.end literal
+
+
+.test page 9
+.header level 2;Branch on Bit Clear or Set
+
+.literal
+	brclr	[],#data,label
+	brset	[],#data,label
+.end literal
+
+
+.test page 42
+.header level 2;Single Operand Instructions
+
+.literal
+	asla		aslb
+	asl	[]
+
+	asra		asrb
+	asr	[]
+
+	clra		clrb
+	clr	[]
+
+	coma		comb
+	com	[]
+
+	deca		decb
+	dec	[]
+
+	inca		incb
+	inc	[]
+
+	lsla		lslb
+	lsl	[]
+
+	lsra		lsrb
+	lsr	[]
+
+	nega		negb
+	neg	[]
+
+	rola		rolb
+	rol	[]
+
+	rora		rorb
+	ror	[]
+
+	tsta		tstb
+	tst	[]
+.end literal
+
+
+.test page 34
+.header level 2;Double Operand Instructions
+
+.literal
+	adca	[]		adcb	[]
+
+	adda	[]		addb	[]
+
+	anda	[]		andb	[]
+
+	bita	[]		bitb	[]
+
+	cmpa	[]		cmpb	[]
+
+	eora	[]		eorb	[]
+
+	ldaa	[]	<=>	lda	[]
+
+	ldab	[]	<=>	ldb	[]
+
+	oraa	[]	<=>	ora	[]
+
+	orab	[]	<=>	orb	[]
+
+	sbca	[]		sbcb	[]
+
+	staa	[]	<=>	sta	[]
+
+	stab	[]	<=>	stb	[]
+
+	suba	[]		subb	[]
+.end literal
+
+
+.test page 8
+.header level 2;Move Instructions
+
+.literal
+	movb	[],[]		movw	[],[]
+.end literal
+
+
+.test page 10
+.header level 2;D-register Instructions
+
+.literal
+	addd	[]		subd	[]
+	cpd	[]	<=>	cmpd	[]
+	ldd	[]		std	[]
+.end literal
+
+
+.test page 19
+.header level 2;Index_/Stack Register Instructions
+
+.literal
+	cps	[]	<=>	cmps	[]
+	cpx	[]	<=>	cmpx	[]
+	cpy	[]	<=>	cmpy	[]
+
+	lds	[]
+	ldx	[]		ldy	[]
+
+	leas	[]
+	leax	[]		leay	[]
+
+	sts	[]
+	stx	[]		sty	[]
+.end literal
+
+
+.test page 9
+.header level 2;Jump and Jump/Call to Subroutine Instructions
+
+.literal
+	call	[],pg
+	jmp	[]		jsr	[]
+.end literal
+
+
+.test page 14
+.header level 2;Other Special Instructions
+
+.literal
+	emacs	[]
+	emaxd	[]		emaxm	[]
+	emind	[]		eminm	[]
+	etbl	[]
+	maxa	[]		maxm	[]
+	mina	[]		minm	[]
+	tbl	[]		trap	#data
+.end literal
+
+
+.test page 9
+.header level 2;Register - Register Instructions
+
+.literal
+	exg	r1,r2		sex	r1,r2
+	tfr	r1,r2
+.end literal
+
+
+.test page 8
+.header level 2;Condition Code Register Instructions
+
+.literal
+	andcc	#data		orcc	#data
+.end literal
+
+
+.test page 13
+.header level 2;M68HC11 Compatibility Mode Instructions
+
+.literal
+	abx		aby		clc
+	cli		clv		des
+	ins		sec		sei
+	sev		tap		tpa
+	tsx		tsy		txs
+	tys		xgdx		xgdy
+.end literal
+

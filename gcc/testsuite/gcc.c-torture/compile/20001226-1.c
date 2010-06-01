@@ -1,7 +1,7 @@
 /* This does not assemble on m68hc11 because the function is larger
    than 64K.  */
 /* { dg-do assemble } */
-/* { dg-xfail-if "function larger than 64K" { m6811-*-* } { "*" } { "" } } */
+/* { dg-xfail-if "function larger than 64K" { m6809-*-* m6811-*-* } { "*" } { "" } } */
 /* { dg-xfail-if "jump beyond 128K not supported" { xtensa-*-* } { "-O0" } { "" } } */
 /* { dg-xfail-if "PR36698" { spu-*-* } { "-O0" } { "" } } */
 /* { dg-skip-if "" { m32c-*-* } { "*" } { "" } } */
