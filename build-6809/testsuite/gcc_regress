@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # run - run GCC 6809 regression test.  This script runs selected
 # testcases that have been known to fail.  This is a faster way of
