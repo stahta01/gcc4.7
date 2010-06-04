@@ -2243,6 +2243,7 @@ void
 m6809_output_ascii (FILE *fp, const char *str, unsigned long size)
 {
 	unsigned long i;
+	bool use_ascii = true;
 
 	/* If the size is too large, then break this up into multiple
 	outputs.  The assembler can only output roughly 48 bytes at a
@@ -2256,15 +2257,30 @@ m6809_output_ascii (FILE *fp, const char *str, unsigned long size)
 		return;
 	}
 
-	fprintf (fp, "\t.ascii \"");
+	/* Check for 8-bit codes, which cannot be embedded in an .ascii */
+	for (i = 0; i < size; i++)
+	{
+		int c = str[i] & 0377;
+		if (c >= 0x80)
+		{
+			use_ascii = false;
+			break;
+		}
+	}
+
+	if (use_ascii)
+		fprintf (fp, "\t.ascii \"");
 
 	for (i = 0; i < size; i++)
 	{
 		int c = str[i] & 0377;
 
+		if (use_ascii)
+		{
 		/* Just output the plain character if it is printable,
 		otherwise output the escape code for the character.
-		The assembler recognizes the same C-style escape sequences. */
+		The assembler recognizes the same C-style octal escape sequences,
+		except that it only supports 7-bit codes. */
 		if (c >= ' ' && c < 0177 && c != '\\' && c != '"')
   			putc (c, fp);
 		else switch (c) 
@@ -2291,8 +2307,15 @@ m6809_output_ascii (FILE *fp, const char *str, unsigned long size)
 				fprintf (fp, "\\%03o", c);
 				break;
 		}
+		}
+		else
+		{
+			fprintf (fp, "\t.byte\t0x%02X\n", c);
+		}
 	}
-	fprintf (fp, "\"\n");
+
+	if (use_ascii)
+		fprintf (fp, "\"\n");
 }
 
 
