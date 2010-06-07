@@ -235,6 +235,55 @@ ___clzsi2:
 	rts
 #endif
 
+#ifdef L_ctzsi2
+	.area .text
+	.globl ___ctzhi2
+	; Input: X = 16-bit unsigned integer
+	; Output: X = number of trailing zeros
+	; F(x) = 15 - clzhi2(X & -x)
+	; This function destroys the value in D.
+___ctzhi2:
+	tfr	x,d
+	coma
+	comb
+	addd	#1
+	pshs	a
+	pshs	b
+	tfr	x,d
+	andb	,s+
+	anda	,s+
+	tfr	d,x
+	jsr	___clzhi2
+	tfr	x,d
+	subd	#16
+	coma
+	comb
+	tfr	d,x
+	rts
+#endif
+
+
+#ifdef L_ctzdi2
+	.area .text
+	.globl ___ctzsi2
+	; Input: 32-bit unsigned integer is on the stack, just
+	; above the return address
+	; Output: X = number of leading zeros
+___ctzsi2:
+	; Check the lower 16-bit word
+	; If it is not zero, then return ctzhi2(X).
+	; A branch can be used instead of a call since no
+	; postprocessing is needed.  Use long branch form
+	; though since functions may not be near each other.
+	ldx	4,s
+	lbne	___ctzhi2
+	ldx	2,s
+	jsr	___ctzhi2
+	leax	16,x
+	rts
+#endif
+
+
 #ifdef L_mulhi3
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; ___mulhi3 - signed/unsigned multiply

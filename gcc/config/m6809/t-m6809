@@ -7,7 +7,7 @@ LIB1ASMSRC = m6809/libgcc1.s
 
 # Here are the functions that are implemented within libgcc1.s
 LIB1ASMFUNCS = _mulhi3 _divhi3 _modhi3 _udivhi3 _umodhi3 \
-	_euclid _seuclid _clzsi2 _clzdi2 _softregs \
+	_euclid _seuclid _clzsi2 _clzdi2 _ctzsi2 _ctzdi2 _softregs \
 	_ashlhi3 _ashrhi3 _lshrhi3
 
 # Flags to use when building libgcc.  IN_GCC does not seem necessary,
