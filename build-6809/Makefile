@@ -349,5 +349,6 @@ source-tarball:
 
 .PHONY : source-patch
 source-patch:
-	cd .. \
-	&& git diff -p --exclude='.git*' --exclude='*.exe' --exclude='patches' --exclude='gcc.sum' --exclude='m6809-run.log' --exclude='web' $(UPSTREAM)
+	cd .. && git diff release-4.3.4 | build-6809/patch_filter '\.git.*' '\.exe\$$' 'patches' \
+		'gcc.sum' 'gcc-.*.sum' 'm6809-run.log' '^build-6809\/web\/' 'as6809\.conf\.example' \
+		'djgpp' 'build-6809\/doc\/' 'autobuild-gcc6809' > gcc6809-4.3.4-3.patch
