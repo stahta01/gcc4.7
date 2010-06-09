@@ -1,4 +1,4 @@
-Test Run By bcd on Fri Jun  4 09:21:21 2010
+Test Run By bcd on Wed Jun  9 16:19:51 2010
 Target is m6809-unknown-none
 Host   is i686-pc-linux-gnu
 
@@ -5774,18 +5774,12 @@ PASS: gcc.c-torture/compile/pr35171.c  -O3 -fomit-frame-pointer -funroll-loops  
 PASS: gcc.c-torture/compile/pr35171.c  -O3 -fomit-frame-pointer -funroll-all-loops -finline-functions  (test for excess errors)
 PASS: gcc.c-torture/compile/pr35171.c  -O3 -g  (test for excess errors)
 PASS: gcc.c-torture/compile/pr35171.c  -Os  (test for excess errors)
-FAIL: gcc.c-torture/compile/pr35318.c  -O0  (internal compiler error)
-FAIL: gcc.c-torture/compile/pr35318.c  -O0  (test for excess errors)
-FAIL: gcc.c-torture/compile/pr35318.c  -O1  (internal compiler error)
-FAIL: gcc.c-torture/compile/pr35318.c  -O1  (test for excess errors)
-FAIL: gcc.c-torture/compile/pr35318.c  -O2  (internal compiler error)
-FAIL: gcc.c-torture/compile/pr35318.c  -O2  (test for excess errors)
-FAIL: gcc.c-torture/compile/pr35318.c  -O3 -fomit-frame-pointer  (internal compiler error)
-FAIL: gcc.c-torture/compile/pr35318.c  -O3 -fomit-frame-pointer  (test for excess errors)
-FAIL: gcc.c-torture/compile/pr35318.c  -O3 -g  (internal compiler error)
-FAIL: gcc.c-torture/compile/pr35318.c  -O3 -g  (test for excess errors)
-FAIL: gcc.c-torture/compile/pr35318.c  -Os  (internal compiler error)
-FAIL: gcc.c-torture/compile/pr35318.c  -Os  (test for excess errors)
+UNSUPPORTED: gcc.c-torture/compile/pr35318.c  -O0 
+UNSUPPORTED: gcc.c-torture/compile/pr35318.c  -O1 
+UNSUPPORTED: gcc.c-torture/compile/pr35318.c  -O2 
+UNSUPPORTED: gcc.c-torture/compile/pr35318.c  -O3 -fomit-frame-pointer 
+UNSUPPORTED: gcc.c-torture/compile/pr35318.c  -O3 -g 
+UNSUPPORTED: gcc.c-torture/compile/pr35318.c  -Os 
 PASS: gcc.c-torture/compile/pr35431.c  -O0  (test for excess errors)
 PASS: gcc.c-torture/compile/pr35431.c  -O1  (test for excess errors)
 PASS: gcc.c-torture/compile/pr35431.c  -O2  (test for excess errors)
@@ -5916,12 +5910,12 @@ PASS: gcc.c-torture/compile/pta-1.c  -O2  (test for excess errors)
 PASS: gcc.c-torture/compile/pta-1.c  -O3 -fomit-frame-pointer  (test for excess errors)
 PASS: gcc.c-torture/compile/pta-1.c  -O3 -g  (test for excess errors)
 PASS: gcc.c-torture/compile/pta-1.c  -Os  (test for excess errors)
-FAIL: gcc.c-torture/compile/simd-1.c  -O0  (test for excess errors)
-FAIL: gcc.c-torture/compile/simd-1.c  -O1  (test for excess errors)
-FAIL: gcc.c-torture/compile/simd-1.c  -O2  (test for excess errors)
-FAIL: gcc.c-torture/compile/simd-1.c  -O3 -fomit-frame-pointer  (test for excess errors)
-FAIL: gcc.c-torture/compile/simd-1.c  -O3 -g  (test for excess errors)
-FAIL: gcc.c-torture/compile/simd-1.c  -Os  (test for excess errors)
+UNSUPPORTED: gcc.c-torture/compile/simd-1.c  -O0 
+UNSUPPORTED: gcc.c-torture/compile/simd-1.c  -O1 
+UNSUPPORTED: gcc.c-torture/compile/simd-1.c  -O2 
+UNSUPPORTED: gcc.c-torture/compile/simd-1.c  -O3 -fomit-frame-pointer 
+UNSUPPORTED: gcc.c-torture/compile/simd-1.c  -O3 -g 
+UNSUPPORTED: gcc.c-torture/compile/simd-1.c  -Os 
 PASS: gcc.c-torture/compile/simd-2.c  -O0  (test for excess errors)
 PASS: gcc.c-torture/compile/simd-2.c  -O1  (test for excess errors)
 PASS: gcc.c-torture/compile/simd-2.c  -O2  (test for excess errors)
@@ -5940,12 +5934,12 @@ PASS: gcc.c-torture/compile/simd-4.c  -O2  (test for excess errors)
 PASS: gcc.c-torture/compile/simd-4.c  -O3 -fomit-frame-pointer  (test for excess errors)
 PASS: gcc.c-torture/compile/simd-4.c  -O3 -g  (test for excess errors)
 PASS: gcc.c-torture/compile/simd-4.c  -Os  (test for excess errors)
-FAIL: gcc.c-torture/compile/simd-5.c  -O0  (test for excess errors)
-FAIL: gcc.c-torture/compile/simd-5.c  -O1  (test for excess errors)
-FAIL: gcc.c-torture/compile/simd-5.c  -O2  (test for excess errors)
-FAIL: gcc.c-torture/compile/simd-5.c  -O3 -fomit-frame-pointer  (test for excess errors)
-FAIL: gcc.c-torture/compile/simd-5.c  -O3 -g  (test for excess errors)
-FAIL: gcc.c-torture/compile/simd-5.c  -Os  (test for excess errors)
+UNSUPPORTED: gcc.c-torture/compile/simd-5.c  -O0 
+UNSUPPORTED: gcc.c-torture/compile/simd-5.c  -O1 
+UNSUPPORTED: gcc.c-torture/compile/simd-5.c  -O2 
+UNSUPPORTED: gcc.c-torture/compile/simd-5.c  -O3 -fomit-frame-pointer 
+UNSUPPORTED: gcc.c-torture/compile/simd-5.c  -O3 -g 
+UNSUPPORTED: gcc.c-torture/compile/simd-5.c  -Os 
 PASS: gcc.c-torture/compile/simd-6.c  -O0  (test for excess errors)
 PASS: gcc.c-torture/compile/simd-6.c  -O1  (test for excess errors)
 PASS: gcc.c-torture/compile/simd-6.c  -O2  (test for excess errors)
@@ -15126,21 +15120,21 @@ PASS: gcc.c-torture/execute/built-in-setjmp.c execution,  -O3 -g
 PASS: gcc.c-torture/execute/built-in-setjmp.c compilation,  -Os 
 PASS: gcc.c-torture/execute/built-in-setjmp.c execution,  -Os 
 PASS: gcc.c-torture/execute/builtin-bitops-1.c compilation,  -O0 
-FAIL: gcc.c-torture/execute/builtin-bitops-1.c execution,  -O0 
+PASS: gcc.c-torture/execute/builtin-bitops-1.c execution,  -O0 
 PASS: gcc.c-torture/execute/builtin-bitops-1.c compilation,  -O1 
-FAIL: gcc.c-torture/execute/builtin-bitops-1.c execution,  -O1 
+PASS: gcc.c-torture/execute/builtin-bitops-1.c execution,  -O1 
 PASS: gcc.c-torture/execute/builtin-bitops-1.c compilation,  -O2 
-FAIL: gcc.c-torture/execute/builtin-bitops-1.c execution,  -O2 
+PASS: gcc.c-torture/execute/builtin-bitops-1.c execution,  -O2 
 PASS: gcc.c-torture/execute/builtin-bitops-1.c compilation,  -O3 -fomit-frame-pointer 
-FAIL: gcc.c-torture/execute/builtin-bitops-1.c execution,  -O3 -fomit-frame-pointer 
+PASS: gcc.c-torture/execute/builtin-bitops-1.c execution,  -O3 -fomit-frame-pointer 
 PASS: gcc.c-torture/execute/builtin-bitops-1.c compilation,  -O3 -fomit-frame-pointer -funroll-loops 
-FAIL: gcc.c-torture/execute/builtin-bitops-1.c execution,  -O3 -fomit-frame-pointer -funroll-loops 
+PASS: gcc.c-torture/execute/builtin-bitops-1.c execution,  -O3 -fomit-frame-pointer -funroll-loops 
 PASS: gcc.c-torture/execute/builtin-bitops-1.c compilation,  -O3 -fomit-frame-pointer -funroll-all-loops -finline-functions 
-FAIL: gcc.c-torture/execute/builtin-bitops-1.c execution,  -O3 -fomit-frame-pointer -funroll-all-loops -finline-functions 
+PASS: gcc.c-torture/execute/builtin-bitops-1.c execution,  -O3 -fomit-frame-pointer -funroll-all-loops -finline-functions 
 PASS: gcc.c-torture/execute/builtin-bitops-1.c compilation,  -O3 -g 
-FAIL: gcc.c-torture/execute/builtin-bitops-1.c execution,  -O3 -g 
+PASS: gcc.c-torture/execute/builtin-bitops-1.c execution,  -O3 -g 
 PASS: gcc.c-torture/execute/builtin-bitops-1.c compilation,  -Os 
-FAIL: gcc.c-torture/execute/builtin-bitops-1.c execution,  -Os 
+PASS: gcc.c-torture/execute/builtin-bitops-1.c execution,  -Os 
 PASS: gcc.c-torture/execute/builtin-constant.c compilation,  -O0 
 PASS: gcc.c-torture/execute/builtin-constant.c execution,  -O0 
 PASS: gcc.c-torture/execute/builtin-constant.c compilation,  -O1 
@@ -15688,17 +15682,17 @@ PASS: gcc.c-torture/execute/ffs-1.c execution,  -Os
 PASS: gcc.c-torture/execute/ffs-2.c compilation,  -O0 
 PASS: gcc.c-torture/execute/ffs-2.c execution,  -O0 
 PASS: gcc.c-torture/execute/ffs-2.c compilation,  -O1 
-FAIL: gcc.c-torture/execute/ffs-2.c execution,  -O1 
+PASS: gcc.c-torture/execute/ffs-2.c execution,  -O1 
 PASS: gcc.c-torture/execute/ffs-2.c compilation,  -O2 
-FAIL: gcc.c-torture/execute/ffs-2.c execution,  -O2 
+PASS: gcc.c-torture/execute/ffs-2.c execution,  -O2 
 PASS: gcc.c-torture/execute/ffs-2.c compilation,  -O3 -fomit-frame-pointer 
-FAIL: gcc.c-torture/execute/ffs-2.c execution,  -O3 -fomit-frame-pointer 
+PASS: gcc.c-torture/execute/ffs-2.c execution,  -O3 -fomit-frame-pointer 
 PASS: gcc.c-torture/execute/ffs-2.c compilation,  -O3 -fomit-frame-pointer -funroll-loops 
-FAIL: gcc.c-torture/execute/ffs-2.c execution,  -O3 -fomit-frame-pointer -funroll-loops 
+PASS: gcc.c-torture/execute/ffs-2.c execution,  -O3 -fomit-frame-pointer -funroll-loops 
 PASS: gcc.c-torture/execute/ffs-2.c compilation,  -O3 -fomit-frame-pointer -funroll-all-loops -finline-functions 
-FAIL: gcc.c-torture/execute/ffs-2.c execution,  -O3 -fomit-frame-pointer -funroll-all-loops -finline-functions 
+PASS: gcc.c-torture/execute/ffs-2.c execution,  -O3 -fomit-frame-pointer -funroll-all-loops -finline-functions 
 PASS: gcc.c-torture/execute/ffs-2.c compilation,  -O3 -g 
-FAIL: gcc.c-torture/execute/ffs-2.c execution,  -O3 -g 
+PASS: gcc.c-torture/execute/ffs-2.c execution,  -O3 -g 
 PASS: gcc.c-torture/execute/ffs-2.c compilation,  -Os 
 PASS: gcc.c-torture/execute/ffs-2.c execution,  -Os 
 FAIL: gcc.c-torture/execute/float-floor.c compilation,  -O0 
@@ -19256,11 +19250,11 @@ PASS: gcc.c-torture/execute/zerolen-2.c execution,  -Os
 
 		=== gcc Summary ===
 
-# of expected passes		18493
-# of unexpected failures	441
+# of expected passes		18507
+# of unexpected failures	403
 # of unexpected successes	5
 # of expected failures		16
 # of unresolved testcases	135
-# of unsupported tests		134
+# of unsupported tests		152
 /oldhome/bcd/src/git/gcc/build-6809/m6809-unknown-none/gcc/xgcc  version 4.3.4 (gcc6809) (GCC) 
 
