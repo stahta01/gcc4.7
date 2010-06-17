@@ -90,9 +90,6 @@ static const char subversion_tag[] =
 /* macro to return TRUE if length of operand mode is one byte */
 #define BYTE_MODE(X) ((GET_MODE_SIZE (GET_MODE (X))) == 1)
 
-#if (TARGET_GCC_VERSION >= 4003)
-#define builtin_function add_builtin_function
-#endif
 
 /* REAL_REG_P(x) is a true if the rtx 'x' represents a real CPU
 register and not a fake one that is emulated in software. */
@@ -155,15 +152,6 @@ int section_changed = 0;
 char code_section_op[128] = "\t.area .text";
 char data_section_op[128] = "\t.area .data";
 char bss_section_op[128] = "\t.area .bss";
-
-#if (TARGET_GCC_VERSION < 4002)
-const char *code_section_ptr = 0;
-const char *data_section_ptr = 0;
-const char *bss_section_ptr = 0;
-const char *far_code_page_option = 0;
-const char *m6809_soft_reg_count = 0;
-const char *m6809_abi_version_ptr = 0;
-#endif
 const char *code_bank_option = 0;
 
 /* TRUE if the direct mode prefix might be valid in this context.
@@ -653,11 +641,7 @@ m6809_get_live_regs (void)
 		regs |= (1 << HARD_FRAME_POINTER_REGNUM);
 
 	for (regno = HARD_X_REGNUM; regno <= HARD_U_REGNUM; regno++)
-#if (TARGET_GCC_VERSION < 4003)
-		if (regs_ever_live[regno] && ! call_used_regs[regno])
-#else
 		if (df_regs_ever_live_p (regno) && ! call_used_regs[regno])
-#endif
 			regs |= (1 << regno);
 
 	return regs;
@@ -867,25 +851,21 @@ m6809_get_actual_frame_size (int register_flag)
 #define BAD_PRAGMA(msgid, arg) \
 	do { warning (WARNING_OPT msgid, arg); return -1; } while (0)
 
-#if (TARGET_GCC_VERSION > 4001)
-#define c_lex pragma_lex
-#endif
-
 static int
 pragma_parse (const char *name, tree *sect)
 {
   tree s, x;
 
-  if (c_lex (&x) != CPP_OPEN_PAREN)
+  if (pragma_lex (&x) != CPP_OPEN_PAREN)
     BAD_PRAGMA ("missing '(' after '#pragma %s' - ignored", name);
 
-  if (c_lex (&s) != CPP_STRING)
+  if (pragma_lex (&s) != CPP_STRING)
     BAD_PRAGMA ("missing section name in '#pragma %s' - ignored", name);
 
-  if (c_lex (&x) != CPP_CLOSE_PAREN)
+  if (pragma_lex (&x) != CPP_CLOSE_PAREN)
     BAD_PRAGMA ("missing ')' for '#pragma %s' - ignored", name);
 
-  if (c_lex (&x) != CPP_EOF)
+  if (pragma_lex (&x) != CPP_EOF)
     warning (WARNING_OPT "junk at end of '#pragma %s'", name);
 
   *sect = s;
@@ -1705,34 +1685,34 @@ m6809_init_builtins (void)
 				tree_cons (NULL_TREE, unsigned_char_type_node, void_list_node)));
 
 	/* Register each builtin function. */
-	builtin_function ("__builtin_swi", void_ftype_void,
+	add_builtin_function ("__builtin_swi", void_ftype_void,
 		M6809_SWI, BUILT_IN_MD, NULL, NULL_TREE);
 
-	builtin_function ("__builtin_swi2", void_ftype_void,
+	add_builtin_function ("__builtin_swi2", void_ftype_void,
 		M6809_SWI2, BUILT_IN_MD, NULL, NULL_TREE);
 
-	builtin_function ("__builtin_swi3", void_ftype_void,
+	add_builtin_function ("__builtin_swi3", void_ftype_void,
 		M6809_SWI3, BUILT_IN_MD, NULL, NULL_TREE);
 
-	builtin_function ("__builtin_cwai", void_ftype_uchar,
+	add_builtin_function ("__builtin_cwai", void_ftype_uchar,
 		M6809_CWAI, BUILT_IN_MD, NULL, NULL_TREE);
 
-	builtin_function ("__builtin_sync", void_ftype_void,
+	add_builtin_function ("__builtin_sync", void_ftype_void,
 		M6809_SYNC, BUILT_IN_MD, NULL, NULL_TREE);
 
-	builtin_function ("__builtin_nop", void_ftype_void,
+	add_builtin_function ("__builtin_nop", void_ftype_void,
 		M6809_NOP, BUILT_IN_MD, NULL, NULL_TREE);
 
-	builtin_function ("__builtin_blockage", void_ftype_void,
+	add_builtin_function ("__builtin_blockage", void_ftype_void,
 		M6809_BLOCKAGE, BUILT_IN_MD, NULL, NULL_TREE);
 
-	builtin_function ("__builtin_add_decimal", uchar_ftype_uchar2,
+	add_builtin_function ("__builtin_add_decimal", uchar_ftype_uchar2,
 		M6809_ADD_DECIMAL, BUILT_IN_MD, NULL, NULL_TREE);
 
-	builtin_function ("__builtin_add_carry", uchar_ftype_uchar2,
+	add_builtin_function ("__builtin_add_carry", uchar_ftype_uchar2,
 		M6809_ADD_CARRY, BUILT_IN_MD, NULL, NULL_TREE);
 
-	builtin_function ("__builtin_sub_carry", uchar_ftype_uchar2,
+	add_builtin_function ("__builtin_sub_carry", uchar_ftype_uchar2,
 		M6809_SUB_CARRY, BUILT_IN_MD, NULL, NULL_TREE);
 }
 
@@ -1751,40 +1731,12 @@ m6809_builtin_operand (tree arglist, enum machine_mode mode, int opnum)
 	tree arg;
 	rtx r;
 
-#if (TARGET_GCC_VERSION >= 4003)
 	arg = CALL_EXPR_ARG (arglist, opnum);
-#else
-	/* First get the tree for the argument */
-	switch (opnum)
-	{
-		case 0:
-			arg = TREE_VALUE (arglist);
-			break;
-
-		case 1:
-			arg = TREE_VALUE (TREE_CHAIN (arglist));
-			break;
-
-		case 2:
-			arg = TREE_VALUE (TREE_CHAIN (TREE_VALUE (TREE_CHAIN (arglist))));
-			break;
-
-		default:
-			return NULL_RTX;
-	}
-#endif
 
 	/* Convert the tree to RTL */
 	r = expand_expr (arg, NULL_RTX, mode, 0);
 	if (r == NULL_RTX)
 		return NULL_RTX;
-
-#if (TARGET_GCC_VERSION <= 4001)
-	/* Not sure why this is needed, but every other backend does it. */
-	r = protect_from_queue (r, 0);
-	if (r == NULL_RTX)
-		return NULL_RTX;
-#endif
 	return r;
 }
 
@@ -1798,13 +1750,8 @@ m6809_expand_builtin (tree exp,
 	enum machine_mode mode ATTRIBUTE_UNUSED,
 	int ignore ATTRIBUTE_UNUSED )
 {
-#if (TARGET_GCC_VERSION >= 4003)
    tree fndecl = TREE_OPERAND (CALL_EXPR_FN (exp), 0);
 	tree arglist = exp;
-#else
-	tree fndecl = TREE_OPERAND (TREE_OPERAND (exp, 0), 0);
-	tree arglist = TREE_OPERAND (exp, 1);
-#endif
 	unsigned int fcode = DECL_FUNCTION_CODE (fndecl);
 	rtx r0, r1;
 
@@ -1920,7 +1867,7 @@ far_function_type_p (tree type)
 const char *
 far_functionp (rtx x)
 {
-	tree decl, decltype;
+	tree decl, decl_type;
 	const char *page;
 
 	/* Find the FUNCTION_DECL corresponding to the rtx being called. */
@@ -1936,10 +1883,10 @@ far_functionp (rtx x)
 
 	/* No, lookup the type of the function and see if the type
 	 * specifies far or not. */
-	decltype = TREE_TYPE (decl);
-	if (decltype == NULL_TREE)
+	decl_type = TREE_TYPE (decl);
+	if (decl_type == NULL_TREE)
 		return NULL;
-	return far_function_type_p (decltype);
+	return far_function_type_p (decl_type);
 }
 
 
@@ -2024,7 +1971,7 @@ m6809_init_cumulative_args (CUMULATIVE_ARGS cum ATTRIBUTE_UNUSED,
 	 * should give an error if a stack parameter is generated. */
 	if (fntype)
 	{
-		char *called_page = far_function_type_p (fntype);
+		const char *called_page = far_function_type_p (fntype);
 		if (called_page && strcmp (called_page, far_code_page) && !TARGET_FAR_STACK_PARAM)
 			cum |= CUM_STACK_INVALID;
 	}
@@ -2736,7 +2683,7 @@ m6809_hard_regno_mode_ok (unsigned int regno, enum machine_mode mode)
 /* exp is the call expression.  DECL is the called function,
  * or NULL for an indirect call */
 bool
-m6809_function_ok_for_sibcall (tree decl, tree exp)
+m6809_function_ok_for_sibcall (tree decl, tree exp ATTRIBUTE_UNUSED)
 {
 	tree type, arg;
    const char *name;

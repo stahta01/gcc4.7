@@ -39,11 +39,6 @@ along with GCC; see the file COPYING3.  If not see
 <http://www.gnu.org/licenses/>.  */
 
 
-/* Assume version 4.3 */
-#ifndef TARGET_GCC_VERSION
-#define TARGET_GCC_VERSION 4003
-#endif
-
 /* Helper macros for creating strings with macros */
 #define C_STRING(x) C_STR(x)
 #define C_STR(x) #x
@@ -689,7 +684,7 @@ enum reg_class {
 	Command-line options can adjust this behavior somewhat.
  */
 #define FUNCTION_ARG(CUM, MODE, TYPE, NAMED) \
-	((MODE == VOIDmode) ? ((CUM) & CUM_STACK_MASK) : \
+	((MODE == VOIDmode) ? NULL_RTX : \
 	((MODE == BLKmode) || (GET_MODE_SIZE (MODE) > 2)) ? NULL_RTX : \
 	((MODE == QImode) && !((CUM) & (CUM_STACK_ONLY | CUM_B_MASK))) ? \
 		gen_rtx_REG (QImode, HARD_D_REGNUM) : \
@@ -924,14 +919,7 @@ enum reg_class {
    has an effect that depends on the machine mode it is used for.
 	In the latest GCC, this case is already handled by the core code
 	so no action is required here. */
-#if (TARGET_GCC_VERSION < 4003)
-#define GO_IF_MODE_DEPENDENT_ADDRESS(ADDR,LABEL) \
-{ if (GET_CODE (ADDR) == POST_INC || GET_CODE (ADDR) == PRE_DEC) \
-    goto LABEL; \
-}
-#else
 #define GO_IF_MODE_DEPENDENT_ADDRESS(ADDR,LABEL) {}
-#endif
 
 
 /*--------------------------------------------------------------
@@ -1012,12 +1000,6 @@ enum reg_class {
    is a byte address (for indexing purposes)
    so give the MEM rtx a byte's mode.  */
 #define FUNCTION_MODE HImode
-
-/* Define TARGET_MEM_FUNCTIONS if we want to use calls to memcpy and
- * memset, instead of the BSD functions bcopy and bzero.  */
-#if (TARGET_GCC_VERSION < 4000)
-#define TARGET_MEM_FUNCTIONS
-#endif
 
 /* Define the cost of moving a value from a register in CLASS1
  * to CLASS2, of a given MODE.
@@ -1162,16 +1144,6 @@ dtors_section ()                                                        \
 #undef DO_GLOBAL_DTORS_BODY
 
 #define HAS_INIT_SECTION
-
-
-/* Taken from ../sparc/svr4.h */
-/* A C statement to output something to the assembler file to switch to section
-   NAME for object DECL which is either a FUNCTION_DECL, a VAR_DECL or
-   NULL_TREE.  Some target formats do not support arbitrary sections.  Do not
-   define this macro in such cases.  */
-#if (TARGET_GCC_VERSION < 4000) 
-#undef  ASM_OUTPUT_SECTION_NAME /* Override earlier definition.  */
-#endif
 
 /* This is how to output an assembler line
    that says to advance the location counter
@@ -1319,7 +1291,7 @@ do { \
 /* This is how to output an internal numbered label where
    PREFIX is the class of label and NUM is the number within the class.  */
 
-#define M6809_OUTPUT_INTERNAL_LABEL(FILE,PREFIX,NUM) \
+/* #define M6809_OUTPUT_INTERNAL_LABEL(FILE,PREFIX,NUM) \
   fprintf (FILE, "%s%ld:\n", PREFIX, NUM)
 
 #define ASM_OUTPUT_CASE_LABEL(FILE,PREFIX,NUM,TABLE) \
@@ -1328,13 +1300,14 @@ do { \
 
 #define ASM_OUTPUT_CASE_END(FILE,NUM,TABLE) \
   ASM_OUTPUT_ALIGN (FILE, 1)
+*/
 
 /* This is how to store into the string LABEL
    the symbol_ref name of an internal numbered label where
    PREFIX is the class of label and NUM is the number within the class.
    This is suitable for output with `assemble_name'.  */
 #define ASM_GENERATE_INTERNAL_LABEL(LABEL,PREFIX,NUM) \
-  sprintf (LABEL, "*%s%d", PREFIX, NUM)
+  sprintf (LABEL, "*%s%lu", PREFIX, (unsigned long int)NUM)
 
 /* This is how to output an assembler line defining an `int' constant.  */
 #define ASM_OUTPUT_INT(FILE,VALUE) \
@@ -1348,15 +1321,6 @@ do { \
   output_addr_const (FILE, (VALUE)), \
   fprintf (FILE, "\n"))
 
-#define ASM_OUTPUT_CHAR(FILE,VALUE) \
-( fprintf (FILE, "\t.byte "), \
-  output_addr_const (FILE, (VALUE)), \
-  fprintf (FILE, "\n"))
-
-/* This is how to output an assembler line for a numeric constant byte.  */
-#define ASM_OUTPUT_BYTE(FILE,VALUE) \
-  fprintf (FILE, "\t.byte %#x\n", (VALUE))
-
 /* This is how to output a string. */ 
 #define ASM_OUTPUT_ASCII(FILE,STR,SIZE) m6809_output_ascii (FILE, STR, SIZE)
 
@@ -1364,29 +1328,24 @@ do { \
    It need not be very fast code.  */
 
 #define ASM_OUTPUT_REG_PUSH(FILE,REGNO) \
-   fprintf (FILE, "\tpshs\t%s\n", \
-	    reg_names[REGNO])
+   fprintf (FILE, "\tpshs\t%s\n", reg_names[REGNO])
 
 /* This is how to output an insn to pop a register from the stack.
    It need not be very fast code.  */
 
 #define ASM_OUTPUT_REG_POP(FILE,REGNO) \
-   fprintf (FILE, "\tpuls\t%s\n", \
-	    reg_names[REGNO])
+   fprintf (FILE, "\tpuls\t%s\n", reg_names[REGNO])
 
 /* This is how to output an element of a case-vector that is absolute. */
 
 #define ASM_OUTPUT_ADDR_VEC_ELT(FILE, VALUE) \
   fprintf (FILE, "\t.word L%u\n", VALUE)
 
-/* This is how to output an element of a case-vector that is relative.  
-*/
+/* This is how to output an element of a case-vector that is relative. */
 
 #define ASM_OUTPUT_ADDR_DIFF_ELT(FILE, BODY, VALUE, REL) \
   fprintf (FILE, "\t.word L%u-L%u\n", VALUE, REL)
 
-/* This is how to output an assembler line
-   that says to advance the location counter by SIZE bytes.  */
 
 /*****************************************************************************
 **
@@ -1414,13 +1373,8 @@ do { \
   } while (0)
 
 /* bss_section switched from a variable to a function at some point... */
-#if (TARGET_GCC_VERSION < 4002)
-#define M6809_BSS_SECTION bss_section ()
-#define M6809_TEXT_SECTION text_section ()
-#else
 #define M6809_BSS_SECTION switch_to_section (bss_section)
 #define M6809_TEXT_SECTION switch_to_section (text_section)
-#endif
 
 /* This says how to output an assembler line
    to define a global common symbol.  */
@@ -1449,7 +1403,7 @@ do { \
 
 #define ASM_FORMAT_PRIVATE_NAME(OUTPUT, NAME, LABELNO) \
 ( (OUTPUT) = (char *) alloca (strlen ((NAME)) + 10), \
-  sprintf ((OUTPUT), "%s.%u", (NAME), (LABELNO)))
+  sprintf ((OUTPUT), "%s.%lu", (NAME), (unsigned long int)(LABELNO)))
 
 /* Print an instruction operand X on file FILE.
    CODE is the code from the %-spec for printing this operand.
