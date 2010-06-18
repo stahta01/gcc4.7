@@ -37,13 +37,6 @@ You should have received a copy of the GNU General Public License
 along with GCC; see the file COPYING3.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-/*
- * This GCC machine configuration has been designed to be portable to
- * a number of different gcc versions at once.  TARGET_GCC_VERSION
- * is used to determine the exact version at compile time.  There are
- * many differences that must be handled by testing this value.
- */
-
 #include <string.h>
 #include <time.h>
 #include <sys/types.h>
@@ -75,17 +68,6 @@ along with GCC; see the file COPYING3.  If not see
 #include "toplev.h"
 #include "optabs.h"
 #include "version.h"
-
-/** Define GCC_SUBVERSION_TAG to a string value to identify
- * further this particular version of the compiler.  The tag
- * value is displayed in assembler listings. */
-static const char subversion_tag[] =
-#ifdef GCC_SUBVERSION_TAG
-	C_STRING(GCC_SUBVERSION_TAG)
-#else
-	"[no tag]"
-#endif
-	;
 
 /* macro to return TRUE if length of operand mode is one byte */
 #define BYTE_MODE(X) ((GET_MODE_SIZE (GET_MODE (X))) == 1)
@@ -130,7 +112,6 @@ static void m6809_encode_section_info PARAMS ((tree, int ));
 #undef TARGET_EXPAND_BUILTIN
 #define TARGET_EXPAND_BUILTIN m6809_expand_builtin
 
-/* For GCC 4.1 and up */
 #undef TARGET_DEFAULT_TARGET_FLAGS
 #define TARGET_DEFAULT_TARGET_FLAGS (MASK_REG_ARGS | MASK_DIRECT)
 
@@ -812,35 +793,6 @@ m6809_declare_function_name (FILE *asm_out_file, const char *name, tree decl)
 
 	/* Emit the label for the function's name */
 	ASM_OUTPUT_LABEL (asm_out_file, name);
-}
-
-
-int
-m6809_get_actual_frame_size (int register_flag)
-{
-   unsigned int frame_size = 0;
-
-   /*
-    * Compute the number of bytes of stack size needed to
-    * be saved/restored.  This is the sum of:
-    *    1. The outgoing argument size, if enabled
-    *    2. The number of bytes for local variables
-    *    3. The space for saving/restoring used registers.
-	 *    Include this only if register_flag is nonzero.
-    */
-	if (ACCUMULATE_OUTGOING_ARGS)
-#if (TARGET_GCC_VERSION >= 4004)
-		frame_size += crtl->outgoing_args_size;
-#else
-		frame_size += current_function_outgoing_args_size;
-#endif
-
-   frame_size += get_frame_size ();
-
-	if (register_flag)
-   	frame_size += m6809_get_regs_size (m6809_get_live_regs ());
-	
-	return (frame_size);
 }
 
 
@@ -2030,8 +1982,8 @@ m6809_asm_file_start (void)
 {
 	const char *module_name;
 
-	fprintf (asm_out_file, "\n;;; gcc for m6809 : %s %s %s\n",
-		__DATE__, __TIME__, subversion_tag);
+	fprintf (asm_out_file, "\n;;; gcc for m6809 : %s %s\n",
+		__DATE__, __TIME__);
 	fprintf (asm_out_file, ";;; %s\n", version_string);
 
 	fprintf (asm_out_file, ";;; ABI version %d\n", m6809_abi_version);
@@ -2094,19 +2046,29 @@ prologue_epilogue_required (void)
 void
 emit_prologue_insns (void)
 {
+  rtx insn;
   unsigned int live_regs = m6809_get_live_regs ();
-  unsigned int frame_size = m6809_get_actual_frame_size (false);
+  unsigned int frame_size = get_frame_size ();
 
   if (live_regs && !m6809_current_function_has_type_attr_p ("interrupt"))
-    emit_insn (
+  {
+    insn = emit_insn (
       gen_rtx_register_pushpop (UNSPEC_PUSH_RS, live_regs));
+    RTX_FRAME_RELATED_P (insn) = 1;
+  }
 
   if (frame_size != 0)
-    emit_insn (gen_rtx_stack_adjust (MINUS, frame_size));
- 
+  {
+    insn = emit_insn (gen_rtx_stack_adjust (MINUS, frame_size));
+    RTX_FRAME_RELATED_P (insn) = 1;
+  }
+
   /* Establish a new frame if necessary */
   if (frame_pointer_needed)
-    emit_move_insn (hard_frame_pointer_rtx, stack_pointer_rtx);
+  {
+    insn = emit_move_insn (hard_frame_pointer_rtx, stack_pointer_rtx);
+    RTX_FRAME_RELATED_P (insn) = 1;
+  }
 }
 
 
@@ -2115,7 +2077,7 @@ void
 emit_epilogue_insns (bool sibcall_p)
 {
   unsigned int live_regs = m6809_get_live_regs ();
-  unsigned int frame_size = m6809_get_actual_frame_size (false);
+  unsigned int frame_size = get_frame_size ();
 
   if (frame_size != 0)
     emit_insn (gen_rtx_stack_adjust (PLUS, frame_size));
