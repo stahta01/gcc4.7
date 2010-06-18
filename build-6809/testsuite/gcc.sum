@@ -1,4 +1,4 @@
-Test Run By bcd on Wed Jun  9 16:19:51 2010
+Test Run By bcd on Fri Jun 18 15:41:16 2010
 Target is m6809-unknown-none
 Host   is i686-pc-linux-gnu
 
@@ -389,8 +389,7 @@ PASS: gcc.c-torture/compile/20001222-1.c  -O2  (test for excess errors)
 PASS: gcc.c-torture/compile/20001222-1.c  -O3 -fomit-frame-pointer  (test for excess errors)
 PASS: gcc.c-torture/compile/20001222-1.c  -O3 -g  (test for excess errors)
 PASS: gcc.c-torture/compile/20001222-1.c  -Os  (test for excess errors)
-WARNING: program timed out.
-XFAIL: gcc.c-torture/compile/20001226-1.c  -O0  (test for excess errors)
+XPASS: gcc.c-torture/compile/20001226-1.c  -O0  (test for excess errors)
 XPASS: gcc.c-torture/compile/20001226-1.c  -O1  (test for excess errors)
 XPASS: gcc.c-torture/compile/20001226-1.c  -O2  (test for excess errors)
 XPASS: gcc.c-torture/compile/20001226-1.c  -O3 -fomit-frame-pointer  (test for excess errors)
@@ -1546,12 +1545,12 @@ PASS: gcc.c-torture/compile/20031023-3.c  -O2  (test for excess errors)
 PASS: gcc.c-torture/compile/20031023-3.c  -O3 -fomit-frame-pointer  (test for excess errors)
 PASS: gcc.c-torture/compile/20031023-3.c  -O3 -g  (test for excess errors)
 PASS: gcc.c-torture/compile/20031023-3.c  -Os  (test for excess errors)
-FAIL: gcc.c-torture/compile/20031023-4.c  -O0  (test for excess errors)
-FAIL: gcc.c-torture/compile/20031023-4.c  -O1  (test for excess errors)
-FAIL: gcc.c-torture/compile/20031023-4.c  -O2  (test for excess errors)
-FAIL: gcc.c-torture/compile/20031023-4.c  -O3 -fomit-frame-pointer  (test for excess errors)
-FAIL: gcc.c-torture/compile/20031023-4.c  -O3 -g  (test for excess errors)
-FAIL: gcc.c-torture/compile/20031023-4.c  -Os  (test for excess errors)
+XFAIL: gcc.c-torture/compile/20031023-4.c  -O0  (test for excess errors)
+XFAIL: gcc.c-torture/compile/20031023-4.c  -O1  (test for excess errors)
+XFAIL: gcc.c-torture/compile/20031023-4.c  -O2  (test for excess errors)
+XFAIL: gcc.c-torture/compile/20031023-4.c  -O3 -fomit-frame-pointer  (test for excess errors)
+XFAIL: gcc.c-torture/compile/20031023-4.c  -O3 -g  (test for excess errors)
+XFAIL: gcc.c-torture/compile/20031023-4.c  -Os  (test for excess errors)
 PASS: gcc.c-torture/compile/20031031-1.c  -O0  (test for excess errors)
 PASS: gcc.c-torture/compile/20031031-1.c  -O1  (test for excess errors)
 PASS: gcc.c-torture/compile/20031031-1.c  -O2  (test for excess errors)
@@ -19251,9 +19250,9 @@ PASS: gcc.c-torture/execute/zerolen-2.c execution,  -Os
 		=== gcc Summary ===
 
 # of expected passes		18507
-# of unexpected failures	403
-# of unexpected successes	5
-# of expected failures		16
+# of unexpected failures	397
+# of unexpected successes	6
+# of expected failures		21
 # of unresolved testcases	135
 # of unsupported tests		152
 /oldhome/bcd/src/git/gcc/build-6809/m6809-unknown-none/gcc/xgcc  version 4.3.4 (gcc6809) (GCC) 
