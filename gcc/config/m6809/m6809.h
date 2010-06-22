@@ -1092,54 +1092,6 @@ do { \
 #define DTORS_SECTION_ASM_OP    "\t.area .dtors"
 
 
-/* #define EXTRA_SECTIONS in_ctors, in_dtors */
-
-/* A list of extra section function definitions.  */
- 
-#define CTORS_SECTION_FUNCTION                                          \
-void                                                                    \
-ctors_section ()                                                        \
-{                                                                       \
-  if (in_section != in_ctors)                                           \
-    {                                                                   \
-      fprintf (asm_out_file, "%s\n", CTORS_SECTION_ASM_OP);             \
-      in_section = in_ctors;                                            \
-    }                                                                   \
-}
- 
-#define DTORS_SECTION_FUNCTION                                          \
-void                                                                    \
-dtors_section ()                                                        \
-{                                                                       \
-  if (in_section != in_dtors)                                           \
-    {                                                                   \
-      fprintf (asm_out_file, "%s\n", DTORS_SECTION_ASM_OP);             \
-      in_section = in_dtors;                                            \
-    }                                                                   \
-}
-
-/* A C statement (sans semicolon) to output an element in the table of
-   global constructors.  */
-#undef TARGET_ASM_OUTPUT_CONSTRUCTOR
-#define TARGET_ASM_OUTPUT_CONSTRUCTOR(FILE,NAME)                               \
-  do {                                                                  \
-    ctors_section ();                                                   \
-    fprintf (FILE, "\t%s\t ", ".word");                              \
-    assemble_name (FILE, NAME);                                         \
-    fprintf (FILE, "\n");                                               \
-  } while (0)
- 
-/* A C statement (sans semicolon) to output an element in the table of
-   global destructors.  */
-#undef TARGET_ASM_OUTPUT_DESTRUCTOR
-#define TARGET_ASM_OUTPUT_DESTRUCTOR(FILE,NAME)                                \
-  do {                                                                  \
-    dtors_section ();                                                   \
-    fprintf (FILE, "\t%s\t ", ".word");                              \
-    assemble_name (FILE, NAME);                                         \
-    fprintf (FILE, "\n");                                               \
-  } while (0)
- 
 #undef DO_GLOBAL_CTORS_BODY
 #undef DO_GLOBAL_DTORS_BODY
 
@@ -1218,7 +1170,7 @@ do { \
   fprintf (ASMFILE, ",%d,0,0,", N_SO); \
   assemble_name (ASMFILE, ltext_label_name); \
   fputc ('\n', ASMFILE); \
-  M6809_TEXT_SECTION; \
+  switch_to_section (text_section); \
   (*targetm.asm_out.internal_label) (ASMFILE, "Ltext", 0); \
 } while (0)
 
@@ -1287,20 +1239,6 @@ do { \
 
 /* External references aren't necessary, so don't emit anything */
 #define ASM_OUTPUT_EXTERNAL(FILE,DECL,NAME)
-
-/* This is how to output an internal numbered label where
-   PREFIX is the class of label and NUM is the number within the class.  */
-
-/* #define M6809_OUTPUT_INTERNAL_LABEL(FILE,PREFIX,NUM) \
-  fprintf (FILE, "%s%ld:\n", PREFIX, NUM)
-
-#define ASM_OUTPUT_CASE_LABEL(FILE,PREFIX,NUM,TABLE) \
-  ASM_OUTPUT_ALIGN (FILE, 1); \
-  M6809_OUTPUT_INTERNAL_LABEL(FILE,PREFIX,NUM)
-
-#define ASM_OUTPUT_CASE_END(FILE,NUM,TABLE) \
-  ASM_OUTPUT_ALIGN (FILE, 1)
-*/
 
 /* This is how to store into the string LABEL
    the symbol_ref name of an internal numbered label where
@@ -1372,16 +1310,12 @@ do { \
     } \
   } while (0)
 
-/* bss_section switched from a variable to a function at some point... */
-#define M6809_BSS_SECTION switch_to_section (bss_section)
-#define M6809_TEXT_SECTION switch_to_section (text_section)
-
 /* This says how to output an assembler line
    to define a global common symbol.  */
 
 #define ASM_OUTPUT_COMMON(FILE, NAME, SIZE, ROUNDED) \
   do { \
-  M6809_BSS_SECTION; \
+  switch_to_section (bss_section); \
   fputs ("\t.globl\t", FILE); \
   assemble_name ((FILE), (NAME)); \
   fputs ("\n", FILE); \
@@ -1393,7 +1327,7 @@ do { \
 
 #define ASM_OUTPUT_LOCAL(FILE, NAME, SIZE, ROUNDED) \
 do { \
-  M6809_BSS_SECTION; \
+  switch_to_section (bss_section); \
   assemble_name ((FILE), (NAME)); \
   fprintf ((FILE), ":\t.blkb\t" FMT_HOST_WIDE_INT "\n", (ROUNDED));} while(0)
 
