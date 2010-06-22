@@ -256,7 +256,7 @@ char *argv[];
 		hp = NULL;
 		radix = 10;
 
-		while (getline()) {
+		while (as_getline()) {
 			ip = ib;
 			link();
 		}
@@ -1021,7 +1021,7 @@ doparse()
 	filep = startp;
 	while (1) {
 		ip = ib;
-		if (getline() == 0)
+		if (as_getline() == 0)
 			break;
 		if (pflag && cfp->f_type != F_STD)
 			fprintf(stdout, "ASlink >> %s\n", ip);

@@ -98,7 +98,7 @@ static void append(char *arname, struct lfile *memberp)
    filep = memberp;
    cfp = NULL;
 
-   while ((ret = getline())) {
+   while ((ret = as_getline())) {
       if (ret == 2) {
 	 if (*modname)
 	    fprintf(libf, "L1 %s\n", modname);
@@ -161,7 +161,7 @@ static void replace(char *arname, struct lfile *memberp, int delete)
       replaced = 0;
       cfp = NULL;
 
-      while (getline()) {
+      while (as_getline()) {
 	 ip = ib;
 	 c = getnb();
 	 switch(c) {
@@ -186,7 +186,7 @@ static void replace(char *arname, struct lfile *memberp, int delete)
 			replaced = 1;
 		     }
 
-		     while (getline()) {
+		     while (as_getline()) {
 			if (ib[1] == '1')
 			   break;
 		     }
@@ -271,7 +271,7 @@ static void extract(char *arname, struct lfile *memberp, int create)
    filep = new_lfile(arname);
    cfp = NULL;
 
-   while (getline()) {
+   while (as_getline()) {
       ip = ib;
       c = getnb();
       switch(c) {
@@ -292,7 +292,7 @@ static void extract(char *arname, struct lfile *memberp, int create)
 		     newf = stdout;
 		  }
 
-		  while (getline()) {
+		  while (as_getline()) {
 		     if (ib[1] == '1')
 			break;
 		     fprintf(newf, "%s\n", ib);

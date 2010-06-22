@@ -30,7 +30,6 @@
  * System Include Files
  */
 
-#define _POSIX_C_SOURCE 200112L
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -1073,7 +1072,7 @@ extern	char		endline(void);
 extern	int		get(void);
 extern	VOID		getfid(char *str, int c);
 extern	VOID		getid(char *id, int c);
-extern	int		getline(void);
+extern	int		as_getline(void);
 extern	int		getmap(int d);
 extern	int		getnb(void);
 extern	int		more(void);
@@ -1245,7 +1244,7 @@ extern	char		endline();
 extern	int		get();
 extern	VOID		getfid();
 extern	VOID		getid();
-extern	int		getline();
+extern	int		as_getline();
 extern	int		getmap();
 extern	int		getnb();
 extern	int		more();
