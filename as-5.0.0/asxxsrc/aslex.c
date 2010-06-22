@@ -37,7 +37,7 @@
  *		int	get()
  *		int	getdlm()
  *		VOID	getid()
- *		int	getline()
+ *		int	as_getline()
  *		int	getmap()
  *		int	getnb()
  *		int	getlnm()
@@ -510,9 +510,9 @@ int flag;
 	return(1);
 }
 
-/*)Function	int	getline()
+/*)Function	int	as_getline()
  *
- *	The function getline() reads a line of assembler-source text
+ *	The function as_getline() reads a line of assembler-source text
  *	from an assembly source text file, include file, or macro.
  *	Lines of text are processed from assembler-source files until
  *	all files have been read.  If an include file is opened then
@@ -524,7 +524,7 @@ int flag;
  *	for internal processing by the assembler.  The function
  *	scanline() is called to process any .define substitutions
  *	in the assembler-source text line.  The function
- *	getline() returns a (1) after succesfully reading
+ *	as_getline() returns a (1) after succesfully reading
  *	a line,	or a (0) if all files have been read.
  *
  *	local variables:
@@ -638,7 +638,7 @@ int flag;
  */
 
 int
-getline()
+as_getline()
 {
 	struct asmf *asmt;
 

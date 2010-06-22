@@ -9,7 +9,6 @@
  * Kent, Ohio  44240
  */
 
-#define _POSIX_C_SOURCE 200112L
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -108,7 +107,7 @@ void unget(int c)
 
 
 
-int getline(void)
+int as_getline(void)
 {
    static FILE *sfp = NULL;
    int ret, i;

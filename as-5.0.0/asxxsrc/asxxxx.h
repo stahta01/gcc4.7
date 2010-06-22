@@ -40,7 +40,6 @@
  * System Include Files
  */
 
-#define _POSIX_C_SOURCE 200112L
 #include <stdlib.h>
 #include <stdio.h>
 #include <setjmp.h>
@@ -1184,7 +1183,7 @@ extern	int		get(void);
 extern	int		getdlm(void);
 extern	VOID		getdstr(char *str, int slen);
 extern	VOID		getid(char *id, int c);
-extern	int		getline(void);
+extern	int		as_getline(void);
 extern	int		getmap(int d);
 extern	int		getnb(void);
 extern	int		getlnm(void);
@@ -1361,7 +1360,7 @@ extern	int		get();
 extern	int		getdlm();
 extern	VOID		getdstr();
 extern	VOID		getid();
-extern	int		getline();
+extern	int		as_getline();
 extern	int		getmap();
 extern	int		getnb();
 extern	int		getlnm();

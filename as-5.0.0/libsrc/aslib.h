@@ -55,13 +55,12 @@ extern struct lfile *cfp;
 extern int get();
 extern void getfid();
 extern void getid();
-extern int getline();
+extern int as_getline();
 extern int getnb();
 extern int more();
 extern void skip();
 extern void unget();
 extern FILE *afile(char *fn, char *ft, int wf);
-extern int getline();
 extern int endline();
 
 extern void *new(unsigned int);

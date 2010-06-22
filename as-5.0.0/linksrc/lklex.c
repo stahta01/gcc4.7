@@ -35,7 +35,7 @@
  *		int	get()
  *		VOID	getfid()
  *		VOID	getid()
- *		int	getline()
+ *		int	as_getline()
  *		int	getmap()
  *		int	getnb()
  *		int	more()
@@ -361,7 +361,7 @@ int d;
 	return (c);
 }
 
-/*)Function	int	getline()
+/*)Function	int	as_getline()
  *
  *	The function getline() reads a line of input text from a
  *	.rel source text file, a .lnk command file or from stdin.
@@ -415,7 +415,7 @@ int d;
  */
 
 int
-getline()
+as_getline()
 {
 	int ftype;
 	char *fid;
