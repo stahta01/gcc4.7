@@ -28,7 +28,6 @@ const char * 		m6809_get_regs_printable (unsigned int regs);
 unsigned int 		m6809_get_regs_size (unsigned int regs);
 int 					m6809_function_has_type_attr_p (tree decl, const char *);
 int 					m6809_current_function_has_type_attr_p (const char *);
-int					m6809_get_actual_frame_size (int register_flag);
 int 					prologue_epilogue_required (void);
 int 					noreturn_functionp (rtx x);
 void 					output_function_prologue (FILE *file, int size);

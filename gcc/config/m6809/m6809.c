@@ -2050,6 +2050,7 @@ emit_prologue_insns (void)
   unsigned int live_regs = m6809_get_live_regs ();
   unsigned int frame_size = get_frame_size ();
 
+  /* Save all registers used, including the frame pointer */
   if (live_regs && !m6809_current_function_has_type_attr_p ("interrupt"))
   {
     insn = emit_insn (
@@ -2057,13 +2058,14 @@ emit_prologue_insns (void)
     RTX_FRAME_RELATED_P (insn) = 1;
   }
 
+  /* Allocate space for local variables */
   if (frame_size != 0)
   {
     insn = emit_insn (gen_rtx_stack_adjust (MINUS, frame_size));
     RTX_FRAME_RELATED_P (insn) = 1;
   }
 
-  /* Establish a new frame if necessary */
+  /* Set the frame pointer if it is needed */
   if (frame_pointer_needed)
   {
     insn = emit_move_insn (hard_frame_pointer_rtx, stack_pointer_rtx);
@@ -2941,6 +2943,30 @@ int
 power_of_two_p (unsigned int n)
 {
 	return (n & (n-1)) == 0;
+}
+
+
+int
+m6809_can_eliminate (int from, int to)
+{
+	if (from == ARG_POINTER_REGNUM && to == STACK_POINTER_REGNUM)
+		return !frame_pointer_needed;
+	return 1;
+}
+
+
+int
+m6809_initial_elimination_offset (int from, int to)
+{
+	switch (from)
+	{
+		case ARG_POINTER_REGNUM:
+			return get_frame_size () + m6809_get_regs_size (m6809_get_live_regs ());
+		case FRAME_POINTER_REGNUM:
+			return get_frame_size ();
+		default:
+			gcc_unreachable ();
+	}
 }
 
 
