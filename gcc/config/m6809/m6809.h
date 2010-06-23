@@ -293,24 +293,13 @@ of machine-mode MODE. */
  { FRAME_POINTER_REGNUM, STACK_POINTER_REGNUM }, \
  { FRAME_POINTER_REGNUM, HARD_FRAME_POINTER_REGNUM }}
 
-#define CAN_ELIMINATE(FROM, TO) \
-	((FROM) == ARG_POINTER_REGNUM && (TO) == STACK_POINTER_REGNUM \
-	? ! frame_pointer_needed : 1)
+#define CAN_ELIMINATE(FROM, TO) m6809_can_eliminate (FROM, TO)
 
 /* Define how to offset the frame or argument pointer to turn it
  * into a stack pointer reference.  This is based on the way that
  * the frame is constructed in the function prologue. */
 #define INITIAL_ELIMINATION_OFFSET(FROM, TO, OFFSET) \
-{ \
-	if (FROM == ARG_POINTER_REGNUM) \
-	{ \
-		(OFFSET) = m6809_get_regs_size (m6809_get_live_regs ()) + get_frame_size (); \
-	} \
-	else \
-	{ \
-		(OFFSET) = get_frame_size (); \
-	} \
-}
+	(OFFSET) = m6809_initial_elimination_offset (FROM, TO)
 
 /* Base register for access to arguments of the function.
  * This is only used prior to reload; no instructions will ever
@@ -580,24 +569,20 @@ enum reg_class {
    of the first local allocated.  */
 #define STARTING_FRAME_OFFSET 0
 
-/* Always push stack arguments for now.
- * Accumulation is not yet working. */
-#ifdef TARGET_ACCUMULATE_OUTGOING_ARGS
-#define ACCUMULATE_OUTGOING_ARGS 1
-#else
-#define PUSH_ROUNDING(BYTES) (BYTES)
-#endif
 
-/* Offset of first parameter from the argument pointer register value.  */
+/* Always push stack arguments for now.  Accumulation is not yet working. */
+#define PUSH_ROUNDING(BYTES) (BYTES)
+
+
+/* Offset of first parameter from the argument pointer register value.
+ * ARG_POINTER_REGNUM is defined to point to the return address pushed
+ * onto the stack, so we must offset by 2 bytes to get to the arguments. */
 #define FIRST_PARM_OFFSET(FNDECL) 2
 
 /* Value is 1 if returning from a function call automatically
    pops the arguments described by the number-of-args field in the call.
    FUNTYPE is the data type of the function (as a tree),
    or for a library call it is an identifier node for the subroutine name. */
-/* The standard MC6809 call, with arg count word, includes popping the
-   args as part of the call template.  We optionally omit the arg count
-   word and let gcc combine the arg pops. */
 #define RETURN_POPS_ARGS(FUNDECL,FUNTYPE,SIZE) 0
 
 /* Define how to find the value returned by a function.
