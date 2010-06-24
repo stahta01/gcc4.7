@@ -38,6 +38,12 @@
        (match_operand 0 "general_operand")))
 
 
+(define_predicate "add_general_operand"
+  (and (match_code "const_int,const_double,const,symbol_ref,label_ref,reg,mem")
+       (match_operand 0 "general_operand")
+		 (match_test "REGNO (op) != SOFT_AP_REGNUM")))
+
+
 (define_predicate "shift_count_operand"
   (and (match_code "const_int")
      (and (match_operand 0 "const_int_operand")
