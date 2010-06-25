@@ -1,4 +1,4 @@
-Test Run By bcd on Wed Jun 23 23:25:16 2010
+Test Run By bcd on Thu Jun 24 21:11:00 2010
 Target is m6809-unknown-none
 Host   is i686-pc-linux-gnu
 
@@ -15719,29 +15719,29 @@ PASS: gcc.c-torture/execute/floatunsisf-1.c execution,  -O3 -g
 PASS: gcc.c-torture/execute/floatunsisf-1.c compilation,  -Os 
 PASS: gcc.c-torture/execute/floatunsisf-1.c execution,  -Os 
 PASS: gcc.c-torture/execute/fprintf-1.c compilation,  -O0 
-FAIL: gcc.c-torture/execute/fprintf-1.c execution,  -O0 
+PASS: gcc.c-torture/execute/fprintf-1.c execution,  -O0 
 PASS: gcc.c-torture/execute/fprintf-1.c compilation,  -O1 
-FAIL: gcc.c-torture/execute/fprintf-1.c execution,  -O1 
+PASS: gcc.c-torture/execute/fprintf-1.c execution,  -O1 
 PASS: gcc.c-torture/execute/fprintf-1.c compilation,  -O2 
-FAIL: gcc.c-torture/execute/fprintf-1.c execution,  -O2 
+PASS: gcc.c-torture/execute/fprintf-1.c execution,  -O2 
 PASS: gcc.c-torture/execute/fprintf-1.c compilation,  -O3 -fomit-frame-pointer 
-FAIL: gcc.c-torture/execute/fprintf-1.c execution,  -O3 -fomit-frame-pointer 
+PASS: gcc.c-torture/execute/fprintf-1.c execution,  -O3 -fomit-frame-pointer 
 PASS: gcc.c-torture/execute/fprintf-1.c compilation,  -O3 -g 
-FAIL: gcc.c-torture/execute/fprintf-1.c execution,  -O3 -g 
+PASS: gcc.c-torture/execute/fprintf-1.c execution,  -O3 -g 
 PASS: gcc.c-torture/execute/fprintf-1.c compilation,  -Os 
-FAIL: gcc.c-torture/execute/fprintf-1.c execution,  -Os 
+PASS: gcc.c-torture/execute/fprintf-1.c execution,  -Os 
 PASS: gcc.c-torture/execute/fprintf-chk-1.c compilation,  -O0 
-FAIL: gcc.c-torture/execute/fprintf-chk-1.c execution,  -O0 
+PASS: gcc.c-torture/execute/fprintf-chk-1.c execution,  -O0 
 PASS: gcc.c-torture/execute/fprintf-chk-1.c compilation,  -O1 
-FAIL: gcc.c-torture/execute/fprintf-chk-1.c execution,  -O1 
+PASS: gcc.c-torture/execute/fprintf-chk-1.c execution,  -O1 
 PASS: gcc.c-torture/execute/fprintf-chk-1.c compilation,  -O2 
-FAIL: gcc.c-torture/execute/fprintf-chk-1.c execution,  -O2 
+PASS: gcc.c-torture/execute/fprintf-chk-1.c execution,  -O2 
 PASS: gcc.c-torture/execute/fprintf-chk-1.c compilation,  -O3 -fomit-frame-pointer 
-FAIL: gcc.c-torture/execute/fprintf-chk-1.c execution,  -O3 -fomit-frame-pointer 
+PASS: gcc.c-torture/execute/fprintf-chk-1.c execution,  -O3 -fomit-frame-pointer 
 PASS: gcc.c-torture/execute/fprintf-chk-1.c compilation,  -O3 -g 
-FAIL: gcc.c-torture/execute/fprintf-chk-1.c execution,  -O3 -g 
+PASS: gcc.c-torture/execute/fprintf-chk-1.c execution,  -O3 -g 
 PASS: gcc.c-torture/execute/fprintf-chk-1.c compilation,  -Os 
-FAIL: gcc.c-torture/execute/fprintf-chk-1.c execution,  -Os 
+PASS: gcc.c-torture/execute/fprintf-chk-1.c execution,  -Os 
 PASS: gcc.c-torture/execute/frame-address.c compilation,  -O0 
 PASS: gcc.c-torture/execute/frame-address.c execution,  -O0 
 PASS: gcc.c-torture/execute/frame-address.c compilation,  -O1 
@@ -18195,29 +18195,29 @@ PASS: gcc.c-torture/execute/pr40579.c execution,  -O3 -g
 PASS: gcc.c-torture/execute/pr40579.c compilation,  -Os 
 PASS: gcc.c-torture/execute/pr40579.c execution,  -Os 
 PASS: gcc.c-torture/execute/printf-1.c compilation,  -O0 
-FAIL: gcc.c-torture/execute/printf-1.c execution,  -O0 
+PASS: gcc.c-torture/execute/printf-1.c execution,  -O0 
 PASS: gcc.c-torture/execute/printf-1.c compilation,  -O1 
-FAIL: gcc.c-torture/execute/printf-1.c execution,  -O1 
+PASS: gcc.c-torture/execute/printf-1.c execution,  -O1 
 PASS: gcc.c-torture/execute/printf-1.c compilation,  -O2 
-FAIL: gcc.c-torture/execute/printf-1.c execution,  -O2 
+PASS: gcc.c-torture/execute/printf-1.c execution,  -O2 
 PASS: gcc.c-torture/execute/printf-1.c compilation,  -O3 -fomit-frame-pointer 
-FAIL: gcc.c-torture/execute/printf-1.c execution,  -O3 -fomit-frame-pointer 
+PASS: gcc.c-torture/execute/printf-1.c execution,  -O3 -fomit-frame-pointer 
 PASS: gcc.c-torture/execute/printf-1.c compilation,  -O3 -g 
-FAIL: gcc.c-torture/execute/printf-1.c execution,  -O3 -g 
+PASS: gcc.c-torture/execute/printf-1.c execution,  -O3 -g 
 PASS: gcc.c-torture/execute/printf-1.c compilation,  -Os 
-FAIL: gcc.c-torture/execute/printf-1.c execution,  -Os 
+PASS: gcc.c-torture/execute/printf-1.c execution,  -Os 
 PASS: gcc.c-torture/execute/printf-chk-1.c compilation,  -O0 
-FAIL: gcc.c-torture/execute/printf-chk-1.c execution,  -O0 
+PASS: gcc.c-torture/execute/printf-chk-1.c execution,  -O0 
 PASS: gcc.c-torture/execute/printf-chk-1.c compilation,  -O1 
-FAIL: gcc.c-torture/execute/printf-chk-1.c execution,  -O1 
+PASS: gcc.c-torture/execute/printf-chk-1.c execution,  -O1 
 PASS: gcc.c-torture/execute/printf-chk-1.c compilation,  -O2 
-FAIL: gcc.c-torture/execute/printf-chk-1.c execution,  -O2 
+PASS: gcc.c-torture/execute/printf-chk-1.c execution,  -O2 
 PASS: gcc.c-torture/execute/printf-chk-1.c compilation,  -O3 -fomit-frame-pointer 
-FAIL: gcc.c-torture/execute/printf-chk-1.c execution,  -O3 -fomit-frame-pointer 
+PASS: gcc.c-torture/execute/printf-chk-1.c execution,  -O3 -fomit-frame-pointer 
 PASS: gcc.c-torture/execute/printf-chk-1.c compilation,  -O3 -g 
-FAIL: gcc.c-torture/execute/printf-chk-1.c execution,  -O3 -g 
+PASS: gcc.c-torture/execute/printf-chk-1.c execution,  -O3 -g 
 PASS: gcc.c-torture/execute/printf-chk-1.c compilation,  -Os 
-FAIL: gcc.c-torture/execute/printf-chk-1.c execution,  -Os 
+PASS: gcc.c-torture/execute/printf-chk-1.c execution,  -Os 
 PASS: gcc.c-torture/execute/ptr-arith-1.c compilation,  -O0 
 PASS: gcc.c-torture/execute/ptr-arith-1.c execution,  -O0 
 PASS: gcc.c-torture/execute/ptr-arith-1.c compilation,  -O1 
@@ -18683,17 +18683,17 @@ PASS: gcc.c-torture/execute/switch-1.c execution,  -O3 -g
 PASS: gcc.c-torture/execute/switch-1.c compilation,  -Os 
 PASS: gcc.c-torture/execute/switch-1.c execution,  -Os 
 PASS: gcc.c-torture/execute/tstdi-1.c compilation,  -O0 
-FAIL: gcc.c-torture/execute/tstdi-1.c execution,  -O0 
+PASS: gcc.c-torture/execute/tstdi-1.c execution,  -O0 
 PASS: gcc.c-torture/execute/tstdi-1.c compilation,  -O1 
-FAIL: gcc.c-torture/execute/tstdi-1.c execution,  -O1 
+PASS: gcc.c-torture/execute/tstdi-1.c execution,  -O1 
 PASS: gcc.c-torture/execute/tstdi-1.c compilation,  -O2 
-FAIL: gcc.c-torture/execute/tstdi-1.c execution,  -O2 
+PASS: gcc.c-torture/execute/tstdi-1.c execution,  -O2 
 PASS: gcc.c-torture/execute/tstdi-1.c compilation,  -O3 -fomit-frame-pointer 
-FAIL: gcc.c-torture/execute/tstdi-1.c execution,  -O3 -fomit-frame-pointer 
+PASS: gcc.c-torture/execute/tstdi-1.c execution,  -O3 -fomit-frame-pointer 
 PASS: gcc.c-torture/execute/tstdi-1.c compilation,  -O3 -g 
-FAIL: gcc.c-torture/execute/tstdi-1.c execution,  -O3 -g 
+PASS: gcc.c-torture/execute/tstdi-1.c execution,  -O3 -g 
 PASS: gcc.c-torture/execute/tstdi-1.c compilation,  -Os 
-FAIL: gcc.c-torture/execute/tstdi-1.c execution,  -Os 
+PASS: gcc.c-torture/execute/tstdi-1.c execution,  -Os 
 PASS: gcc.c-torture/execute/unroll-1.c compilation,  -O0 
 PASS: gcc.c-torture/execute/unroll-1.c execution,  -O0 
 PASS: gcc.c-torture/execute/unroll-1.c compilation,  -O1 
@@ -18991,17 +18991,17 @@ PASS: gcc.c-torture/execute/va-arg-5.c execution,  -O3 -g
 PASS: gcc.c-torture/execute/va-arg-5.c compilation,  -Os 
 PASS: gcc.c-torture/execute/va-arg-5.c execution,  -Os 
 PASS: gcc.c-torture/execute/va-arg-6.c compilation,  -O0 
-FAIL: gcc.c-torture/execute/va-arg-6.c execution,  -O0 
+PASS: gcc.c-torture/execute/va-arg-6.c execution,  -O0 
 PASS: gcc.c-torture/execute/va-arg-6.c compilation,  -O1 
-FAIL: gcc.c-torture/execute/va-arg-6.c execution,  -O1 
+PASS: gcc.c-torture/execute/va-arg-6.c execution,  -O1 
 PASS: gcc.c-torture/execute/va-arg-6.c compilation,  -O2 
-FAIL: gcc.c-torture/execute/va-arg-6.c execution,  -O2 
+PASS: gcc.c-torture/execute/va-arg-6.c execution,  -O2 
 PASS: gcc.c-torture/execute/va-arg-6.c compilation,  -O3 -fomit-frame-pointer 
-FAIL: gcc.c-torture/execute/va-arg-6.c execution,  -O3 -fomit-frame-pointer 
+PASS: gcc.c-torture/execute/va-arg-6.c execution,  -O3 -fomit-frame-pointer 
 PASS: gcc.c-torture/execute/va-arg-6.c compilation,  -O3 -g 
-FAIL: gcc.c-torture/execute/va-arg-6.c execution,  -O3 -g 
+PASS: gcc.c-torture/execute/va-arg-6.c execution,  -O3 -g 
 PASS: gcc.c-torture/execute/va-arg-6.c compilation,  -Os 
-FAIL: gcc.c-torture/execute/va-arg-6.c execution,  -Os 
+PASS: gcc.c-torture/execute/va-arg-6.c execution,  -Os 
 PASS: gcc.c-torture/execute/va-arg-7.c compilation,  -O0 
 PASS: gcc.c-torture/execute/va-arg-7.c execution,  -O0 
 PASS: gcc.c-torture/execute/va-arg-7.c compilation,  -O1 
@@ -19055,53 +19055,53 @@ PASS: gcc.c-torture/execute/va-arg-pack-1.c execution,  -O3 -g
 PASS: gcc.c-torture/execute/va-arg-pack-1.c compilation,  -Os 
 PASS: gcc.c-torture/execute/va-arg-pack-1.c execution,  -Os 
 PASS: gcc.c-torture/execute/vfprintf-1.c compilation,  -O0 
-FAIL: gcc.c-torture/execute/vfprintf-1.c execution,  -O0 
+PASS: gcc.c-torture/execute/vfprintf-1.c execution,  -O0 
 PASS: gcc.c-torture/execute/vfprintf-1.c compilation,  -O1 
-FAIL: gcc.c-torture/execute/vfprintf-1.c execution,  -O1 
+PASS: gcc.c-torture/execute/vfprintf-1.c execution,  -O1 
 PASS: gcc.c-torture/execute/vfprintf-1.c compilation,  -O2 
-FAIL: gcc.c-torture/execute/vfprintf-1.c execution,  -O2 
+PASS: gcc.c-torture/execute/vfprintf-1.c execution,  -O2 
 PASS: gcc.c-torture/execute/vfprintf-1.c compilation,  -O3 -fomit-frame-pointer 
-FAIL: gcc.c-torture/execute/vfprintf-1.c execution,  -O3 -fomit-frame-pointer 
+PASS: gcc.c-torture/execute/vfprintf-1.c execution,  -O3 -fomit-frame-pointer 
 PASS: gcc.c-torture/execute/vfprintf-1.c compilation,  -O3 -g 
-FAIL: gcc.c-torture/execute/vfprintf-1.c execution,  -O3 -g 
+PASS: gcc.c-torture/execute/vfprintf-1.c execution,  -O3 -g 
 PASS: gcc.c-torture/execute/vfprintf-1.c compilation,  -Os 
-FAIL: gcc.c-torture/execute/vfprintf-1.c execution,  -Os 
+PASS: gcc.c-torture/execute/vfprintf-1.c execution,  -Os 
 PASS: gcc.c-torture/execute/vfprintf-chk-1.c compilation,  -O0 
-FAIL: gcc.c-torture/execute/vfprintf-chk-1.c execution,  -O0 
+PASS: gcc.c-torture/execute/vfprintf-chk-1.c execution,  -O0 
 PASS: gcc.c-torture/execute/vfprintf-chk-1.c compilation,  -O1 
-FAIL: gcc.c-torture/execute/vfprintf-chk-1.c execution,  -O1 
+PASS: gcc.c-torture/execute/vfprintf-chk-1.c execution,  -O1 
 PASS: gcc.c-torture/execute/vfprintf-chk-1.c compilation,  -O2 
-FAIL: gcc.c-torture/execute/vfprintf-chk-1.c execution,  -O2 
+PASS: gcc.c-torture/execute/vfprintf-chk-1.c execution,  -O2 
 PASS: gcc.c-torture/execute/vfprintf-chk-1.c compilation,  -O3 -fomit-frame-pointer 
-FAIL: gcc.c-torture/execute/vfprintf-chk-1.c execution,  -O3 -fomit-frame-pointer 
+PASS: gcc.c-torture/execute/vfprintf-chk-1.c execution,  -O3 -fomit-frame-pointer 
 PASS: gcc.c-torture/execute/vfprintf-chk-1.c compilation,  -O3 -g 
-FAIL: gcc.c-torture/execute/vfprintf-chk-1.c execution,  -O3 -g 
+PASS: gcc.c-torture/execute/vfprintf-chk-1.c execution,  -O3 -g 
 PASS: gcc.c-torture/execute/vfprintf-chk-1.c compilation,  -Os 
-FAIL: gcc.c-torture/execute/vfprintf-chk-1.c execution,  -Os 
+PASS: gcc.c-torture/execute/vfprintf-chk-1.c execution,  -Os 
 PASS: gcc.c-torture/execute/vprintf-1.c compilation,  -O0 
-FAIL: gcc.c-torture/execute/vprintf-1.c execution,  -O0 
+PASS: gcc.c-torture/execute/vprintf-1.c execution,  -O0 
 PASS: gcc.c-torture/execute/vprintf-1.c compilation,  -O1 
-FAIL: gcc.c-torture/execute/vprintf-1.c execution,  -O1 
+PASS: gcc.c-torture/execute/vprintf-1.c execution,  -O1 
 PASS: gcc.c-torture/execute/vprintf-1.c compilation,  -O2 
-FAIL: gcc.c-torture/execute/vprintf-1.c execution,  -O2 
+PASS: gcc.c-torture/execute/vprintf-1.c execution,  -O2 
 PASS: gcc.c-torture/execute/vprintf-1.c compilation,  -O3 -fomit-frame-pointer 
-FAIL: gcc.c-torture/execute/vprintf-1.c execution,  -O3 -fomit-frame-pointer 
+PASS: gcc.c-torture/execute/vprintf-1.c execution,  -O3 -fomit-frame-pointer 
 PASS: gcc.c-torture/execute/vprintf-1.c compilation,  -O3 -g 
-FAIL: gcc.c-torture/execute/vprintf-1.c execution,  -O3 -g 
+PASS: gcc.c-torture/execute/vprintf-1.c execution,  -O3 -g 
 PASS: gcc.c-torture/execute/vprintf-1.c compilation,  -Os 
-FAIL: gcc.c-torture/execute/vprintf-1.c execution,  -Os 
+PASS: gcc.c-torture/execute/vprintf-1.c execution,  -Os 
 PASS: gcc.c-torture/execute/vprintf-chk-1.c compilation,  -O0 
-FAIL: gcc.c-torture/execute/vprintf-chk-1.c execution,  -O0 
+PASS: gcc.c-torture/execute/vprintf-chk-1.c execution,  -O0 
 PASS: gcc.c-torture/execute/vprintf-chk-1.c compilation,  -O1 
-FAIL: gcc.c-torture/execute/vprintf-chk-1.c execution,  -O1 
+PASS: gcc.c-torture/execute/vprintf-chk-1.c execution,  -O1 
 PASS: gcc.c-torture/execute/vprintf-chk-1.c compilation,  -O2 
-FAIL: gcc.c-torture/execute/vprintf-chk-1.c execution,  -O2 
+PASS: gcc.c-torture/execute/vprintf-chk-1.c execution,  -O2 
 PASS: gcc.c-torture/execute/vprintf-chk-1.c compilation,  -O3 -fomit-frame-pointer 
-FAIL: gcc.c-torture/execute/vprintf-chk-1.c execution,  -O3 -fomit-frame-pointer 
+PASS: gcc.c-torture/execute/vprintf-chk-1.c execution,  -O3 -fomit-frame-pointer 
 PASS: gcc.c-torture/execute/vprintf-chk-1.c compilation,  -O3 -g 
-FAIL: gcc.c-torture/execute/vprintf-chk-1.c execution,  -O3 -g 
+PASS: gcc.c-torture/execute/vprintf-chk-1.c execution,  -O3 -g 
 PASS: gcc.c-torture/execute/vprintf-chk-1.c compilation,  -Os 
-FAIL: gcc.c-torture/execute/vprintf-chk-1.c execution,  -Os 
+PASS: gcc.c-torture/execute/vprintf-chk-1.c execution,  -Os 
 PASS: gcc.c-torture/execute/vrp-1.c compilation,  -O0 
 PASS: gcc.c-torture/execute/vrp-1.c execution,  -O0 
 PASS: gcc.c-torture/execute/vrp-1.c compilation,  -O1 
@@ -19249,8 +19249,8 @@ PASS: gcc.c-torture/execute/zerolen-2.c execution,  -Os
 
 		=== gcc Summary ===
 
-# of expected passes		18545
-# of unexpected failures	359
+# of expected passes		18605
+# of unexpected failures	299
 # of unexpected successes	6
 # of expected failures		21
 # of unresolved testcases	135
