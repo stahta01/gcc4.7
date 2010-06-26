@@ -349,6 +349,6 @@ source-tarball:
 
 .PHONY : source-patch
 source-patch:
-	cd .. && git diff release-4.3.4 | build-6809/patch_filter '\.git.*' '\.exe\$$' 'patches' \
+	cd .. && git diff @{upstream} | build-6809/patch_filter '\.git.*' '\.exe\$$' 'patches' \
 		'gcc.sum' 'gcc-.*.sum' 'm6809-run.log' '^build-6809\/web\/' 'as6809\.conf\.example' \
-		'djgpp' 'build-6809\/doc\/' 'autobuild-gcc6809' > gcc6809-4.3.4-3.patch
+		'djgpp' 'build-6809\/doc\/' 'autobuild-gcc6809' > gcc6809-$(shell basename `git symbolic-ref HEAD`)-N.patch
