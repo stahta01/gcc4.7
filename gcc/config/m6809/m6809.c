@@ -1989,8 +1989,6 @@ m6809_asm_file_start (void)
 	fprintf (asm_out_file, ";;; ABI version %d\n", m6809_abi_version);
 	fprintf (asm_out_file, ";;; %s\n",
 		(TARGET_BYTE_INT ? "-mint8" : "-mint16"));
-	if (TARGET_EXPERIMENT)
-		fprintf (asm_out_file, ";;; -mexperiment\n");
 	if (TARGET_WPC)
 		fprintf (asm_out_file, ";;; -mwpc\n");
 	if (TARGET_6309)
