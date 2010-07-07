@@ -51,10 +51,6 @@ mwpc
 Target RejectNegative Mask(WPC)
 Enable WPC platform extensions
 
-mexperiment
-Target RejectNegative Mask(EXPERIMENT)
-Enable current experimental feature
-
 m6309
 Target RejectNegative Mask(6309)
 Enable Hitachi 6309 extensions
