@@ -676,10 +676,12 @@ enum reg_class {
 	((MODE == HImode) && !((CUM) & (CUM_STACK_ONLY | CUM_X_MASK))) ?  \
 		gen_rtx_REG (HImode, HARD_X_REGNUM) : m6809_function_arg_on_stack (&CUM))
 
-/* Output assembler code to FILE to increment profiler label # LABELNO
-   for profiling a function entry.  */
-#define FUNCTION_PROFILER(FILE, LABELNO) \
-   fprintf (FILE, "\tldd\t#LP%u\n\tjsr\tmcount\n", (LABELNO));
+/* Output assembler code to FILE to profile function entry.
+   We do not require a label, so say NO_PROFILE_COUNTERS and don't
+	use LABELNO. */
+#define NO_PROFILE_COUNTERS 1
+
+#define FUNCTION_PROFILER(FILE, LABELNO) fprintf (FILE, "\tjsr\t_mcount\n")
 
 /* Stack pointer must be correct on function exit */
 #define EXIT_IGNORE_STACK 0
