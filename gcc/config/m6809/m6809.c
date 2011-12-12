@@ -1898,7 +1898,7 @@ output_far_call_insn (rtx *operands, int has_return)
 		if (flag_pic)
 			output_asm_insn ("lbsr\t__far_call_handler", operands);
 		else
-			output_asm_insn ("jsr\t__far_call_handler\t;old style", operands);
+			output_asm_insn ("jsr\t__far_call_handler", operands);
   
     /* Now output the name of the call site */
     output_asm_insn ("\t.dw\t%C0", operands);
