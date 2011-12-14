@@ -102,6 +102,8 @@ static void m6809_encode_section_info PARAMS ((tree, int ));
 
 #undef TARGET_RTX_COSTS
 #define TARGET_RTX_COSTS m6809_rtx_costs
+#undef TARGET_ADDRESS_COST
+#define TARGET_ADDRESS_COST m6809_address_cost
 
 #undef TARGET_ATTRIBUTE_TABLE
 #define TARGET_ATTRIBUTE_TABLE m6809_attribute_table
@@ -1323,7 +1325,7 @@ m6809_rtx_costs (rtx X, int code, int outer_code ATTRIBUTE_UNUSED,
 				*total = 0;
 				return true;
 			}
-			else if ((unsigned) INTVAL (X) < 077) 
+			else if ((unsigned) INTVAL (X) < 077)
 			{
 				*total = 1;
 				return true;
@@ -1559,6 +1561,42 @@ m6809_rtx_costs (rtx X, int code, int outer_code ATTRIBUTE_UNUSED,
 	/* Always return false, and let the caller gather the costs
 	 * of the operands */
 	return false;
+}
+
+/* Return the cost of an address RTX. */
+
+static int m6809_address_cost (rtx addr)
+{
+  int cost = 1; /* 0 was pretty good */
+
+	if (MEM_P (addr))
+	{
+		addr = XEXP (addr, 0);
+		cost += 2;
+	}
+
+	if (REGISTER_ADDRESS_P (addr))
+		cost += 4;
+	else if (PUSH_POP_ADDRESS_P (addr))
+		cost = 0;
+	else if (EXTENDED_ADDRESS_P (addr))
+		cost += 2;
+	else if (INDEXED_ADDRESS (addr))
+	{
+		int opnum;
+		cost += 5;
+		for (opnum=0; opnum < 2; opnum++)
+		{
+			rtx operand = XEXP (addr, opnum);
+			if (CONSTANT_ADDRESS_P (operand) && GET_CODE (operand) == CONST_INT)
+			{
+				if ((unsigned) INTVAL (operand) < 16)
+					cost--;
+				break;
+			}
+		}
+	}
+	return cost;
 }
 
 
