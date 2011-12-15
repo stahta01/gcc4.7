@@ -1584,14 +1584,14 @@ static int m6809_address_cost (rtx addr)
 	else if (INDEXED_ADDRESS (addr))
 	{
 		int opnum;
-		cost += 5;
+		cost += 8;
 		for (opnum=0; opnum < 2; opnum++)
 		{
 			rtx operand = XEXP (addr, opnum);
 			if (CONSTANT_ADDRESS_P (operand) && GET_CODE (operand) == CONST_INT)
 			{
 				if ((unsigned) INTVAL (operand) < 16)
-					cost--;
+					cost -= 2;
 				break;
 			}
 		}
