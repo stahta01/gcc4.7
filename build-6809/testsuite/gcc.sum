@@ -1,4 +1,4 @@
-Test Run By bcd on Mon Oct 17 09:33:42 2011
+Test Run By bcd on Wed Dec 14 20:38:57 2011
 Target is m6809-unknown-none
 Host   is i686-pc-linux-gnu
 
@@ -17301,9 +17301,9 @@ PASS: gcc.c-torture/execute/pr27285.c execution,  -O2
 PASS: gcc.c-torture/execute/pr27285.c compilation,  -O3 -fomit-frame-pointer 
 PASS: gcc.c-torture/execute/pr27285.c execution,  -O3 -fomit-frame-pointer 
 PASS: gcc.c-torture/execute/pr27285.c compilation,  -O3 -fomit-frame-pointer -funroll-loops 
-FAIL: gcc.c-torture/execute/pr27285.c execution,  -O3 -fomit-frame-pointer -funroll-loops 
+PASS: gcc.c-torture/execute/pr27285.c execution,  -O3 -fomit-frame-pointer -funroll-loops 
 PASS: gcc.c-torture/execute/pr27285.c compilation,  -O3 -fomit-frame-pointer -funroll-all-loops -finline-functions 
-FAIL: gcc.c-torture/execute/pr27285.c execution,  -O3 -fomit-frame-pointer -funroll-all-loops -finline-functions 
+PASS: gcc.c-torture/execute/pr27285.c execution,  -O3 -fomit-frame-pointer -funroll-all-loops -finline-functions 
 PASS: gcc.c-torture/execute/pr27285.c compilation,  -O3 -g 
 PASS: gcc.c-torture/execute/pr27285.c execution,  -O3 -g 
 PASS: gcc.c-torture/execute/pr27285.c compilation,  -Os 
@@ -18545,9 +18545,9 @@ PASS: gcc.c-torture/execute/strcmp-1.c execution,  -O2
 PASS: gcc.c-torture/execute/strcmp-1.c compilation,  -O3 -fomit-frame-pointer 
 PASS: gcc.c-torture/execute/strcmp-1.c execution,  -O3 -fomit-frame-pointer 
 PASS: gcc.c-torture/execute/strcmp-1.c compilation,  -O3 -fomit-frame-pointer -funroll-loops 
-PASS: gcc.c-torture/execute/strcmp-1.c execution,  -O3 -fomit-frame-pointer -funroll-loops 
+FAIL: gcc.c-torture/execute/strcmp-1.c execution,  -O3 -fomit-frame-pointer -funroll-loops 
 PASS: gcc.c-torture/execute/strcmp-1.c compilation,  -O3 -fomit-frame-pointer -funroll-all-loops -finline-functions 
-PASS: gcc.c-torture/execute/strcmp-1.c execution,  -O3 -fomit-frame-pointer -funroll-all-loops -finline-functions 
+FAIL: gcc.c-torture/execute/strcmp-1.c execution,  -O3 -fomit-frame-pointer -funroll-all-loops -finline-functions 
 PASS: gcc.c-torture/execute/strcmp-1.c compilation,  -O3 -g 
 PASS: gcc.c-torture/execute/strcmp-1.c execution,  -O3 -g 
 PASS: gcc.c-torture/execute/strcmp-1.c compilation,  -Os 
@@ -18693,9 +18693,9 @@ PASS: gcc.c-torture/execute/strlen-1.c execution,  -O2
 PASS: gcc.c-torture/execute/strlen-1.c compilation,  -O3 -fomit-frame-pointer 
 PASS: gcc.c-torture/execute/strlen-1.c execution,  -O3 -fomit-frame-pointer 
 PASS: gcc.c-torture/execute/strlen-1.c compilation,  -O3 -fomit-frame-pointer -funroll-loops 
-PASS: gcc.c-torture/execute/strlen-1.c execution,  -O3 -fomit-frame-pointer -funroll-loops 
+FAIL: gcc.c-torture/execute/strlen-1.c execution,  -O3 -fomit-frame-pointer -funroll-loops 
 PASS: gcc.c-torture/execute/strlen-1.c compilation,  -O3 -fomit-frame-pointer -funroll-all-loops -finline-functions 
-PASS: gcc.c-torture/execute/strlen-1.c execution,  -O3 -fomit-frame-pointer -funroll-all-loops -finline-functions 
+FAIL: gcc.c-torture/execute/strlen-1.c execution,  -O3 -fomit-frame-pointer -funroll-all-loops -finline-functions 
 PASS: gcc.c-torture/execute/strlen-1.c compilation,  -O3 -g 
 PASS: gcc.c-torture/execute/strlen-1.c execution,  -O3 -g 
 PASS: gcc.c-torture/execute/strlen-1.c compilation,  -Os 
@@ -18709,9 +18709,9 @@ PASS: gcc.c-torture/execute/strncmp-1.c execution,  -O2
 PASS: gcc.c-torture/execute/strncmp-1.c compilation,  -O3 -fomit-frame-pointer 
 PASS: gcc.c-torture/execute/strncmp-1.c execution,  -O3 -fomit-frame-pointer 
 PASS: gcc.c-torture/execute/strncmp-1.c compilation,  -O3 -fomit-frame-pointer -funroll-loops 
-PASS: gcc.c-torture/execute/strncmp-1.c execution,  -O3 -fomit-frame-pointer -funroll-loops 
+FAIL: gcc.c-torture/execute/strncmp-1.c execution,  -O3 -fomit-frame-pointer -funroll-loops 
 PASS: gcc.c-torture/execute/strncmp-1.c compilation,  -O3 -fomit-frame-pointer -funroll-all-loops -finline-functions 
-PASS: gcc.c-torture/execute/strncmp-1.c execution,  -O3 -fomit-frame-pointer -funroll-all-loops -finline-functions 
+FAIL: gcc.c-torture/execute/strncmp-1.c execution,  -O3 -fomit-frame-pointer -funroll-all-loops -finline-functions 
 PASS: gcc.c-torture/execute/strncmp-1.c compilation,  -O3 -g 
 PASS: gcc.c-torture/execute/strncmp-1.c execution,  -O3 -g 
 PASS: gcc.c-torture/execute/strncmp-1.c compilation,  -Os 
@@ -19395,8 +19395,8 @@ PASS: gcc.c-torture/execute/zerolen-2.c execution,  -Os
 
 		=== gcc Summary ===
 
-# of expected passes		18721
-# of unexpected failures	329
+# of expected passes		18717
+# of unexpected failures	333
 # of unexpected successes	6
 # of expected failures		21
 # of unresolved testcases	135
