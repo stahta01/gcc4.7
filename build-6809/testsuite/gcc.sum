@@ -1,4 +1,4 @@
-Test Run By bcd on Wed Dec 14 20:38:57 2011
+Test Run By bcd on Fri Dec 16 17:42:51 2011
 Target is m6809-unknown-none
 Host   is i686-pc-linux-gnu
 
@@ -5905,18 +5905,12 @@ PASS: gcc.c-torture/compile/pr39041.c  -O3 -fomit-frame-pointer -funroll-loops  
 PASS: gcc.c-torture/compile/pr39041.c  -O3 -fomit-frame-pointer -funroll-all-loops -finline-functions  (test for excess errors)
 PASS: gcc.c-torture/compile/pr39041.c  -O3 -g  (test for excess errors)
 PASS: gcc.c-torture/compile/pr39041.c  -Os  (test for excess errors)
-FAIL: gcc.c-torture/compile/pr39779.c  -O0  (internal compiler error)
-FAIL: gcc.c-torture/compile/pr39779.c  -O0  (test for excess errors)
-FAIL: gcc.c-torture/compile/pr39779.c  -O1  (internal compiler error)
-FAIL: gcc.c-torture/compile/pr39779.c  -O1  (test for excess errors)
-FAIL: gcc.c-torture/compile/pr39779.c  -O2  (internal compiler error)
-FAIL: gcc.c-torture/compile/pr39779.c  -O2  (test for excess errors)
-FAIL: gcc.c-torture/compile/pr39779.c  -O3 -fomit-frame-pointer  (internal compiler error)
-FAIL: gcc.c-torture/compile/pr39779.c  -O3 -fomit-frame-pointer  (test for excess errors)
-FAIL: gcc.c-torture/compile/pr39779.c  -O3 -g  (internal compiler error)
-FAIL: gcc.c-torture/compile/pr39779.c  -O3 -g  (test for excess errors)
-FAIL: gcc.c-torture/compile/pr39779.c  -Os  (internal compiler error)
-FAIL: gcc.c-torture/compile/pr39779.c  -Os  (test for excess errors)
+PASS: gcc.c-torture/compile/pr39779.c  -O0  (test for excess errors)
+PASS: gcc.c-torture/compile/pr39779.c  -O1  (test for excess errors)
+PASS: gcc.c-torture/compile/pr39779.c  -O2  (test for excess errors)
+PASS: gcc.c-torture/compile/pr39779.c  -O3 -fomit-frame-pointer  (test for excess errors)
+PASS: gcc.c-torture/compile/pr39779.c  -O3 -g  (test for excess errors)
+PASS: gcc.c-torture/compile/pr39779.c  -Os  (test for excess errors)
 PASS: gcc.c-torture/compile/pr39943.c  -O0  (test for excess errors)
 PASS: gcc.c-torture/compile/pr39943.c  -O1  (test for excess errors)
 PASS: gcc.c-torture/compile/pr39943.c  -O2  (test for excess errors)
@@ -19395,8 +19389,8 @@ PASS: gcc.c-torture/execute/zerolen-2.c execution,  -Os
 
 		=== gcc Summary ===
 
-# of expected passes		18717
-# of unexpected failures	333
+# of expected passes		18723
+# of unexpected failures	321
 # of unexpected successes	6
 # of expected failures		21
 # of unresolved testcases	135
