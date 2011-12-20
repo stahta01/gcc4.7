@@ -1,4 +1,4 @@
-Test Run By bcd on Fri Dec 16 17:42:51 2011
+Test Run By bcd on Mon Dec 19 22:24:35 2011
 Target is m6809-unknown-none
 Host   is i686-pc-linux-gnu
 
@@ -18090,18 +18090,18 @@ PASS: gcc.c-torture/execute/pr37125.c compilation,  -O3 -g
 PASS: gcc.c-torture/execute/pr37125.c execution,  -O3 -g 
 PASS: gcc.c-torture/execute/pr37125.c compilation,  -Os 
 PASS: gcc.c-torture/execute/pr37125.c execution,  -Os 
-FAIL: gcc.c-torture/execute/pr37882.c compilation,  -O0 
-UNRESOLVED: gcc.c-torture/execute/pr37882.c execution,  -O0 
-FAIL: gcc.c-torture/execute/pr37882.c compilation,  -O1 
-UNRESOLVED: gcc.c-torture/execute/pr37882.c execution,  -O1 
-FAIL: gcc.c-torture/execute/pr37882.c compilation,  -O2 
-UNRESOLVED: gcc.c-torture/execute/pr37882.c execution,  -O2 
-FAIL: gcc.c-torture/execute/pr37882.c compilation,  -O3 -fomit-frame-pointer 
-UNRESOLVED: gcc.c-torture/execute/pr37882.c execution,  -O3 -fomit-frame-pointer 
-FAIL: gcc.c-torture/execute/pr37882.c compilation,  -O3 -g 
-UNRESOLVED: gcc.c-torture/execute/pr37882.c execution,  -O3 -g 
-FAIL: gcc.c-torture/execute/pr37882.c compilation,  -Os 
-UNRESOLVED: gcc.c-torture/execute/pr37882.c execution,  -Os 
+PASS: gcc.c-torture/execute/pr37882.c compilation,  -O0 
+PASS: gcc.c-torture/execute/pr37882.c execution,  -O0 
+PASS: gcc.c-torture/execute/pr37882.c compilation,  -O1 
+PASS: gcc.c-torture/execute/pr37882.c execution,  -O1 
+PASS: gcc.c-torture/execute/pr37882.c compilation,  -O2 
+PASS: gcc.c-torture/execute/pr37882.c execution,  -O2 
+PASS: gcc.c-torture/execute/pr37882.c compilation,  -O3 -fomit-frame-pointer 
+PASS: gcc.c-torture/execute/pr37882.c execution,  -O3 -fomit-frame-pointer 
+PASS: gcc.c-torture/execute/pr37882.c compilation,  -O3 -g 
+PASS: gcc.c-torture/execute/pr37882.c execution,  -O3 -g 
+PASS: gcc.c-torture/execute/pr37882.c compilation,  -Os 
+PASS: gcc.c-torture/execute/pr37882.c execution,  -Os 
 PASS: gcc.c-torture/execute/pr37924.c compilation,  -O0 
 PASS: gcc.c-torture/execute/pr37924.c execution,  -O0 
 PASS: gcc.c-torture/execute/pr37924.c compilation,  -O1 
@@ -18222,18 +18222,18 @@ PASS: gcc.c-torture/execute/pr40057.c compilation,  -O3 -g
 PASS: gcc.c-torture/execute/pr40057.c execution,  -O3 -g 
 PASS: gcc.c-torture/execute/pr40057.c compilation,  -Os 
 PASS: gcc.c-torture/execute/pr40057.c execution,  -Os 
-FAIL: gcc.c-torture/execute/pr40404.c compilation,  -O0 
-UNRESOLVED: gcc.c-torture/execute/pr40404.c execution,  -O0 
-FAIL: gcc.c-torture/execute/pr40404.c compilation,  -O1 
-UNRESOLVED: gcc.c-torture/execute/pr40404.c execution,  -O1 
-FAIL: gcc.c-torture/execute/pr40404.c compilation,  -O2 
-UNRESOLVED: gcc.c-torture/execute/pr40404.c execution,  -O2 
-FAIL: gcc.c-torture/execute/pr40404.c compilation,  -O3 -fomit-frame-pointer 
-UNRESOLVED: gcc.c-torture/execute/pr40404.c execution,  -O3 -fomit-frame-pointer 
-FAIL: gcc.c-torture/execute/pr40404.c compilation,  -O3 -g 
-UNRESOLVED: gcc.c-torture/execute/pr40404.c execution,  -O3 -g 
-FAIL: gcc.c-torture/execute/pr40404.c compilation,  -Os 
-UNRESOLVED: gcc.c-torture/execute/pr40404.c execution,  -Os 
+PASS: gcc.c-torture/execute/pr40404.c compilation,  -O0 
+PASS: gcc.c-torture/execute/pr40404.c execution,  -O0 
+PASS: gcc.c-torture/execute/pr40404.c compilation,  -O1 
+PASS: gcc.c-torture/execute/pr40404.c execution,  -O1 
+PASS: gcc.c-torture/execute/pr40404.c compilation,  -O2 
+PASS: gcc.c-torture/execute/pr40404.c execution,  -O2 
+PASS: gcc.c-torture/execute/pr40404.c compilation,  -O3 -fomit-frame-pointer 
+PASS: gcc.c-torture/execute/pr40404.c execution,  -O3 -fomit-frame-pointer 
+PASS: gcc.c-torture/execute/pr40404.c compilation,  -O3 -g 
+PASS: gcc.c-torture/execute/pr40404.c execution,  -O3 -g 
+PASS: gcc.c-torture/execute/pr40404.c compilation,  -Os 
+PASS: gcc.c-torture/execute/pr40404.c execution,  -Os 
 PASS: gcc.c-torture/execute/pr40579.c compilation,  -O0 
 PASS: gcc.c-torture/execute/pr40579.c execution,  -O0 
 PASS: gcc.c-torture/execute/pr40579.c compilation,  -O1 
@@ -18263,17 +18263,17 @@ PASS: gcc.c-torture/execute/pr41917.c execution,  -O3 -g
 PASS: gcc.c-torture/execute/pr41917.c compilation,  -Os 
 PASS: gcc.c-torture/execute/pr41917.c execution,  -Os 
 PASS: gcc.c-torture/execute/pr43220.c compilation,  -O0 
-FAIL: gcc.c-torture/execute/pr43220.c execution,  -O0 
+PASS: gcc.c-torture/execute/pr43220.c execution,  -O0 
 PASS: gcc.c-torture/execute/pr43220.c compilation,  -O1 
-FAIL: gcc.c-torture/execute/pr43220.c execution,  -O1 
+PASS: gcc.c-torture/execute/pr43220.c execution,  -O1 
 PASS: gcc.c-torture/execute/pr43220.c compilation,  -O2 
-FAIL: gcc.c-torture/execute/pr43220.c execution,  -O2 
+PASS: gcc.c-torture/execute/pr43220.c execution,  -O2 
 PASS: gcc.c-torture/execute/pr43220.c compilation,  -O3 -fomit-frame-pointer 
-FAIL: gcc.c-torture/execute/pr43220.c execution,  -O3 -fomit-frame-pointer 
+PASS: gcc.c-torture/execute/pr43220.c execution,  -O3 -fomit-frame-pointer 
 PASS: gcc.c-torture/execute/pr43220.c compilation,  -O3 -g 
-FAIL: gcc.c-torture/execute/pr43220.c execution,  -O3 -g 
+PASS: gcc.c-torture/execute/pr43220.c execution,  -O3 -g 
 PASS: gcc.c-torture/execute/pr43220.c compilation,  -Os 
-FAIL: gcc.c-torture/execute/pr43220.c execution,  -Os 
+PASS: gcc.c-torture/execute/pr43220.c execution,  -Os 
 PASS: gcc.c-torture/execute/pr43438.c compilation,  -O0 
 PASS: gcc.c-torture/execute/pr43438.c execution,  -O0 
 PASS: gcc.c-torture/execute/pr43438.c compilation,  -O1 
@@ -19389,11 +19389,11 @@ PASS: gcc.c-torture/execute/zerolen-2.c execution,  -Os
 
 		=== gcc Summary ===
 
-# of expected passes		18723
-# of unexpected failures	321
+# of expected passes		18753
+# of unexpected failures	303
 # of unexpected successes	6
 # of expected failures		21
-# of unresolved testcases	135
+# of unresolved testcases	123
 # of unsupported tests		152
 /home/bcd/src/git/gcc/build-6809/m6809-unknown-none/gcc/xgcc  version 4.3.6 (gcc6809) (GCC) 
 
