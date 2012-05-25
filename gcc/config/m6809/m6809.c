@@ -2447,7 +2447,7 @@ m6809_split_shift (int code, rtx *operands)
 	 * (near to the maximum of 8) as a rotate and mask. */
 	if (mode == QImode && REG_P (operands[0]) && count >= ((code == ASHIFTRT) ? 7 : 6))
 	{
-		unsigned int mask;
+		HOST_WIDE_INT mask;
 		unsigned int was_signed = (code == ASHIFTRT);
 
 		code = (code == ASHIFT) ? ROTATERT : ROTATE;
