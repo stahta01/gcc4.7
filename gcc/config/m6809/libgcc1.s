@@ -24,6 +24,7 @@ along with GCC; see the file COPYING3.  If not see
    This exception does not however invalidate any other reasons why
    the executable file might be covered by the GNU General Public License.  */
 
+	.module libgcc1.s
 
 #define SIGFPE jmp _abort
 
