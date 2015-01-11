@@ -46,10 +46,9 @@
 #include <string.h>
 
 /*
- * Local Definitions
+ * Config Include File
  */
-
-#define	VERSION	"V05.00"
+#include "../config.h"
 
 /*
  * To include NoICE Debugging set non-zero
@@ -60,7 +59,6 @@
  * To include SDCC Debugging set non-zero
  */
 #define	SDCDB	1
-
 
 /*
  * The assembler requires certain variables to have
@@ -149,11 +147,9 @@
 #define	LFTERM	'('		/* Left expression delimeter */
 #define	RTTERM	')'		/* Right expression delimeter */
 
-#define NCPS	80		/* Characters per symbol */
 #define	HUGE	1000		/* A huge number */
 #define NERR	2		/* Errors per line */
-#define NINPUT	128		/* Input buffer size */
-#define NCODE	128		/* Listing code buffer size */
+#define NCODE	(NINPUT)/* Listing code buffer size */
 #define NTITL	80		/* Title buffer size */
 #define	NSBTL	80		/* SubTitle buffer size */
 #define	NHASH	(1 << 6)	/* Buckets in hash table */
@@ -163,7 +159,6 @@
 #define	MAXINC	6		/* Maximum nesting of include files */
 #define	MAXMCR	20		/* Maximum nesting of macro expansions */
 #define	MAXIF	10		/* Maximum nesting of if/else/endif */
-#define	FILSPC	255		/* Chars. in filespec */
 
 #define NLIST	0		/* No listing */
 #define SLIST	1		/* Source only */
