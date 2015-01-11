@@ -1602,7 +1602,7 @@ static int m6809_address_cost (rtx addr)
 
 static tree
 m6809_handle_fntype_attribute (tree *node, tree name,
-	tree args ATTRIBUTE_UNUSED,
+	tree args,
 	int flags ATTRIBUTE_UNUSED,
 	bool *no_add_attrs)
 {
@@ -1611,6 +1611,28 @@ m6809_handle_fntype_attribute (tree *node, tree name,
 		warning (WARNING_OPT "'%s' only valid for functions", 
 			IDENTIFIER_POINTER (name));
 		*no_add_attrs = TRUE;
+	}
+
+	if (!strcmp (IDENTIFIER_POINTER (name), "interrupt"))
+	{
+		if (args != NULL_TREE)
+		{
+			tree value = TREE_VALUE (args);
+			if (TREE_CODE (value) != STRING_CST)
+			{
+				warning (OPT_Wattributes,
+					"argument of %qs attribute is not a string constant",
+					IDENTIFIER_POINTER (name));
+				*no_add_attrs = TRUE;
+			}
+			else if (strcmp (TREE_STRING_POINTER (value), "firq"))
+			{
+				warning (OPT_Wattributes,
+					"argument of %qs attribute is not \"firq\"",
+					IDENTIFIER_POINTER (name));
+				*no_add_attrs = TRUE;
+			}
+		}
 	}
 
 	return NULL_TREE;
@@ -1643,7 +1665,7 @@ m6809_handle_default_attribute (tree *node ATTRIBUTE_UNUSED,
 /* Table of valid machine attributes */
 const struct attribute_spec m6809_attribute_table[] = { /*
 { name,        min, max, decl,  type, fntype, handler } */
-{ "interrupt", 0,   0,   false, true,  true,  m6809_handle_fntype_attribute },
+{ "interrupt", 0,   1,   false, true,  true,  m6809_handle_fntype_attribute },
 { "naked",     0,   0,   false, true,  true,  m6809_handle_fntype_attribute },
 { "far",       0,   1,   false, true,  true,  m6809_handle_fntype_attribute },
 { "bank",      0,   1,   true,  false, false, m6809_handle_default_attribute },
@@ -2087,11 +2109,37 @@ emit_prologue_insns (void)
   unsigned int frame_size = get_frame_size ();
 
   /* Save all registers used, including the frame pointer */
-  if (live_regs && !m6809_current_function_has_type_attr_p ("interrupt"))
+  tree type = TREE_TYPE (current_function_decl);
+  tree attr = lookup_attribute ("interrupt", TYPE_ATTRIBUTES (type));
+  if (attr == NULL_TREE)
   {
-    insn = emit_insn (
-      gen_rtx_register_pushpop (UNSPEC_PUSH_RS, live_regs));
-    RTX_FRAME_RELATED_P (insn) = 1;
+    if (live_regs)
+    {
+      insn = emit_insn (
+        gen_rtx_register_pushpop (UNSPEC_PUSH_RS, live_regs));
+      RTX_FRAME_RELATED_P (insn) = 1;
+    }
+  }
+  else
+  {
+    /* Make sure it has a value assigned to it */
+    attr = TREE_VALUE (attr);
+    if (attr != NULL_TREE)
+    {
+      /* Return the interrupt name */
+      attr = TREE_VALUE (attr);
+      if (!strcmp (TREE_STRING_POINTER (attr), "firq"))
+      {
+        /* TODO save D and X only if they have changed or a
+           function has been called */
+        live_regs |= (1 << HARD_D_REGNUM) | (1 << HARD_X_REGNUM);
+        insn = emit_insn (
+          gen_rtx_register_pushpop (UNSPEC_PUSH_RS, live_regs));
+        RTX_FRAME_RELATED_P (insn) = 1;
+      }
+      else
+        gcc_unreachable ();
+    }
   }
 
   /* Allocate space for local variables */
@@ -2127,14 +2175,35 @@ emit_epilogue_insns (bool sibcall_p)
   }
   else
   {
-    if (live_regs && !m6809_current_function_has_type_attr_p ("interrupt"))
+    tree type = TREE_TYPE (current_function_decl);
+    tree attr = lookup_attribute ("interrupt", TYPE_ATTRIBUTES (type));
+    if (attr == NULL_TREE)
+    {
+      if (live_regs)
         emit_insn (
           gen_rtx_register_pushpop (UNSPEC_POP_RS, PC_REGBIT | live_regs));
-  
-    if (m6809_current_function_has_type_attr_p ("interrupt"))
-      emit_jump_insn (gen_return_rti ());
-    else
+
       emit_jump_insn (gen_return_rts ());
+    }
+    else
+    {
+      /* Make sure it has a value assigned to it */
+      attr = TREE_VALUE (attr);
+      if (attr != NULL_TREE)
+      {
+        /* Return the interrupt name */
+        attr = TREE_VALUE (attr);
+        if (!strcmp (TREE_STRING_POINTER (attr), "firq"))
+        {
+          live_regs |= (1 << HARD_D_REGNUM) | (1 << HARD_X_REGNUM);
+          emit_insn (gen_rtx_register_pushpop (UNSPEC_POP_RS, live_regs));
+        }
+        else
+          gcc_unreachable ();
+      }
+
+      emit_jump_insn (gen_return_rti ());
+    }
   }
 }
 
@@ -2697,7 +2766,8 @@ m6809_function_ok_for_sibcall (tree decl, tree exp ATTRIBUTE_UNUSED)
 		goto done;
 
 	/* Never allow an interrupt handler to be optimized this way. */
-	if (m6809_function_has_type_attr_p (decl, "interrupt"))
+	if (m6809_function_has_type_attr_p (current_function_decl, "interrupt")
+		|| m6809_function_has_type_attr_p (decl, "interrupt"))
 		goto done;
 
 	/* Skip sibcall if the type can't be found for
