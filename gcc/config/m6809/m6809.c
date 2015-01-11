@@ -921,7 +921,7 @@ m6809_preferred_reload_class (rtx x, enum reg_class regclass)
 			 * it's best to avoid using D register since it is
 			 * needed for other things.
 			 */
-			else if (((unsigned) (INTVAL(x) + 0x80) < 0x10000) &&
+			else if (((unsigned) (INTVAL(x) + 0x8000) < 0x10000) &&
   				 (regclass > A_REGS))
       		return A_REGS;
 			break;
