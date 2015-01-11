@@ -965,6 +965,7 @@ bss_initializer_p (const_tree decl)
 void
 align_variable (tree decl, bool dont_output_data)
 {
+#if MAX_OFILE_ALIGNMENT/BITS_PER_UNIT > 1
   unsigned int align = DECL_ALIGN (decl);
 
   /* In the case for initialing an array whose length isn't specified,
@@ -983,6 +984,9 @@ align_variable (tree decl, bool dont_output_data)
 	       MAX_OFILE_ALIGNMENT/BITS_PER_UNIT);
       align = MAX_OFILE_ALIGNMENT;
     }
+#else
+  unsigned int align = MAX_OFILE_ALIGNMENT;
+#endif
 
   /* On some machines, it is good to increase alignment sometimes.  */
   if (! DECL_USER_ALIGN (decl))
