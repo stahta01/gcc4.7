@@ -1078,6 +1078,8 @@ do { \
 #undef DTORS_SECTION_ASM_OP
 #define DTORS_SECTION_ASM_OP    "\t.area .dtors"
 
+/* Prevent generation of __CTOR_LIST__ and __DTOR_LIST__ */
+#define CTOR_LISTS_DEFINED_EXTERNALLY
 
 #undef DO_GLOBAL_CTORS_BODY
 #undef DO_GLOBAL_DTORS_BODY
