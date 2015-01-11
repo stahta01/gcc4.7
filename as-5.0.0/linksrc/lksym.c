@@ -652,7 +652,7 @@ unsigned int n;
 	return (p);
 }
 
-#else
+#elif !defined(__GLIBC__)
 
 /*)Function	char *	strsto(str)
  *
@@ -767,5 +767,31 @@ unsigned int n;
 	}
 	return (p);
 }
+
+#else
+
+
+static void die(void)
+{
+	fprintf(stderr, "Out of space!\n");
+	lkexit(ER_FATAL);
+}
+
+char *strsto(char *str)
+{
+	char *p;
+	if ((p = strdup(str)) == NULL)
+		die();
+	return p;
+}
+
+char *new(unsigned int n)
+{
+	char *p;
+	if ((p = (char *)calloc(1, n)) == NULL)
+		die();
+	return p;
+}
+
 
 #endif

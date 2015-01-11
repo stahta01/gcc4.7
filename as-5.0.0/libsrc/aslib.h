@@ -1,8 +1,18 @@
 /* aslib.h */
+
+/*
+ * System Include Files
+ */
 #include <stdio.h>
 
-#define VERSION "v0.2"
+/*
+ * Config Include File
+ */
+#include "../config.h"
 
+/*
+ * Local Definitions
+ */
 #define FSEPX '.'
 
 /*
@@ -14,9 +24,6 @@
  * This file defines the format of the
  * relocatable binary file.
  */
-#define NCPS    32    /* characters per symbol */
-#define NINPUT  128   /* Input buffer size */
-#define FILSPC  255   /* File spec length */
 
 struct lfile
 {

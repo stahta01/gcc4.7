@@ -29,16 +29,14 @@
 /*
  * System Include Files
  */
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 
 /*
- * Local Definitions
+ * Config Include File
  */
-
-#define	VERSION	"V05.00"
+#include "../config.h"
 
 /*
  * To include NoICE Debugging set non-zero
@@ -171,17 +169,13 @@
  * This file defines the format of the
  * relocatable binary file.
  */
-
-#define NCPS		80	/* characters per symbol */
-#define	NINPUT		512	/* Input buffer size */
-#define	NHASH	     (1 << 6)	/* Buckets in hash table */
+#define	NHASH	     (1 << 8)	/* Buckets in hash table */
 #define	HMASK	    (NHASH - 1)	/* Hash mask */
 #define	NLPP		60	/* Lines per page */
 #define	NMAX		78	/* IXX/SXX/DBX Buffer Length */
-#define		IXXMAXBYTES	32	/* NMAX > (2 * IXXMAXBYTES) */
-#define		SXXMAXBYTES	32	/* NMAX > (2 * SXXMAXBYTES) */
-#define		DBXMAXBYTES	64	/* NMAX > (  DBXMAXBYTES  ) */
-#define	FILSPC		255	/* File spec length */
+#define	IXXMAXBYTES	32	/* NMAX > (2 * IXXMAXBYTES) */
+#define	SXXMAXBYTES	32	/* NMAX > (2 * SXXMAXBYTES) */
+#define	DBXMAXBYTES	64	/* NMAX > (  DBXMAXBYTES  ) */
 
 /*
  * NTXT must be defined to have the same value in
