@@ -48,7 +48,7 @@ else
 endif
 
 # Set default set of languages to build frontends for.
-GCC_LANGUAGES ?= c
+GCC_LANGUAGES ?= c,c++
 
 # Set default gcc version to build.
 GCC_VERSION ?= $(shell cat ../gcc/BASE-VER)
@@ -78,14 +78,16 @@ as_bindir := $(as_prefix)/bin
 # Set the target CPU
 target_cpu := m6809
 
-# Set the target machine type.  The 'unknown' type is used for simulation
+# Set the target machine type
 # This can be overriden at the command-line.
 target_vendor ?= unknown
 #target_vendor = coco
+#target_vendor = sim
 #target_vendor = wpc
 
 # Set the target OS
-target_os = none
+# This can be overriden at the command-line.
+target_os ?= none
 #target_os = freewpc
 #target_os = nitros9
 #target_os = os9
@@ -153,7 +155,17 @@ endif
 ##########################################################################
 
 coco :
-	$(MAKE) everything target_vendor=coco prefix=/opt/coco GCC_LANGUAGES=c,c++
+	$(MAKE) everything target_vendor=coco prefix=/opt/coco
+
+##########################################################################
+
+sim :
+	$(MAKE) everything target_vendor=sim
+
+##########################################################################
+
+dfboard :
+	$(MAKE) everything prefix=/usr/src/gcc6809/build SUDO=
 
 ##########################################################################
 
