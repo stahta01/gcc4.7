@@ -136,6 +136,7 @@ SRCDIR := $(abspath $(PWD)/..)
 BLDDIR := $(PWD)/$(target)
 DEJADIR=/usr/share/dejagnu
 TESTEXP := m6809-sim.exp
+MULTILIBS := . mdret fpic fpic/mdret
 
 ##########################################################################
 ##########################################################################
@@ -180,11 +181,12 @@ build :
 .PHONY : install
 install : post-install
 
-# TODO : multiple copies of the libgcc cache need to be made for multilibs
 .PHONY : post-install
 post-install: gccinstall
 	@echo "Installing libgcc cache..." && \
-		$(SUDO) $(call run_binutil,ar) --cache $(prefix)/lib/gcc/$(target)/$(GCC_CURRENT_VERSION)/libgcc.a
+		for lib in $(MULTILIBS); do \
+			$(SUDO) $(call run_binutil,ar) --cache $(prefix)/lib/gcc/$(target)/$(GCC_CURRENT_VERSION)/$$lib/libgcc.a ;\
+		done
 
 ##########################################################################
 
