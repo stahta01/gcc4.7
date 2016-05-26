@@ -343,7 +343,6 @@ print_operand_address (FILE *file, rtx addr)
 		}
 	}
 
-
 	switch (GET_CODE (addr)) {
 		case REG:
 			regno = REGNO (addr);
@@ -439,6 +438,7 @@ print_operand_address (FILE *file, rtx addr)
 	if (indirect_flag)
 		fprintf (file, "]");
 }
+
 
 /*-------------------------------------------------------------------
     Update the CC Status
@@ -909,7 +909,7 @@ m6809_preferred_reload_class (rtx x, enum reg_class regclass)
 		case CONST_INT:
 		   /* Constants that can fit into 1 byte should be
 			 * loaded into a Q_REGS reg */
-			if (((unsigned) (INTVAL(x) + 0x80) < 0x100) &&
+			if ((INTVAL(x) >= -128 && INTVAL(x) <= 127) &&
   				 (regclass > A_REGS))
       		return Q_REGS;
 
@@ -921,7 +921,7 @@ m6809_preferred_reload_class (rtx x, enum reg_class regclass)
 			 * it's best to avoid using D register since it is
 			 * needed for other things.
 			 */
-			else if (((unsigned) (INTVAL(x) + 0x8000) < 0x10000) &&
+			else if ((INTVAL(x) >= -32768 && INTVAL(x) <= 32767) &&
   				 (regclass > A_REGS))
       		return A_REGS;
 			break;
@@ -1900,7 +1900,6 @@ far_functionp (rtx x)
 		return NULL;
 	return far_function_type_p (decl_type);
 }
-
 
 
 /** Outputs the assembly language for a far call. */
