@@ -323,7 +323,7 @@ print_operand (FILE * file, rtx x, int code)
 
 /** Prints an address operand to assembler from its RTL representation. */
 void
-print_operand_address (FILE *file, rtx addr)
+print_operand_address (FILE *file, rtx addr, rtx ofst)
 {
 	register rtx base = 0;
 	register rtx offset = 0;
@@ -345,6 +345,8 @@ print_operand_address (FILE *file, rtx addr)
 
 	switch (GET_CODE (addr)) {
 		case REG:
+			if (indirect_flag && ofst != NULL_RTX && CONSTANT_P (ofst) && XEXP (ofst, 0))
+				output_addr_const(file, ofst);
 			regno = REGNO (addr);
 			fprintf (file, ",%s", reg_names[regno]);
 			break;
@@ -1899,6 +1901,19 @@ far_functionp (rtx x)
 	if (decl_type == NULL_TREE)
 		return NULL;
 	return far_function_type_p (decl_type);
+}
+
+
+/** Outputs the assembly language for a call. */
+void
+output_call_insn (rtx *operands)
+{
+	/* First output the JSR instruction */
+	fputs ("\tjsr\t", asm_out_file);
+
+	/* Finally output the operand and a new line */
+	print_operand_address (asm_out_file, XEXP (operands[0], 0), operands[1]);
+	fputs ("\n", asm_out_file);
 }
 
 

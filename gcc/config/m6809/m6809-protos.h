@@ -61,7 +61,7 @@ int m6809_init_cumulative_args (CUMULATIVE_ARGS cum, tree fntype, rtx libname);
 #ifdef RTX_CODE
 void 					print_direct_prefix (FILE *file, rtx addr);
 void 					print_operand (FILE *file, rtx x, int code);
-void 					print_operand_address (FILE *file, rtx addr);
+void 					print_operand_address (FILE *file, rtx addr, rtx ofst);
 void 					notice_update_cc (rtx exp, rtx insn);
 enum 					reg_class m6809_preferred_reload_class (rtx x, enum reg_class regclass);
 rtx 					gen_rtx_const_high (rtx r);
@@ -69,6 +69,7 @@ rtx 					gen_rtx_const_low (rtx r);
 rtx 					gen_rtx_register_pushpop (int pop_flag, int regs);
 void 					emit_libcall_insns (enum machine_mode mode, const char *name, rtx *operands, int count);
 const char *		output_branch_insn (enum rtx_code code, rtx *operands, int length);
+void					output_call_insn (rtx *operands);
 void 					output_far_call_insn (rtx *operands, int has_return);
 void 					m6809_initialize_trampoline (rtx tramp, rtx fnaddr, rtx cxt);
 rtx 					m6809_expand_builtin (tree exp, rtx target, rtx subtarget, enum machine_mode mode, int ignore);
