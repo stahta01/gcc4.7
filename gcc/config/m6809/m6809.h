@@ -1334,7 +1334,7 @@ do { \
 #define PRINT_OPERAND(FILE, X, CODE) print_operand (FILE, X, CODE)
 
 /* Print a memory operand whose address is X, on file FILE. */
-#define PRINT_OPERAND_ADDRESS(FILE, ADDR) print_operand_address (FILE, ADDR)
+#define PRINT_OPERAND_ADDRESS(FILE, ADDR) print_operand_address (FILE, ADDR, NULL_RTX)
 
 /* Don't let stack pushes build up too much. */
 #define MAX_PENDING_STACK 8
