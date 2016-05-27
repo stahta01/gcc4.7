@@ -137,7 +137,7 @@ BLDDIR := $(PWD)/$(target)
 DEJADIR=/usr/share/dejagnu
 TESTEXP := m6809-sim.exp
 MULTILIB_LIB = gcc gcov
-MULTILIB_DIR = $(shell $(prefix)/bin/$(program_prefix)gcc -print-multi-lib | sed -n 's/\(^[^;]*\).*$$/\1/p')
+MULTILIB_DIR = $(shell $(call run_binutil,gcc) -print-multi-lib | sed -n 's/\(^[^;]*\).*$$/\1/p')
 
 ##########################################################################
 ##########################################################################
