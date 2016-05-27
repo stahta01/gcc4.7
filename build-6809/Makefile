@@ -136,7 +136,8 @@ SRCDIR := $(abspath $(PWD)/..)
 BLDDIR := $(PWD)/$(target)
 DEJADIR=/usr/share/dejagnu
 TESTEXP := m6809-sim.exp
-MULTILIBS := . mdret fpic fpic/mdret
+MULTILIB_LIB = gcc gcov
+MULTILIB_DIR = $(shell $(prefix)/bin/$(program_prefix)gcc -print-multi-lib | sed -n 's/\(^[^;]*\).*$$/\1/p')
 
 ##########################################################################
 ##########################################################################
@@ -183,10 +184,12 @@ install : post-install
 
 .PHONY : post-install
 post-install: gccinstall
-	@echo "Installing libgcc cache..." && \
-		for lib in $(MULTILIBS); do \
-			$(SUDO) $(call run_binutil,ar) --cache $(prefix)/lib/gcc/$(target)/$(GCC_CURRENT_VERSION)/$$lib/libgcc.a ;\
-		done
+	@for lib in $(MULTILIB_LIB); do \
+		echo "Installing $$lib cache..." && \
+		for dir in $(MULTILIB_DIR); do \
+			$(SUDO) $(call run_binutil,ar) --cache $(prefix)/lib/gcc/$(target)/$(GCC_CURRENT_VERSION)/$$dir/lib$$lib.a ;\
+		done \
+	done
 
 ##########################################################################
 
@@ -284,6 +287,8 @@ info :
 	@echo BLDDIR is $(BLDDIR)
 	@echo as_bindir is $(as_bindir)
 	@echo prefix is $(prefix)
+	@echo MULTILIB_DIR is $(MULTILIB_DIR)
+	@echo MULTILIB_LIB is $(MULTILIB_LIB)
 
 ##########################################################################
 
