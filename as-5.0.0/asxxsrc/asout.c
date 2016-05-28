@@ -1121,12 +1121,12 @@ outbuf(s)
 char *s;
 {
 	if (txtp > &txt[a_bytes]) {
-		fprintf(ofp, "T");
+		fputs("T", ofp);
 		out(txt,(int) (txtp-txt));
-		fprintf(ofp, "\n");
-		fprintf(ofp, s);
+		fputs("\n", ofp);
+		fputs(s, ofp);
 		out(rel,(int) (relp-rel));
-		fprintf(ofp, "\n");
+		fputs("\n", ofp);
 	}
 	txtp = txt;
 	relp = rel;

@@ -89,8 +89,11 @@ static void append(char *arname, struct lfile *memberp)
    }
 
    /* seek 'End' marker */
-   while (getc(libf) != 'E')
-      fgets(line, 256, libf);
+   while ((ret=getc(libf)) != 'E')
+      if (ret == EOF || fgets(line, 256, libf) == NULL) {
+         printf("Error: cannot seek 'End' marker.\n");
+         exit(1);
+      }
 
    fseek(libf, -1, SEEK_CUR);
 

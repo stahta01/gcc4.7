@@ -296,10 +296,10 @@ struct bank *yp;
 			}
 			putc('\n', mfp);
 			for(i=0;i<n;++i)
-				fprintf(mfp, frmta);
+				fputs(frmta, mfp);
 			putc('\n', mfp);
 			for(i=0;i<n;++i)
-				fprintf(mfp, frmtb);
+				fputs(frmtb, mfp);
 			putc('\n', mfp);
 		}
 
@@ -460,7 +460,7 @@ struct bank *yp;
 			case 3:
 			case 4: frmt = "   "; break;
 			}
-			fprintf(mfp, frmt);
+			fputs(frmt, mfp);
 		} else
 		if ((i % n) == 0) {
 			slew(xp, yp);
@@ -470,7 +470,7 @@ struct bank *yp;
 			case 3:
 			case 4: frmt = "  "; break;
 			}
-			fprintf(mfp, frmt);
+			fputs(frmt, mfp);
 		}
 
 		sp = p[i];
