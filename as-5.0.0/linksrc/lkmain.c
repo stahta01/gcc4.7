@@ -153,8 +153,6 @@ char *argv[];
 		exit(ER_FATAL);
 	}
 
-	fprintf(stdout, "\n");
-
 	startp = (struct lfile *) new (sizeof (struct lfile));
 	startp->f_idp = "";
 
