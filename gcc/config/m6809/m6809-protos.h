@@ -29,7 +29,6 @@ unsigned int 		m6809_get_regs_size (unsigned int regs);
 int 					m6809_function_has_type_attr_p (tree decl, const char *);
 int 					m6809_current_function_has_type_attr_p (const char *);
 int 					prologue_epilogue_required (void);
-int 					noreturn_functionp (rtx x);
 void 					output_function_prologue (FILE *file, int size);
 void 					output_function_epilogue (FILE *file, int size);
 int 					check_float_value (enum machine_mode mode, double *d, int overflow);
