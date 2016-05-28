@@ -87,6 +87,7 @@ supported machines. */
 	.area .gcc_except_table (BANK=prog)
 	.area .bss              (BANK=prog)
 	.area .noinit           (BANK=prog)
+	.area .vector
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
@@ -271,10 +272,10 @@ ___crt0_vector:
 	rti
 
 	;;;
-	;;; vector : The interrupt vector table
+	;;; .vector : The interrupt vector table
 	;;; The linker will ensure that this gets loaded at address 0xFFF0.
 	;;;
-	.area vector
+	.area .vector
 vectors:
 	.word ___crt0_vector
 	.word ___crt0_vector

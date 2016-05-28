@@ -30,12 +30,17 @@ libs=
 verbose=
 case $0 in
 	*m6809-coco-*)
-		options="-b .text=0x2000 -b .data=0x7000 -b .bss=0x7C00 -b .ctors=0x7F00 -b .dtors=0x7F80 -b vector=0x7FF0"
+		options="-b .text=0x2000 -b .data=0x7000 -b .bss=0x7C00 -b .ctors=0x7F00 -b .dtors=0x7F80 -b .vector=0x7FF0"
 		aslink_options="-nwxst"
 		exe_suffix=.bin
 		;;
-	*)
-		options="-b .text=0x10 -b vector=0xFFF0"
+	*m6809-sim-*)
+		options="-b .text=0x10 -b .vector=0xFFF0"
+		aslink_options="-nwxso"
+		exe_suffix=.s19
+		;;
+	*m6809-*-*)
+		options="-b .vector=0xFFF0"
 		aslink_options="-nwxso"
 		exe_suffix=.s19
 		;;
