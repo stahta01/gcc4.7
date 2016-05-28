@@ -1834,21 +1834,6 @@ m6809_expand_builtin (tree exp,
 }
 
 
-
-/* Returns nonzero if 'x' represents a function that was declared
- * as __noreturn__. */
-int
-noreturn_functionp (rtx x)
-{
-	tree decl = call_target_decl (x);
-
-	if (decl == NULL_TREE)
-		return 0;
-	else
-		return TREE_THIS_VOLATILE (decl);
-}
-
-
 const char *
 far_function_type_p (tree type)
 {
