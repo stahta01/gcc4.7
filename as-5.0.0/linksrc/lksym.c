@@ -380,11 +380,9 @@ struct sym *tsp;
 		for (i=0; i<hp->h_nsym; ++i) {
 		    if (p[i] == tsp) {
 			fprintf(fp,
-				"\n?ASlink-Warning-Undefined Global %s ",
-				tsp->s_id);
-			fprintf(fp,
+				"?ASlink-Warning-Undefined symbol %s "
 				"referenced by module %s\n",
-				hp->m_id);
+				tsp->s_id, hp->m_id);
 			lkerr++;
 		    }
 		}
@@ -773,7 +771,7 @@ unsigned int n;
 
 static void die(void)
 {
-	fprintf(stderr, "Out of space!\n");
+	fputs("Out of space!\n", stderr);
 	lkexit(ER_FATAL);
 }
 
