@@ -7,7 +7,7 @@
    forward us bugs reported to you, if you determine that they are
    not bugs in your modifications.)  */
 
-const char bug_report_url[] = "<URL:http://www.oddchange.com/gcc6809>";
+const char bug_report_url[] = "<URL:https://github.com/dfffffff/gcc6809/issues>";
 
 /* The complete version string, assembled from several pieces.
    BASEVER, DATESTAMP, DEVPHASE, and REVISION are defined by the
