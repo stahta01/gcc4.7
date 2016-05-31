@@ -1,6 +1,9 @@
-#!/bin/bash
+#!/bin/sh
 #
 # Copyright 2006 by Brian Dominy <brian@oddchange.com>
+#
+# Changes by David Flamand <dflamand@gmail.com> (May 2016)
+#  - cleanup, more robust and verbose in case of error
 #
 # This file is part of GCC6809.
 #
@@ -19,76 +22,92 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
-
 # This script is a frontend to the aslib library manager, to make it
 # look more like GNU ar.  Not all ar features are supported here.
 # It basically translates ar style options into aslib format.
 
+set -e
+
 as_prefix=@AS_PREFIX@
 bindir=${as_prefix}/bin; export bindir
 
+error ()
+{
+	echo "ar (m6809): $1" 1>&2
+	exit 1
+}
+
 libcachetool ()
 {
+	if [ $# = 0 ]; then
+		error "no file given"
+	fi
+	if [ $# -gt 1 ]; then
+		shift
+		error "extra garbage '$*'"
+	fi
+
 	libpathname=$1
-	libfile=`basename $libpathname`
-	libdir=`echo $libpathname | sed -e "s/\/$libfile//"`
-	lib=`echo $libfile | sed -e "s/\.a//"`
+	if [ ! -f "$libpathname" ]; then
+		error "no such file '$libpathname'"
+	fi
+
+	libfile=`basename "$libpathname"`
+	libdir=`dirname "$libpathname"`
+	lib=${libfile%.*}
 	reallibfile=as-$libfile
 	libcache=${lib}-cache
 
-	if [ ! -d $libdir ]; then
-		echo "ar (m6809): no such directory $libdir"
+	if [ ! -d "$libdir" ]; then
+		error "no such directory '$libdir'"
 	fi
-	cd $libdir
+	cd "$libdir"
 
-	if [ "$libfile" = "" ]; then
-		echo "ar (m6809): $libfile does not exist in $libdir"
-		return 1
+	if [ ! -f "$libfile" ]; then
+		error "'$libfile' does not exist in '$libdir'"
 	fi
 
 	# Recreate the cache directory
-	rm -rf $libcache
-	mkdir -p $libcache
+	rm -rf "$libcache"
+	mkdir -p "$libcache"
 
 	# Fill the cache
-	cd $libcache
-	$bindir/aslib x ../$libfile
+	cd "$libcache"
+	$bindir/aslib x ../"$libfile"
 	cd ..
-	ls -1 ./$libcache/*.o > $reallibfile
-	return 0
+
+	# Make the index file
+	find "$libcache" -name '*.o' | LC_ALL=C sort > "$reallibfile"
+	exit
 }
 
-
 # Parse and translate command-line options
-libs=
-options=$1; shift
-case $options in
-	rc|cru|-rc|-cru)
-		options="rc"
-		;;
-	rv)
-		options="rv"
-		;;
-	x|-x)
-		options="x"
-		;;
-	C|-C|--cache)
-		libpathname=$1; shift
-		libcachetool $libpathname
-		exit $?
-		;;
-	*)
-		options="rc $options"
-		if [ "$libname" = "" ]; then
-			libname=$options
-		fi
-		;;
-esac
-
-if [ "x$options" = "x" ]; then
-	echo "ar (m6809): no options given"
-	exit 1
+options=${1#-}
+if [ -n "$options" ]; then
+	case $options in
+		C|-cache)
+			shift; libcachetool "$@"
+			;;
+		rc|cr|rcu|cru)
+			shift; options="rc"
+			;;
+		rv|vr)
+			shift; options="rv"
+			;;
+		x)
+			shift; options="x"
+			;;
+		*.*)
+			options="rc"
+			;;
+		*)
+			error "invalid options '$options'"
+			;;
+	esac
+fi
+if [ -z "$options" ]; then
+	error "no options given"
 fi
 
 # Run the real archiver with translated options.
-$bindir/aslib $options $*
+exec $bindir/aslib $options "$@"
