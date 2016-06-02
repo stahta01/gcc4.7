@@ -2381,37 +2381,44 @@ m6809_output_shift_insn (int rtx_code, rtx *operands)
 	if (GET_CODE (operands[2]) == CONST_INT)
 		abort ();
 
-	if (optimize_size && GET_MODE (operands[0]) == HImode)
+	if (GET_MODE (operands[0]) == HImode)
 	{
-		switch (rtx_code)
+		if (optimize_size)
 		{
-			case ASHIFT:
-				output_asm_insn ("jsr\t_ashlhi3", operands);
-				break;
-			case ASHIFTRT:
-				output_asm_insn ("jsr\t_ashrhi3", operands);
-				break;
-			case LSHIFTRT:
-				output_asm_insn ("jsr\t_lshrhi3", operands);
-				break;
+			switch (rtx_code)
+			{
+				case ASHIFT:
+					output_asm_insn (flag_pic ? "lbsr\t_ashlhi3" : "jsr\t_ashlhi3", operands);
+					break;
+				case ASHIFTRT:
+					output_asm_insn (flag_pic ? "lbsr\t_ashrhi3" : "jsr\t_ashrhi3", operands);
+					break;
+				case LSHIFTRT:
+					output_asm_insn (flag_pic ? "lbsr\t_lshrhi3" : "jsr\t_lshrhi3", operands);
+					break;
+				default:
+					abort ();
+				}
+		}
+		else
+		{
+			switch (rtx_code)
+			{
+				case ASHIFT:
+					m6809_gen_register_shift (operands, "aslb", "rola");
+					break;
+				case ASHIFTRT:
+					m6809_gen_register_shift (operands, "asra", "rorb");
+					break;
+				case LSHIFTRT:
+					m6809_gen_register_shift (operands, "lsra", "rorb");
+					break;
+				default:
+					abort ();
+			}
 		}
 	}
-	else if (GET_MODE (operands[0]) == HImode)
-	{
-		switch (rtx_code)
-		{
-			case ASHIFT:
-				m6809_gen_register_shift (operands, "aslb", "rola");
-				break;
-			case ASHIFTRT:
-				m6809_gen_register_shift (operands, "asra", "rorb");
-				break;
-			case LSHIFTRT:
-				m6809_gen_register_shift (operands, "lsra", "rorb");
-				break;
-		}
-	}
-	else
+	else if (GET_MODE (operands[0]) == QImode)
 	{
 		switch (rtx_code)
 		{
@@ -2424,8 +2431,12 @@ m6809_output_shift_insn (int rtx_code, rtx *operands)
 			case LSHIFTRT:
 				m6809_gen_register_shift (operands, "lsrb", NULL);
 				break;
+			default:
+				abort ();
 		}
 	}
+	else
+		abort ();
 }
 
 
