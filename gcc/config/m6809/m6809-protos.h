@@ -32,7 +32,7 @@ int 					prologue_epilogue_required (void);
 void 					output_function_prologue (FILE *file, int size);
 void 					output_function_epilogue (FILE *file, int size);
 int 					check_float_value (enum machine_mode mode, double *d, int overflow);
-void 					m6809_asm_named_section (const char *name, unsigned int flags, unsigned int align);
+void 					m6809_asm_named_section (const char *name, unsigned int flags, tree decl);
 void 					m6809_asm_file_start (void);
 void              m6809_output_ascii (FILE *fp, const char *str, unsigned long size);
 void              m6809_declare_function_name (FILE *asm_out_file, const char *name, tree decl);

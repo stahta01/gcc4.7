@@ -82,7 +82,6 @@ register and not a fake one that is emulated in software. */
 /*-------------------------------------------------------------------
     Target hooks, moved from target.h
 -------------------------------------------------------------------*/
-static void m6809_encode_section_info PARAMS ((tree, int ));
 
 #undef TARGET_ENCODE_SECTION_INFO
 #define TARGET_ENCODE_SECTION_INFO m6809_encode_section_info
@@ -163,6 +162,21 @@ unsigned int m6809_soft_regs = 0;
 
 /* ABI version */
 unsigned int m6809_abi_version = M6809_ABI_VERSION_REGS;
+
+
+/* Character class test functions */
+static inline int isdigit(int c)
+{
+	return c >= '0' && c <= '9';
+}
+static inline int isalpha(int c)
+{
+	return (c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z');
+}
+static inline int isalnum(int c)
+{
+	return isalpha(c) || isdigit(c);
+}
 
 
 /**
@@ -838,6 +852,7 @@ pragma_parse (const char *name, tree *sect)
  * This is deprecated; code should use __attribute__(section("name"))
  * instead.
  */
+void pragma_section (cpp_reader *pfile);
 void pragma_section (cpp_reader *pfile ATTRIBUTE_UNUSED)
 {
 	tree sect;
@@ -900,7 +915,7 @@ void
 m6809_asm_named_section (
 	const char *name, 
 	unsigned int flags ATTRIBUTE_UNUSED,
-	unsigned int align ATTRIBUTE_UNUSED)
+	tree decl ATTRIBUTE_UNUSED)
 {
 	fprintf (asm_out_file, "\t.area\t%s\n", name);
 }
@@ -960,7 +975,7 @@ m6809_preferred_reload_class (rtx x, enum reg_class regclass)
  * short instructions.
  */
 static void
-m6809_encode_section_info (tree decl, int new_decl_p ATTRIBUTE_UNUSED)
+m6809_encode_section_info (tree decl, rtx rtl ATTRIBUTE_UNUSED, int first ATTRIBUTE_UNUSED)
 {
    tree attr, id;
    const char *name;
@@ -1309,7 +1324,7 @@ output_branch_insn (enum rtx_code code, rtx *operands, int length)
  */
 static bool
 m6809_rtx_costs (rtx X, int code, int outer_code ATTRIBUTE_UNUSED,
-	int *total, bool speed)
+	int *total)
 {
 	int has_const_arg = 0;
 	HOST_WIDE_INT const_arg = 0;
@@ -2767,11 +2782,11 @@ m6809_hard_regno_mode_ok (unsigned int regno, enum machine_mode mode)
 static bool
 m6809_function_ok_for_sibcall (tree decl, tree exp ATTRIBUTE_UNUSED)
 {
-	tree type, arg;
-	/*const char *name;*/
+	tree type;
 	bool result = 0;
-	int argcount = 0;
-	int step = 1;
+	/*int step = 1;
+	const char *name;
+	int argcount = 0;*/
 
 	/* If there is no DECL, it is an indirect call.
 	 * Never optimize this??? */
@@ -2785,20 +2800,20 @@ m6809_function_ok_for_sibcall (tree decl, tree exp ATTRIBUTE_UNUSED)
 
 	/* Skip sibcall if the type can't be found for
 	 * some reason */
-	step++;
+	/*step++;*/
 	/*name = IDENTIFIER_POINTER (DECL_NAME (decl));*/
 	type = TREE_TYPE (decl);
 	if (type == NULL)
 		goto done;
 
 	/* Skip sibcall if the target is a far function */
-	step++;
+	/*step++;*/
 	if (far_function_type_p (type) != NULL)
 		goto done;
 
 	/* Skip sibcall if the called function's arguments are
 	 * variable */
-	step++;
+	/*step++;*/
 	if (TYPE_ARG_TYPES (type) == NULL)
 		goto done;
 
@@ -3077,6 +3092,8 @@ m6809_can_eliminate (int from, int to)
 int
 m6809_initial_elimination_offset (int from, int to)
 {
+	if (to != STACK_POINTER_REGNUM && to != HARD_FRAME_POINTER_REGNUM)
+		gcc_unreachable ();
 	switch (from)
 	{
 		case ARG_POINTER_REGNUM:
