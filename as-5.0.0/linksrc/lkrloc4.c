@@ -1027,14 +1027,14 @@ char *str;
 	/*
 	 * Print Error
 	 */
-	fprintf(fptr, "\n?ASlink-Warning-%s", str);
+	fprintf(fptr, "?ASlink-Warning-%s", str);
 	lkerr++;
 
 	/*
 	 * Print symbol if symbol based
 	 */
 	if (mode & R4_SYM) {
-		fprintf(fptr, " for symbol  %s\n",
+		fprintf(fptr, " for symbol %s\n",
 			&s[rindex]->s_id[0]);
 	} else {
 		fprintf(fptr, "\n");
@@ -1068,7 +1068,7 @@ char *str;
 /*        |                 |                 |                 |           */
 	fprintf(fptr,
 "  Defin  %-14.14s    %-14.14s    %-14.14s    ",
-			raxp->a_bhp->h_lfile->f_idp,
+			raxp->a_bhp->h_lfile ? raxp->a_bhp->h_lfile->f_idp : "",
 			&raxp->a_bhp->m_id[0],
 			&raxp->a_bap->a_id[0]);
 	if (mode & R4_SYM) {
