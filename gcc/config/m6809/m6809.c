@@ -968,7 +968,7 @@ m6809_preferred_reload_class (rtx x, enum reg_class regclass)
 
 /**
  * Check a new declaration for the "section" attribute.
- * If it exists, and the target section is "direct", then mark
+ * If it exists, and the target section is ".direct", then mark
  * the declaration (in RTL) to indicate special treatment.
  * When the variable is referenced later, we test for this flag
  * and can emit special asm text to force the assembler to use
@@ -1006,7 +1006,7 @@ m6809_encode_section_info (tree decl, rtx rtl ATTRIBUTE_UNUSED, int first ATTRIB
       return;
 
 	/* See if the value is 'direct'.  If so, mark it. */
-   if (!strcmp (name, "direct"))
+   if (!strcmp (name, ".direct"))
       SYMBOL_REF_FLAG (XEXP (DECL_RTL (decl), 0)) = 1;
 }
 
