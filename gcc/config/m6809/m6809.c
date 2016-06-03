@@ -347,7 +347,7 @@ print_operand_address (FILE *file, rtx addr, rtx ofst)
 
 	switch (GET_CODE (addr)) {
 		case REG:
-			if (indirect_flag && ofst != NULL_RTX && CONSTANT_P (ofst) && XEXP (ofst, 0))
+			if (indirect_flag && ofst != NULL_RTX && INTVAL (ofst))
 				output_addr_const(file, ofst);
 			regno = REGNO (addr);
 			fprintf (file, ",%s", reg_names[regno]);
