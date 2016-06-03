@@ -68,6 +68,8 @@ along with GCC; see the file COPYING3.  If not see
 #include "toplev.h"
 #include "optabs.h"
 #include "version.h"
+#include "df.h"
+#include "rtlhooks-def.h"
 
 /* macro to return TRUE if length of operand mode is one byte */
 #define BYTE_MODE(X) ((GET_MODE_SIZE (GET_MODE (X))) == 1)
@@ -740,7 +742,7 @@ m6809_current_function_is_void (void)
 
 /** Get the value of a declaration's 'bank', as set by the 'bank'
  * attribute.  If no bank was declared, it returns NULL by default. */
-const char *
+static const char *
 m6809_get_decl_bank (tree decl)
 {
 	tree attr;
@@ -962,14 +964,14 @@ m6809_encode_section_info (tree decl, int new_decl_p ATTRIBUTE_UNUSED)
 {
    tree attr, id;
    const char *name;
-   const char *decl_name;
+   /*const char *decl_name;*/
 
    /* We only care about variable declarations, not functions */
    if (TREE_CODE (decl) != VAR_DECL)
       return;
 
 	/* For debugging purposes only; grab the decl's name */
-   decl_name = IDENTIFIER_POINTER (DECL_NAME (decl));
+   /*decl_name = IDENTIFIER_POINTER (DECL_NAME (decl));*/
 
 	/* Give up if the decl doesn't have any RTL */
    if (!DECL_RTL (decl))
@@ -1190,7 +1192,8 @@ emit_libcall_insns (enum machine_mode mode,
  * LONG_P is nonzero if we are emitting a long branch, and need to
  * prepend an 'l' to the opcode name.
  */
-void output_branch_insn1 (const char *opcode, rtx *operands, int long_p)
+static void
+output_branch_insn1 (const char *opcode, rtx *operands, int long_p)
 {
 	char pattern[64];
 	sprintf (pattern, "%s%s\t%%l0", long_p ? "l" : "", opcode);
@@ -1309,7 +1312,7 @@ m6809_rtx_costs (rtx X, int code, int outer_code ATTRIBUTE_UNUSED,
 	int *total, bool speed)
 {
 	int has_const_arg = 0;
-	HOST_WIDE_INT const_arg;
+	HOST_WIDE_INT const_arg = 0;
 	enum machine_mode mode;
 	int nargs = 1;
 	rtx op0, op1;
@@ -1741,7 +1744,7 @@ m6809_init_builtins (void)
  *
  * This rtx is suitable for use in the emitted RTL for the
  * builtin instruction. */
-rtx
+static rtx
 m6809_builtin_operand (tree arglist, enum machine_mode mode, int opnum)
 {
 	tree arg;
@@ -1836,7 +1839,7 @@ m6809_expand_builtin (tree exp,
 }
 
 
-const char *
+static const char *
 far_function_type_p (tree type)
 {
 	tree attr;
@@ -2376,8 +2379,6 @@ m6809_output_quoted_string (FILE *asm_file, const char *string)
 void
 m6809_output_shift_insn (int rtx_code, rtx *operands)
 {
-	struct shift_opcode *op;
-
 	if (GET_CODE (operands[2]) == CONST_INT)
 		abort ();
 
@@ -2440,7 +2441,7 @@ m6809_output_shift_insn (int rtx_code, rtx *operands)
 }
 
 
-void
+static void
 m6809_emit_move_insn (rtx dst, rtx src)
 {
 	emit_insn (gen_rtx_SET (VOIDmode, dst, src));
@@ -2763,11 +2764,11 @@ m6809_hard_regno_mode_ok (unsigned int regno, enum machine_mode mode)
 
 /* exp is the call expression.  DECL is the called function,
  * or NULL for an indirect call */
-bool
+static bool
 m6809_function_ok_for_sibcall (tree decl, tree exp ATTRIBUTE_UNUSED)
 {
 	tree type, arg;
-   const char *name;
+	/*const char *name;*/
 	bool result = 0;
 	int argcount = 0;
 	int step = 1;
@@ -2785,7 +2786,7 @@ m6809_function_ok_for_sibcall (tree decl, tree exp ATTRIBUTE_UNUSED)
 	/* Skip sibcall if the type can't be found for
 	 * some reason */
 	step++;
-	name = IDENTIFIER_POINTER (DECL_NAME (decl));
+	/*name = IDENTIFIER_POINTER (DECL_NAME (decl));*/
 	type = TREE_TYPE (decl);
 	if (type == NULL)
 		goto done;

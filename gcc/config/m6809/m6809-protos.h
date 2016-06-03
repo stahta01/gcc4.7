@@ -52,6 +52,9 @@ void              m6809_output_addsi3 (int rtx_code, rtx *operands);
 rtx               m6809_function_arg_on_stack (CUMULATIVE_ARGS *cump);
 void              expand_constant_shift (int code, rtx dst, rtx src, rtx count);
 int               m6809_single_operand_operator (rtx exp);
+void              m6809_split_shift (int code, rtx *operands);
+int               m6809_can_eliminate (int from, int to);
+int               m6809_initial_elimination_offset (int from, int to);
 
 #ifdef TREE_CODE
 int m6809_init_cumulative_args (CUMULATIVE_ARGS cum, tree fntype, rtx libname);
