@@ -77,6 +77,11 @@ supported machines. */
 
 	;; Declare all linker sections, and combine them into a single bank
 	.bank prog              __PROG_SIZE
+#ifdef TARGET_UNKNOWN
+	.area .direct           (BANK=prog)
+#else
+	.area .direct
+#endif
 	.area .base             (BANK=prog)
 	.area .text             (BANK=prog)
 	.area .romcall          (BANK=prog)

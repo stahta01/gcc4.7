@@ -84,7 +84,7 @@ _lshrhi3:
 
 
 #ifdef L_m0
-	.area		direct
+	.area		.direct
 	.globl	m0, m1, m2, m3
 m0: .blkb 1
 m1: .blkb 1
@@ -93,7 +93,7 @@ m3: .blkb 1
 #endif
 
 #ifdef L_m4
-	.area		direct
+	.area		.direct
 	.globl	m4, m5, m6, m7
 m4: .blkb 1
 m5: .blkb 1
@@ -102,7 +102,7 @@ m7: .blkb 1
 #endif
 
 #ifdef L_im0
-	.area		direct
+	.area		.direct
 	.globl	im0, im1, im2, im3
 im0: .blkb 1
 im1: .blkb 1
@@ -111,7 +111,7 @@ im3: .blkb 1
 #endif
 
 #ifdef L_im4
-	.area		direct
+	.area		.direct
 	.globl	im4, im5, im6, im7
 im4: .blkb 1
 im5: .blkb 1
@@ -120,7 +120,7 @@ im7: .blkb 1
 #endif
 
 #ifdef L_fm0
-	.area		direct
+	.area		.direct
 	.globl	fm0, fm1, fm2, fm3
 fm0: .blkb 1
 fm1: .blkb 1
@@ -129,7 +129,7 @@ fm3: .blkb 1
 #endif
 
 #ifdef L_fm4
-	.area		direct
+	.area		.direct
 	.globl	fm4, fm5, fm6, fm7
 fm4: .blkb 1
 fm5: .blkb 1
