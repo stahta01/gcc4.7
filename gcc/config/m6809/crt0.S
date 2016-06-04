@@ -198,10 +198,13 @@ __ctors_done:
 
 	;; Set up argc/argv arrays
 #ifdef TARGET_UNKNOWN
-	;; argc/argv need to be defined elsewhere
+	;;  __argc/__argv need to be defined elsewhere,
+	;;  for example from C code:
+	;;   int _argc = 1;
+	;;   char *_argv[] = {"param1", NULL};
 	LEA	(x,__argv)
 	pshs	x
-	LEA	(x,__argc)
+	ldx	MEM(__argc)
 #endif
 
 	;; Call the main function.  The exit code will
