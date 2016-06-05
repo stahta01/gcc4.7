@@ -14,6 +14,7 @@
 # prefix                     Mandatory
 # target                     Mandatory
 # program_prefix             Mandatory
+# GCC_VERSION                Mandatory
 # SRCDIR                     Mandatory
 # SUDO                       Optional, sudo command
 # hosted                     Optional, set to 'enable' or 'disable'
@@ -31,9 +32,9 @@ CXX := $(prefix)/bin/$(program_prefix)g++
 INCPATH := $(prefix)/$(target)/include
 LIBPATH := $(prefix)/$(target)/lib
 BLDDIR := $(PWD)/$(target)
-LIBNAME := libsupc++
+LIBNAME := libstdc++
 ARCHIVE := $(BLDDIR)/install/$(LIBNAME)-cache
-CXXCONFIG := $(BLDDIR)/install/c++/bits/c++config.h
+CXXCONFIG := $(BLDDIR)/install/c++/$(GCC_VERSION)/bits/c++config.h
 
 ifeq ($(target),)
 $(error null target)
@@ -43,6 +44,9 @@ $(error null prefix)
 endif
 ifeq ($(program_prefix),)
 $(error null program_prefix)
+endif
+ifeq ($(GCC_VERSION),)
+$(error null GCC_VERSION)
 endif
 ifeq ($(SRCDIR),)
 $(error null SRCDIR)
@@ -56,7 +60,7 @@ build: $(ARCHIVE)
 .PHONY: clean
 clean:
 	cd $(BLDDIR)/libsupc++ && $(MAKE) clean
-	rm -rf $(BLDDIR)/install/*$(LIBNAME)*
+	rm -rf $(BLDDIR)/install/*$(LIBNAME)* $(BLDDIR)/install/*libsupc++*
 
 .PHONY: distclean
 distclean:
@@ -64,7 +68,7 @@ distclean:
 
 .PHONY: install
 install: build
-	$(SUDO) cp -r '$(BLDDIR)/install/c++/' '$(INCPATH)'
+	$(SUDO) cp -r '$(BLDDIR)/install/c++/' '$(INCPATH)/c++/'
 	$(SUDO) cp    '$(BLDDIR)/install/$(LIBNAME).a' '$(LIBPATH)'
 	$(SUDO) cp    '$(BLDDIR)/install/as-$(LIBNAME).a' '$(LIBPATH)'
 	$(SUDO) cp -r '$(BLDDIR)/install/$(LIBNAME)-cache/' '$(LIBPATH)'
@@ -79,10 +83,13 @@ uninstall:
 ##########################################################################
 
 $(ARCHIVE): $(BLDDIR)/install/$(LIBNAME).a
-	@echo "Building libsupc++ cache ..." && \
+	@echo "Building $(LIBNAME) cache ..." && \
 	$(AR) --cache $(BLDDIR)/install/$(LIBNAME).a
 
-$(BLDDIR)/install/$(LIBNAME).a: $(CXXCONFIG)
+$(BLDDIR)/install/$(LIBNAME).a: $(BLDDIR)/install/libsupc++.a
+	cp $< $@
+
+$(BLDDIR)/install/libsupc++.a: $(CXXCONFIG)
 	@echo "Building libsupc++ sources ..." && \
 	echo "#include <stdlib.h>\n"\
 	"char* __cxa_demangle(const char* __mangled_name, char* __output_buffer,\n"\
@@ -90,8 +97,8 @@ $(BLDDIR)/install/$(LIBNAME).a: $(CXXCONFIG)
 	"{ \n"\
 	"	*__status = -1;\n"\
 	"	return NULL;\n"\
-	"}" > $(BLDDIR)/$(LIBNAME)/cp-demangle.c && \
-	cd $(BLDDIR)/$(LIBNAME) && $(MAKE) install
+	"}" > $(BLDDIR)/libsupc++/cp-demangle.c && \
+	cd $(BLDDIR)/libsupc++ && $(MAKE) install
 
 ##########################################################################
 
@@ -108,10 +115,10 @@ $(BLDDIR)/config.status: $(CXX) | $(BLDDIR)
 $(CXXCONFIG): $(BLDDIR)/config.status
 	@echo "Building libsupc++ headers ..." && \
 		cd $(BLDDIR)/include && $(MAKE) && $(MAKE) install-headers
-	mkdir -p $(BLDDIR)/install/c++ $(BLDDIR)/install/c++/bits $(BLDDIR)/install/c++/ext
-	cd $(BLDDIR)/install/include/c++ && cp -r $(CXXINCLUDE) -t ../../c++
-	cd $(BLDDIR)/install/include/c++/bits && cp -r $(CXXINCBITS) -t ../../../c++/bits
-	cd $(BLDDIR)/install/include/c++/ext && cp -r $(CXXINCEXT) -t ../../../c++/ext
+	mkdir -p $(BLDDIR)/install/c++/$(GCC_VERSION) $(BLDDIR)/install/c++/$(GCC_VERSION)/bits $(BLDDIR)/install/c++/$(GCC_VERSION)/ext
+	cd $(BLDDIR)/install/include/c++ && cp -r $(CXXINCLUDE) -t ../../c++/$(GCC_VERSION)
+	cd $(BLDDIR)/install/include/c++/bits && cp -r $(CXXINCBITS) -t ../../../c++/$(GCC_VERSION)/bits
+	cd $(BLDDIR)/install/include/c++/ext && cp -r $(CXXINCEXT) -t ../../../c++/$(GCC_VERSION)/ext
 	cp $(BLDDIR)/install/include/c++/$(target)/bits/c++config.h $(CXXCONFIG)
 
 $(BLDDIR):

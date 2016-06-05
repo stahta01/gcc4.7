@@ -222,7 +222,7 @@ $(BLDDIR) :
 
 .PHONY : cxx-build cxx-install cxx-uninstall cxx-clean cxx-distclean
 cxx-build cxx-install cxx-uninstall cxx-clean cxx-distclean :
-	@cd cxx && $(MAKE) $(subst cxx-,,$@) target=$(target) prefix=$(prefix) program_prefix=$(program_prefix) SRCDIR=$(SRCDIR) SUDO=$(SUDO)
+	@cd cxx && $(MAKE) $(subst cxx-,,$@) target=$(target) prefix=$(prefix) program_prefix=$(program_prefix) GCC_VERSION=$(GCC_VERSION) SRCDIR=$(SRCDIR) SUDO=$(SUDO)
 
 ##########################################################################
 
