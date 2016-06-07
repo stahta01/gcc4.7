@@ -147,7 +147,7 @@ int n;
 		if ((p = oprio(c)) <= n)
 			break;
 		if ((c == '>' || c == '<') && c != get()) {
-			lkwarning("Invalid expression");
+			lkwarning("Invalid expression\n");
 			return(v);
 		}
 		ve = expr(p);
@@ -268,7 +268,7 @@ term()
 	if (c == '(') {
 		v = expr(0);
 		if (getnb() != ')') {
-			lkwarning("Missing delimiter");
+			lkwarning("Missing delimiter\n");
 		}
 		return(v);
 	}
@@ -342,13 +342,13 @@ term()
 	if (ctype[c] & LETTER) {
 		getid(id, c);
 		if ((sp = lkpsym(id, 0)) == NULL) {
-			lkwarning("Undefined symbol %s", id);
+			lkwarning("Undefined symbol %s\n", id);
 			return(0);
 		} else {
 			return(symval(sp));
 		}
 	}
-	lkwarning("Unknown operator %c", c);
+	lkwarning("Unknown operator %c\n", c);
 	return(0);
 }
 

@@ -128,7 +128,7 @@ newbank()
 				bp->b_base = v;
 			} else {
 				if (v && (bp->b_base != v)) {
-					lkwarning("Conflicting address in bank %s", id);
+					lkwarning("Conflicting address in bank %s\n", id);
 				}
 			}
 		} else
@@ -141,7 +141,7 @@ newbank()
 				bp->b_size = v;
 			} else {
 				if (v && (bp->b_size != v)) {
-					lkwarning("Conflicting size in bank %s", id);
+					lkwarning("Conflicting size in bank %s\n", id);
 				}
 			}
 		} else
@@ -154,7 +154,7 @@ newbank()
 				bp->b_map = v;
 			} else {
 				if (v && (bp->b_map != v)) {
-					lkwarning("Conflicting mapping in bank %s", id);
+					lkwarning("Conflicting mapping in bank %s\n", id);
 				}
 			}
 		} else
@@ -167,7 +167,7 @@ newbank()
 				bp->b_flag = i;
 			} else {
 				if (i && (bp->b_flag != i)) {
-					lkwarning("Conflicting flags in bank %s", id);
+					lkwarning("Conflicting flags in bank %s\n", id);
 				}
 			}
 		} else
@@ -181,7 +181,7 @@ newbank()
 					bp->b_fsfx = strsto(id);
 				} else {
 					if (!symeq(bp->b_fsfx, id, 1)) {
-						lkwarning("Conflicting fsfx in bank %s", id);
+						lkwarning("Conflicting fsfx in bank %s\n", id);
 					}
 				}
 			}
@@ -405,7 +405,7 @@ FILE *fp;
 		}
 		if ((ahigh - alow) > blimit) {
 			lkwarning(
-			"Size limit exceeded in bank %s", bp->b_id);
+			"Size limit exceeded in bank %s\n", bp->b_id);
 		}
 	}
 }

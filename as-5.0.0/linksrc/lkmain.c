@@ -1176,18 +1176,18 @@ setgbl()
 			sp = lkpsym(id, 0);
 			if (sp == NULL) {
 				lkwarning(
-				"No definition of symbol %s", id);
+				"No definition of symbol %s\n", id);
 			} else {
 				if (sp->s_type & S_DEF) {
 					lkwarning(
-					"Redefinition of symbol %s", id);
+					"Redefinition of symbol %s\n", id);
 					sp->s_axp = NULL;
 				}
 				sp->s_addr = v;
 				sp->s_type |= S_DEF;
 			}
 		} else {
-			lkwarning("No '=' in global expression");
+			lkwarning("No '=' in global expression\n");
 		}
 		gsp = gsp->g_globl;
 	}
@@ -1247,7 +1247,7 @@ int wf;
 	FILE *fp;
 
 	if (strlen(fn) > (FILSPC-7)) {
-		lkwarning("Filename to long : \"%s\"", fn);
+		lkwarning("Filename to long: \"%s\"\n", fn);
 		return(NULL);
 	}
 
@@ -1297,7 +1297,7 @@ int wf;
 #endif
 	}
 	if ((fp = fopen(afspec, frmt)) == NULL) {
-		lkwarning("Cannot %s \"%s\"", wf?"create":"open", afspec);
+		lkwarning("Cannot %s \"%s\"\n", wf?"create":"open", afspec);
 	}
 	return (fp);
 }
@@ -1494,7 +1494,6 @@ lkwarning(const char *format, ...)
 	va_start(ap, format);
 	vfprintf(stderr, format, ap);
 	va_end(ap);
-	fprintf(stderr, "\n");
 	lkerr++;
 }
 

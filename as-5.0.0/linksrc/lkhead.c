@@ -304,6 +304,6 @@ module()
 		getid(id, -1);
 		hp->m_id = strsto(id);
 	} else {
-		lkwarning("No header defined");
+		lkwarning("No header defined\n");
 	}
 }

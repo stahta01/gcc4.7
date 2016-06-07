@@ -284,7 +284,7 @@ relr3()
 	 * Verify Area Mode
 	 */
 	if (eval() != R3_AREA || eval()) {
-		lkwarning("R input error");
+		lkwarning("R input error\n");
 		return;
 	}
 
@@ -293,7 +293,7 @@ relr3()
 	 */
 	aindex = (int) evword();
 	if (aindex >= hp->h_narea) {
-		lkwarning("R area error");
+		lkwarning("R area error\n");
 		return;
 	}
 
@@ -345,13 +345,13 @@ relr3()
 		 */
 		if (mode & R3_SYM) {
 			if (rindex >= hp->h_nsym) {
-				lkwarning("R symbol error");
+				lkwarning("R symbol error\n");
 				return;
 			}
 			reli = symval(s[rindex]);
 		} else {
 			if (rindex >= hp->h_narea) {
-				lkwarning("R area error");
+				lkwarning("R area error\n");
 				return;
 			}
 			reli = a[rindex]->a_addr;
@@ -658,7 +658,7 @@ relp3()
 	 * Verify Area Mode
 	 */
 	if (eval() != R3_AREA || eval()) {
-		lkwarning("P input error");
+		lkwarning("P input error\n");
 	}
 
 	/*
@@ -666,7 +666,7 @@ relp3()
 	 */
 	aindex = (int) evword();
 	if (aindex >= hp->h_narea) {
-		lkwarning("P area error");
+		lkwarning("P area error\n");
 		return;
 	}
 
@@ -683,13 +683,13 @@ relp3()
 		 */
 		if (mode & R3_SYM) {
 			if (rindex >= hp->h_nsym) {
-				lkwarning("P symbol error");
+				lkwarning("P symbol error\n");
 				return;
 			}
 			relv = symval(s[rindex]);
 		} else {
 			if (rindex >= hp->h_narea) {
-				lkwarning("P area error");
+				lkwarning("P area error\n");
 				return;
 			}
 			relv = a[rindex]->a_addr;
@@ -702,14 +702,14 @@ relp3()
 	 */
 	aindex = (int) adb_xb(0, a_bytes);
 	if (aindex >= hp->h_narea) {
-		lkwarning("P area error");
+		lkwarning("P area error\n");
 		return;
 	}
 	sdp.s_areax = a[aindex];
 	sdp.s_area = sdp.s_areax->a_bap;
 	sdp.s_addr = adb_xb(0,a_bytes*2);
 	if (sdp.s_area->a_addr & 0xFF || sdp.s_addr & 0xFF)
-		relerp3("Page Definition Boundary Error");
+		relerp3("Page definition boundary error");
 }
 
 /*)Function	VOID	rele3()
@@ -830,7 +830,7 @@ char *str;
 	if (fptr == stderr) {
 		lkwarning(str);
 	} else {
-		fprintf(fptr, "Warning: %s\n", str);
+		fprintf(fptr, "\n%s", str);
 	}
 
 	/*
@@ -950,8 +950,9 @@ char *str;
 	if (fptr == stderr) {
 		lkwarning(str);
 	} else {
-		fprintf(fptr, "Warning: %s\n", str);
+		fprintf(fptr, "\n%s", str);
 	}
+	fprintf(fptr, "\n");
 
 	/*
 	 * Print PgDef Info
