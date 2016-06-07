@@ -1470,12 +1470,14 @@ int n;
 VOID
 lkerror(const char *format, ...)
 {
-	va_list ap;
-	fprintf(stderr, "?ASlink-Error: ");
-	va_start(ap, format);
-	vfprintf(stderr, format, ap);
-	va_end(ap);
-	fprintf(stderr, "\n");
+	if (format != NULL) {
+		va_list ap;
+		fprintf(stderr, "?ASlink-Error: ");
+		va_start(ap, format);
+		vfprintf(stderr, format, ap);
+		va_end(ap);
+		fprintf(stderr, "\n");
+	}
 	lkexit(ER_FATAL);
 }
 

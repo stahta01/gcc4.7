@@ -471,7 +471,7 @@ loop:	if (cfp && cfp->f_type == F_STD)
 				lkerror("Invalid file type");
 			}
 			if (sfp == NULL) {
-				lkerror("Cannot open input file");
+				lkerror(NULL);
 			}
 			goto loop;
 		} else {
