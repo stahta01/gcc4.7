@@ -160,7 +160,7 @@ newarea()
 				if (iflags) {
 			 		if (aflags & A4_OVR) {
 						if (iflags != (aflags & A4_OVR)) {
-							lkwarning("Conflicting CON/OVR flags in area %s", id);
+							lkwarning("Conflicting CON/OVR flags in area %s\n", id);
 						}
 					} else {
 						ap->a_flag |= iflags;
@@ -170,7 +170,7 @@ newarea()
 				if (iflags) {
 			 		if (aflags & A4_ABS) {
 						if (iflags != (aflags & A4_ABS)) {
-							lkwarning("Conflicting REL/ABS flags in area %s", id);
+							lkwarning("Conflicting REL/ABS flags in area %s\n", id);
 						}
 					} else {
 						ap->a_flag |= iflags;
@@ -180,7 +180,7 @@ newarea()
 				if (iflags) {
 			 		if (aflags & A4_PAG) {
 						if (iflags != (aflags & A4_PAG)) {
-							lkwarning("Conflicting NOPAG/PAG flags in area %s", id);
+							lkwarning("Conflicting NOPAG/PAG flags in area %s\n", id);
 						}
 					} else {
 						ap->a_flag |= iflags;
@@ -190,7 +190,7 @@ newarea()
 					iflags = (int) (i & (A4_DSEG | A4_WLMSK));
 				 	if (aflags & A4_DSEG) {
 						if (iflags != (aflags & (A4_DSEG | A4_WLMSK))) {
-							lkwarning("Conflicting CSEG/DSEG flags in area %s", id);
+							lkwarning("Conflicting CSEG/DSEG flags in area %s\n", id);
 						}
 					} else {
 						ap->a_flag |= iflags;
@@ -220,7 +220,7 @@ newarea()
 			}
 			if (ap->a_bp != NULL) {
 				if (ap->a_bp != hblp[(int) i]) {
-					lkwarning("Multiple bank assignments for area %s ( %s / %s )",
+					lkwarning("Multiple bank assignments for area %s ( %s / %s )\n",
 						id, ap->a_bp->b_id, hblp[(int) i]->b_id);
 				}
 			} else {
@@ -497,7 +497,7 @@ struct area *tap;
 	addr = tap->a_addr;
 	if (((tap->a_flag & A4_PAG) == A4_PAG) && (addr & 0xFF)) {
 	    lkwarning(
-		"Paged area %s boundary error",
+		"Paged area %s boundary error\n",
 		tap->a_id);
 	}
 	taxp = tap->a_axp;
@@ -525,7 +525,7 @@ struct area *tap;
 	tap->a_size = size;
 	if (((tap->a_flag & A4_PAG) == A4_PAG) && (size > 256)) {
 	    lkwarning(
-		"Paged area %s length error",
+		"Paged area %s length error\n",
 		tap->a_id);
 	}
 }
@@ -583,13 +583,13 @@ setarea()
 			}
 			if (ap == NULL) {
 				lkwarning(
-				"No definition of area %s", id);
+				"No definition of area %s\n", id);
 			} else {
 				ap->a_addr = v;
 				ap->a_bset = 1;
 			}
 		} else {
-			lkwarning("No '=' in base expression");
+			lkwarning("No '=' in base expression\n");
 		}
 		bsp = bsp->b_base;
 	}

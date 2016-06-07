@@ -159,14 +159,14 @@ newsym()
 	if (c == 'R') {
 		tsp->s_type |= S_REF;
 		if (eval()) {
-			lkwarning("Non zero S_REF");
+			lkwarning("Non zero S_REF\n");
 		}
 	} else
 	if (c == 'D') {
 		ev = eval();
 		if (tsp->s_type & S_DEF) {
 			if (tsp->s_addr != ev) {
-				lkwarning("Multiple definition of %s", id);
+				lkwarning("Multiple definition of %s\n", id);
 			}
 		} else {
 			/*
@@ -373,10 +373,17 @@ struct sym *tsp;
 		p = hp->s_list;
 		for (i=0; i<hp->h_nsym; ++i) {
 		    if (p[i] == tsp) {
-			lkwarning(
-				"Undefined symbol %s "
-				"referenced by module %s",
-				tsp->s_id, hp->m_id);
+			if (fp == stderr) {
+				lkwarning(
+					"Undefined symbol %s "
+					"referenced by module %s\n",
+					tsp->s_id, hp->m_id);
+			} else {
+				fprintf(fp,
+					"\nUndefined symbol %s "
+					"referenced by module %s\n",
+					tsp->s_id, hp->m_id);
+			}
 		    }
 		}
 	    hp = hp->h_hp;
