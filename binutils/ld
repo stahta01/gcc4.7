@@ -65,11 +65,11 @@ setformat ()
 	case $1 in
 		s19)
 			aslink_options="${aslink_options}o"
-			exe_suffix=.$1
+			exe_suffix=$1
 			;;
 		bin)
 			aslink_options="${aslink_options}t"
-			exe_suffix=.$1
+			exe_suffix=$1
 			;;
 		*)
 			msg "unrecognized output format '$1'" 1
@@ -253,7 +253,7 @@ while [ $# -gt 0 ]; do
 	esac
 done
 
-asout_file=${output_file%\.*}${exe_suffix}
+asout_file=${output_file%\.*}.$exe_suffix
 asmap_file=${asout_file%\.*}.map
 if [ -z "$map_file" ]; then
 	map_file=${output_file%\.*}.map
@@ -277,6 +277,7 @@ fi
 if [ -n "$verbose" ]; then
 	echo "$bindir/aslink $aslink_options $options $asout_file $crt0_file $input_files $libpaths $libs"
 	echo "Target: '$target'"
+	echo "Output format: '$exe_suffix'"
 	echo "Output file: '$output_file'"
 	if [ -n "$gen_map_file" ]; then
 		echo "Map file: '$map_file'"
