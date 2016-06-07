@@ -649,7 +649,7 @@ map()
 	 */
 	mfp = afile(linkp->f_idp, "map", 1);
 	if (mfp == NULL) {
-		lkexit(ER_FATAL);
+		lkerror(NULL);
 	}
 
 	/*
