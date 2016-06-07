@@ -41,7 +41,7 @@
  *	lklibr.c contains the following functions:
  *		VOID	addpath()
  *		VOID	addlib()
- *		VOID	addfile()
+ *		int	addfile()
  *		VOID	search()
  *		VOID	fndsym()
  *		VOID	library()
@@ -109,7 +109,7 @@ addpath()
  *				 	path structure
  *
  *	 functions called:
- *		VOID	addfile()	lklibr.c
+ *		int	addfile()	lklibr.c
  *		int	getnb()		lklex.c
  *		VOID	unget()		lklex.c
  *
@@ -122,19 +122,26 @@ VOID
 addlib()
 {
 	struct lbpath *lbph;
+	int found = 0;
 
 	unget(getnb());
 
 	if (lbphead == NULL) {
-		addfile(NULL,ip);
-		return;
-	}	
-	for (lbph=lbphead; lbph; lbph=lbph->next) {
-		addfile(lbph->path,ip);
+		found |= addfile(NULL,ip);
+	} else {
+		for (lbph=lbphead; lbph; lbph=lbph->next) {
+			found |= addfile(lbph->path,ip);
+			if (found)
+				break;
+		}
+	}
+
+	if (!found) {
+		lkerror("Cannot find library \"%s\"", ip);
 	}
 }
 
-/*)Function	VOID	addfile(path,libfil)
+/*)Function	int	addfile(path,libfil)
  *
  *		char	*path		library path specification
  *		char	*libfil		library file specification
@@ -169,7 +176,7 @@ addlib()
  *		An lbname structure may be created.
  */
 
-VOID
+int
 addfile(path,libfil)
 char *path;
 char *libfil;
@@ -212,8 +219,10 @@ char *libfil;
 		strcpy(lbnh->libfil,libfil);
 		lbnh->libspc = str;
 		lbnh->f_obj = objflg;
+		return 1;
 	} else {
 		free(str);
+		return 0;
 	}
 }
 

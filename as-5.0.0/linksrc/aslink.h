@@ -1192,7 +1192,7 @@ extern	VOID		relerr4(char *str);
 extern	VOID		relerp4(char *str);
 
 /* lklibr.c */
-extern	VOID		addfile(char *path, char *libfil);
+extern	int		addfile(char *path, char *libfil);
 extern	VOID		addlib(void);
 extern	VOID		addpath(void);
 extern	int		fndsym(char *name);
