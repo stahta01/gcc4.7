@@ -112,8 +112,7 @@ int c;
 		break;
 
 	default:
-		fprintf(stderr, "Undefined Relocation Operation\n");
-		lkerr++;
+		lkwarning("Undefined relocation operation");
 		break;
 
 	}
@@ -307,8 +306,7 @@ relr4()
 	 * Verify Area Mode
 	 */
 	if (eval() != R4_AREA || eval()) {
-		fprintf(stderr, "R input error\n");
-		lkerr++;
+		lkwarning("R input error");
 		return;
 	}
 
@@ -317,8 +315,7 @@ relr4()
 	 */
 	aindex = (int) evword();
 	if (aindex >= hp->h_narea) {
-		fprintf(stderr, "R area error\n");
-		lkerr++;
+		lkwarning("R area error");
 		return;
 	}
 
@@ -392,15 +389,13 @@ relr4()
 		 */
 		if (mode & R4_SYM) {
 			if (rindex >= hp->h_nsym) {
-				fprintf(stderr, "R symbol error\n");
-				lkerr++;
+				lkwarning("R symbol error");
 				return;
 			}
 			reli = symval(s[rindex]);
 		} else {
 			if (rindex >= hp->h_narea) {
-				fprintf(stderr, "R area error\n");
-				lkerr++;
+				lkwarning("R area error");
 				return;
 			}
 			reli = a[rindex]->a_addr;
@@ -853,8 +848,7 @@ relp4()
 	 * Verify Area Mode
 	 */
 	if ((eval() != R4_AREA) || eval()) {
-		fprintf(stderr, "P input error\n");
-		lkerr++;
+		lkwarning("P input error");
 	}
 
 	/*
@@ -862,8 +856,7 @@ relp4()
 	 */
 	aindex = (int) evword();
 	if (aindex >= hp->h_narea) {
-		fprintf(stderr, "P area error\n");
-		lkerr++;
+		lkwarning("P area error");
 		return;
 	}
 
@@ -880,15 +873,13 @@ relp4()
 		 */
 		if (mode & R4_SYM) {
 			if (rindex >= hp->h_nsym) {
-				fprintf(stderr, "P symbol error\n");
-				lkerr++;
+				lkwarning("P symbol error");
 				return;
 			}
 			relv = symval(s[rindex]);
 		} else {
 			if (rindex >= hp->h_narea) {
-				fprintf(stderr, "P area error\n");
-				lkerr++;
+				lkwarning("P area error");
 				return;
 			}
 			relv = a[rindex]->a_addr;
@@ -901,8 +892,7 @@ relp4()
 	 */
 	aindex = (int) adb_xb(0,a_bytes);
 	if (aindex >= hp->h_narea) {
-		fprintf(stderr, "P area error\n");
-		lkerr++;
+		lkwarning("P area error");
 		return;
 	}
 	sdp.s_areax = a[aindex];
@@ -1027,8 +1017,11 @@ char *str;
 	/*
 	 * Print Error
 	 */
-	fprintf(fptr, "?ASlink-Warning-%s", str);
-	lkerr++;
+	if (fptr == stderr) {
+		lkwarning(str);
+	} else {
+		fprintf(fptr, "Warning: %s\n", str);
+	}
 
 	/*
 	 * Print symbol if symbol based
@@ -1144,8 +1137,11 @@ char *str;
 	/*
 	 * Print Error
 	 */
-	fprintf(fptr, "\n?ASlink-Warning-%s\n", str);
-	lkerr++;
+	if (fptr == stderr) {
+		lkwarning(str);
+	} else {
+		fprintf(fptr, "Warning: %s\n", str);
+	}
 
 	/*
 	 * Print PgDef Info
@@ -1184,7 +1180,7 @@ char *str;
  *
  *	functions called:
  *		int	fprintf()	c_library
- *		VOID	lkexit()	lkmain.c
+ *		VOID	lkerror()	lkmain.c
  *
  *	side effects:
  *		none
@@ -1200,8 +1196,7 @@ a_uint base;
 	a_uint m;
 
 	if ((mp = hp->m_list[r]) == NULL) {
-		fprintf(stderr, "undefined G mode\n");
-		lkexit(ER_FATAL);
+		lkerror("Undefined G mode");
 	}
 
 	if (mp->m_flag) {

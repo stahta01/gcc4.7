@@ -69,7 +69,7 @@
  *
  *	functions called:
  *		a_uint	eval()		lkeval.c
- *		VOID	exit()		c_library
+ *		VOID	lkerror()	lkmain.c
  *		int	fprintf()	c_library
  *		VOID	getid()		lklex.c
  *		VOID	lkpbank()	lkbank.c
@@ -107,8 +107,7 @@ newbank()
 	struct bank **hblp;
 
 	if (headp == NULL) {
-		fprintf(stderr, "No header defined\n");
-		lkexit(ER_FATAL);
+		lkerror("No header defined");
 	}
 	/*
 	 * Create bank entry
@@ -129,8 +128,7 @@ newbank()
 				bp->b_base = v;
 			} else {
 				if (v && (bp->b_base != v)) {
-					fprintf(stderr, "Conflicting address in bank %s\n", id);
-					lkerr++;
+					lkwarning("Conflicting address in bank %s", id);
 				}
 			}
 		} else
@@ -143,8 +141,7 @@ newbank()
 				bp->b_size = v;
 			} else {
 				if (v && (bp->b_size != v)) {
-					fprintf(stderr, "Conflicting size in bank %s\n", id);
-					lkerr++;
+					lkwarning("Conflicting size in bank %s", id);
 				}
 			}
 		} else
@@ -157,8 +154,7 @@ newbank()
 				bp->b_map = v;
 			} else {
 				if (v && (bp->b_map != v)) {
-					fprintf(stderr, "Conflicting mapping in bank %s\n", id);
-					lkerr++;
+					lkwarning("Conflicting mapping in bank %s", id);
 				}
 			}
 		} else
@@ -171,8 +167,7 @@ newbank()
 				bp->b_flag = i;
 			} else {
 				if (i && (bp->b_flag != i)) {
-					fprintf(stderr, "Conflicting flags in bank %s\n", id);
-					lkerr++;
+					lkwarning("Conflicting flags in bank %s", id);
 				}
 			}
 		} else
@@ -186,8 +181,7 @@ newbank()
 					bp->b_fsfx = strsto(id);
 				} else {
 					if (!symeq(bp->b_fsfx, id, 1)) {
-						fprintf(stderr, "Conflicting fsfx in bank %s\n", id);
-						lkerr++;
+						lkwarning("Conflicting fsfx in bank %s", id);
 					}
 				}
 			}
@@ -204,8 +198,7 @@ newbank()
 			return;
 		}
 	}
-	fprintf(stderr, "Header bank list overflow\n");
-	lkexit(ER_FATAL);
+	lkerror("Header bank list overflow");
 }
 
 /*)Function	VOID	lkpbank(id)
@@ -411,9 +404,8 @@ FILE *fp;
 			}
 		}
 		if ((ahigh - alow) > blimit) {
-			fprintf(fp,
-			"\n?ASlink-Warning-Size limit exceeded in bank %s\n", bp->b_id);
-			lkerr++;
+			lkwarning(
+			"Size limit exceeded in bank %s", bp->b_id);
 		}
 	}
 }
@@ -456,7 +448,7 @@ FILE *fp;
  *		FILE *	afile()		lkmain.c
  *		int	fclose()	c_library
  *		int	fprintf()	c_library
- *		VOID	lkexit()	lkmain.c
+ *		VOID	lkerror()	lkmain.c
  *		char *	strcpy()	c_library
  *		char *	strsto()	lksym.c
  *		char *	symeq()		lksym.c
@@ -551,7 +543,7 @@ lkfopen()
 				}
 				if (fp != stderr) {
 					if (fp == NULL) {
-						lkexit(ER_FATAL);
+						lkerror("Cannot create output file");
 					}
 					bp->b_ofspec = strsto(afspec);
 #if NOICE

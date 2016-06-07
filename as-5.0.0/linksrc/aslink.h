@@ -1059,6 +1059,9 @@ extern	VOID		doparse(void);
 extern	VOID		setarea(void);
 extern	VOID		setgbl(void);
 extern	VOID		usage(int n);
+extern	VOID		lkerror(const char *format, ...);
+extern	VOID		lkwarning(const char *format, ...);
+extern	VOID		lkinfo(const char *format, ...);
 
 /* lklex.c */
 extern	VOID		chopcrlf(char *str);

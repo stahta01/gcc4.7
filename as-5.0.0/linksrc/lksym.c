@@ -114,7 +114,7 @@ syminit()
  *
  *	functions called:
  *		a_uint	eval()		lkeval.c
- *		VOID	exit()		c_library
+ *		VOID	lkerror()	lkmain.c
  *		int	fprintf()	c_library
  *		int	get()		lklex.c
  *		int	getnb()		lklex.c
@@ -148,8 +148,7 @@ newsym()
 	char id[NCPS];
 
 	if (headp == NULL) {
-		fprintf(stderr, "No header defined\n");
-		lkexit(ER_FATAL);
+		lkerror("No header defined");
 	}
 	/*
 	 * Create symbol entry
@@ -160,17 +159,14 @@ newsym()
 	if (c == 'R') {
 		tsp->s_type |= S_REF;
 		if (eval()) {
-			fprintf(stderr, "Non zero S_REF\n");
-			lkerr++;
+			lkwarning("Non zero S_REF");
 		}
 	} else
 	if (c == 'D') {
 		ev = eval();
 		if (tsp->s_type & S_DEF) {
 			if (tsp->s_addr != ev) {
-				fprintf(stderr,
-					"Multiple definition of %s\n", id);
-				lkerr++;
+				lkwarning("Multiple definition of %s", id);
 			}
 		} else {
 			/*
@@ -182,8 +178,7 @@ newsym()
 			tsp->m_id = hp->m_id;
 		}
 	} else {
-		fprintf(stderr, "Invalid symbol type %c for %s\n", c, id);
-		lkexit(ER_FATAL);
+		lkerror("Invalid symbol type %c for %s", c, id);
 	}
 	/*
 	 * Place pointer in header symbol list
@@ -196,8 +191,7 @@ newsym()
 			return(tsp);
 		}
 	}
-	fprintf(stderr, "Header symbol list overflow\n");
-	lkexit(ER_FATAL);
+	lkerror("Header symbol list overflow");
 	return(NULL);
 }
 
@@ -379,11 +373,10 @@ struct sym *tsp;
 		p = hp->s_list;
 		for (i=0; i<hp->h_nsym; ++i) {
 		    if (p[i] == tsp) {
-			fprintf(fp,
-				"?ASlink-Warning-Undefined symbol %s "
-				"referenced by module %s\n",
+			lkwarning(
+				"Undefined symbol %s "
+				"referenced by module %s",
 				tsp->s_id, hp->m_id);
-			lkerr++;
 		    }
 		}
 	    hp = hp->h_hp;
@@ -641,8 +634,7 @@ unsigned int n;
 		bytes -= n;
 	}
 	if (p == NULL) {
-		fprintf(stderr, "Out of space!\n");
-		lkexit(ER_FATAL);
+		lkerror("Out of space");
 	}
 	for (i=0,q=p; i<n; i++) {
 		*q++ = 0;
@@ -757,8 +749,7 @@ unsigned int n;
 	unsigned int i;
 
 	if ((p = (char *) malloc(n)) == NULL) {
-		fprintf(stderr, "Out of space!\n");
-		lkexit(ER_FATAL);
+		lkerror("Out of space");
 	}
 	for (i=0,q=p; i<n; i++) {
 		*q++ = 0;
@@ -769,17 +760,11 @@ unsigned int n;
 #else
 
 
-static void die(void)
-{
-	fputs("Out of space!\n", stderr);
-	lkexit(ER_FATAL);
-}
-
 char *strsto(char *str)
 {
 	char *p;
 	if ((p = strdup(str)) == NULL)
-		die();
+		lkerror("Out of space");
 	return p;
 }
 
@@ -787,7 +772,7 @@ char *new(unsigned int n)
 {
 	char *p;
 	if ((p = (char *)calloc(1, n)) == NULL)
-		die();
+		lkerror("Out of space");
 	return p;
 }
 

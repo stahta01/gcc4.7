@@ -88,7 +88,7 @@ static char currentFunction[NCPS];
  *
  *	functions called:
  *		FILE *	afile()		lkmain.c
- *		VOID	lkexit()	lkmain.c
+ *		VOID	lkerror()	lkmain.c
  *
  *	side effects:
  *		The NoICE output file is opened.
@@ -101,7 +101,7 @@ VOID NoICEfopen(void)
 	if (jflag) {
 		jfp = afile(linkp->f_idp, "noi", 1);
 		if (jfp == NULL) {
-			lkexit(1);
+			lkerror("Cannot create NoICE file");
 		}
 		mflag = 1;
 	}

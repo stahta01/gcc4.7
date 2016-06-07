@@ -54,7 +54,7 @@
  *
  *	functions called:
  *		FILE *	afile()		lkmain.c
- *		VOID	lkexit()	lkmain.c
+ *		VOID	lkerror()	lkmain.c
  *
  *	side effects:
  *		The SDCDB output file is opened.
@@ -67,7 +67,7 @@ VOID SDCDBfopen(void)
 	if (yflag) {
 		yfp = afile(linkp->f_idp, "cdb", 1);
 		if (yfp == NULL) {
-			lkexit(1);
+			lkerror("Cannot create SDCDB file");
 		}
 		mflag = 1;
 	}

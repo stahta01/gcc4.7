@@ -199,7 +199,7 @@ newhead()
  *	functions called:
  *		a_uint	eval()		lkexpr.c
  *		int	fprintf()	c_library
- *		VOID	lkexit()	lkmain.c
+ *		VOID	lkerror()	lkmain.c
  *		int	more()		lklex.c
  *		char *	new()		lksym.c
  *
@@ -216,16 +216,14 @@ newmode()
 	struct mode *mp;
 
 	if (headp == NULL) {
-		fprintf(stderr, "No header defined\n");
-		lkexit(ER_FATAL);
+		lkerror("No header defined");
 	}
 	/*
 	 * Mode number
 	 */
 	n = (int) eval();
 	if (n >= hp->h_nmode) {
-		fprintf(stderr, "Header mode list overflow\n");
-		lkexit(ER_FATAL);
+		lkerror("Header mode list overflow");
 	}
 	/*
 	 * Bit index
@@ -306,7 +304,6 @@ module()
 		getid(id, -1);
 		hp->m_id = strsto(id);
 	} else {
-		fprintf(stderr, "No header defined\n");
-		lkerr++;
+		lkwarning("No header defined");
 	}
 }

@@ -88,8 +88,7 @@ int c;
 		break;
 
 	default:
-		fprintf(stderr, "Internal Version Error");
-		lkexit(ER_FATAL);
+		lkerror("Internal version error");
 		break;
 	}
 }
