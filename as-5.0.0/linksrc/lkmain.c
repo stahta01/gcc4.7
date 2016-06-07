@@ -189,6 +189,8 @@ char *argv[];
 
 				case 'f':
 				case 'F':
+					if (i+1 >= argc)
+						lkerror("Missing argument to option -%c", c);
 					strcat(ip, " ");
 					strcat(ip, argv[++i]);
 					break;
