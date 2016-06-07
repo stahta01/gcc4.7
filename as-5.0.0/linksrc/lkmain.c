@@ -23,6 +23,7 @@
  */
 
 #include "aslink.h"
+#include <stdarg.h>
 
 /*)Module	lkmain.c
  *
@@ -47,6 +48,9 @@
  *		VOID	doparse()
  *		VOID	setgbl()
  *		VOID	usage()
+ *		VOID	lkerror()
+ *		VOID	lkwarning()
+ *		VOID	lkinfo()
  *
  *	lkmain.c contains the following local variables:
  *		char *	usetext[]	array of pointers to the
@@ -133,6 +137,7 @@
  *		char *	sprintf()	c_library
  *		VOID	symdef()	lksym.c
  *		VOID	usage()		lkmain.c
+ *		VOID	lkerror()	lkmain.c
  *
  *	side effects:
  *		Completion of main() completes the linking process
@@ -149,8 +154,7 @@ char *argv[];
 	int c, i, j, k;
 
 	if (intsiz() < 4) {
-		fprintf(stderr, "?ASlink-Error-Size of INT32 is not 32 bits or larger.\n\n");
-		exit(ER_FATAL);
+		lkerror("Size of INT32 is not 32 bits or larger");
 	}
 
 	startp = (struct lfile *) new (sizeof (struct lfile));
@@ -923,8 +927,7 @@ parse()
 					break;
 
 				default:
-					fprintf(stderr,
-					    "Unkown option -%c ignored\n", c);
+					lkinfo("Unkown option -%c ignored", c);
 					break;
 				}
 			}
@@ -968,8 +971,7 @@ parse()
 			lfp->f_idx = fndidx(p);
 			lfp->f_obj = objflg;
 		} else {
-			fprintf(stderr, "Invalid input");
-			lkexit(ER_FATAL);
+			lkerror("Invalid input");
 		}
 	}
 	return(0);
@@ -1173,22 +1175,19 @@ setgbl()
 			v = (int) expr(0);
 			sp = lkpsym(id, 0);
 			if (sp == NULL) {
-				fprintf(stderr,
-				"No definition of symbol %s\n", id);
-				lkerr++;
+				lkwarning(
+				"No definition of symbol %s", id);
 			} else {
 				if (sp->s_type & S_DEF) {
-					fprintf(stderr,
-					"Redefinition of symbol %s\n", id);
-					lkerr++;
+					lkwarning(
+					"Redefinition of symbol %s", id);
 					sp->s_axp = NULL;
 				}
 				sp->s_addr = v;
 				sp->s_type |= S_DEF;
 			}
 		} else {
-			fprintf(stderr, "No '=' in global expression");
-			lkerr++;
+			lkwarning("No '=' in global expression");
 		}
 		gsp = gsp->g_globl;
 	}
@@ -1248,8 +1247,7 @@ int wf;
 	FILE *fp;
 
 	if (strlen(fn) > (FILSPC-7)) {
-		fprintf(stderr, "?ASlink-Error-<filspc to long> : \"%s\"\n", fn);
-		lkerr++;
+		lkwarning("Filename to long : \"%s\"", fn);
 		return(NULL);
 	}
 
@@ -1299,8 +1297,7 @@ int wf;
 #endif
 	}
 	if ((fp = fopen(afspec, frmt)) == NULL) {
-		fprintf(stderr, "?ASlink-Error-<cannot %s> : \"%s\"\n", wf?"create":"open", afspec);
-		lkerr++;
+		lkwarning("Cannot %s \"%s\"", wf?"create":"open", afspec);
 	}
 	return (fp);
 }
@@ -1461,4 +1458,60 @@ int n;
 	for (dp = usetxt; *dp; dp++)
 		fprintf(stderr, "%s\n", *dp);
 	lkexit(n);
+}
+
+/*)Function	VOID	lkerror(const char *format, ...)
+ *
+ *		const char * format	string format
+ *		...			parameters if any
+ *
+*/
+
+VOID
+lkerror(const char *format, ...)
+{
+	va_list ap;
+	fprintf(stderr, "?ASlink-Error: ");
+	va_start(ap, format);
+	vfprintf(stderr, format, ap);
+	va_end(ap);
+	fprintf(stderr, "\n");
+	lkexit(ER_FATAL);
+}
+
+/*)Function	VOID	lkwarning(const char *format, ...)
+ *
+ *		const char * format	string format
+ *		...			parameters if any
+ *
+*/
+
+VOID
+lkwarning(const char *format, ...)
+{
+	va_list ap;
+	fprintf(stderr, "?ASlink-Warning: ");
+	va_start(ap, format);
+	vfprintf(stderr, format, ap);
+	va_end(ap);
+	fprintf(stderr, "\n");
+	lkerr++;
+}
+
+/*)Function	VOID	lkinfo(const char *format, ...)
+ *
+ *		const char * format	string format
+ *		...			parameters if any
+ *
+*/
+
+VOID
+lkinfo(const char *format, ...)
+{
+	va_list ap;
+	fprintf(stderr, "?ASlink-Info: ");
+	va_start(ap, format);
+	vfprintf(stderr, format, ap);
+	va_end(ap);
+	fprintf(stderr, "\n");
 }

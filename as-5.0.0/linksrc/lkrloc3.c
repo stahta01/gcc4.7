@@ -102,8 +102,7 @@ int c;
 		break;
 
 	default:
-		fprintf(stderr, "Undefined Relocation Operation\n");
-		lkerr++;
+		lkwarning("Undefined relocation operation");
 		break;
 
 	}
@@ -285,8 +284,7 @@ relr3()
 	 * Verify Area Mode
 	 */
 	if (eval() != R3_AREA || eval()) {
-		fprintf(stderr, "R input error\n");
-		lkerr++;
+		lkwarning("R input error");
 		return;
 	}
 
@@ -295,8 +293,7 @@ relr3()
 	 */
 	aindex = (int) evword();
 	if (aindex >= hp->h_narea) {
-		fprintf(stderr, "R area error\n");
-		lkerr++;
+		lkwarning("R area error");
 		return;
 	}
 
@@ -348,15 +345,13 @@ relr3()
 		 */
 		if (mode & R3_SYM) {
 			if (rindex >= hp->h_nsym) {
-				fprintf(stderr, "R symbol error\n");
-				lkerr++;
+				lkwarning("R symbol error");
 				return;
 			}
 			reli = symval(s[rindex]);
 		} else {
 			if (rindex >= hp->h_narea) {
-				fprintf(stderr, "R area error\n");
-				lkerr++;
+				lkwarning("R area error");
 				return;
 			}
 			reli = a[rindex]->a_addr;
@@ -663,8 +658,7 @@ relp3()
 	 * Verify Area Mode
 	 */
 	if (eval() != R3_AREA || eval()) {
-		fprintf(stderr, "P input error\n");
-		lkerr++;
+		lkwarning("P input error");
 	}
 
 	/*
@@ -672,8 +666,7 @@ relp3()
 	 */
 	aindex = (int) evword();
 	if (aindex >= hp->h_narea) {
-		fprintf(stderr, "P area error\n");
-		lkerr++;
+		lkwarning("P area error");
 		return;
 	}
 
@@ -690,15 +683,13 @@ relp3()
 		 */
 		if (mode & R3_SYM) {
 			if (rindex >= hp->h_nsym) {
-				fprintf(stderr, "P symbol error\n");
-				lkerr++;
+				lkwarning("P symbol error");
 				return;
 			}
 			relv = symval(s[rindex]);
 		} else {
 			if (rindex >= hp->h_narea) {
-				fprintf(stderr, "P area error\n");
-				lkerr++;
+				lkwarning("P area error");
 				return;
 			}
 			relv = a[rindex]->a_addr;
@@ -711,8 +702,7 @@ relp3()
 	 */
 	aindex = (int) adb_xb(0, a_bytes);
 	if (aindex >= hp->h_narea) {
-		fprintf(stderr, "P area error\n");
-		lkerr++;
+		lkwarning("P area error");
 		return;
 	}
 	sdp.s_areax = a[aindex];
@@ -837,14 +827,17 @@ char *str;
 	/*
 	 * Print Error
 	 */
-	fprintf(fptr, "\n?ASlink-Warning-%s", str);
-	lkerr++;
+	if (fptr == stderr) {
+		lkwarning(str);
+	} else {
+		fprintf(fptr, "Warning: %s\n", str);
+	}
 
 	/*
 	 * Print symbol if symbol based
 	 */
 	if (mode & R3_SYM) {
-		fprintf(fptr, " for symbol  %s\n",
+		fprintf(fptr, " for symbol %s\n",
 			&s[rindex]->s_id[0]);
 	} else {
 		fprintf(fptr, "\n");
@@ -878,7 +871,7 @@ char *str;
 /*        |                 |                 |                 |           */
 	fprintf(fptr,
 "  Defin  %-14.14s    %-14.14s    %-14.14s    ",
-			raxp->a_bhp->h_lfile->f_idp,
+			raxp->a_bhp->h_lfile ? raxp->a_bhp->h_lfile->f_idp : "",
 			&raxp->a_bhp->m_id[0],
 			&raxp->a_bap->a_id[0]);
 	if (mode & R3_SYM) {
@@ -954,8 +947,11 @@ char *str;
 	/*
 	 * Print Error
 	 */
-	fprintf(fptr, "\n?ASlink-Warning-%s\n", str);
-	lkerr++;
+	if (fptr == stderr) {
+		lkwarning(str);
+	} else {
+		fprintf(fptr, "Warning: %s\n", str);
+	}
 
 	/*
 	 * Print PgDef Info
@@ -963,7 +959,7 @@ char *str;
 /*         111111111122222222223333333333444444444455555555556666666666777*/
 /*123456789012345678901234567890123456789012345678901234567890123456789012*/
 	fprintf(fptr,
-"         file              module            pgarea            pgoffset\n");
+"         file              module            pgarea               pgoffset\n");
 	fprintf(fptr,
 "  PgDef  %-14.14s    %-14.14s    %-14.14s    ",
 			thp->h_lfile->f_idp,

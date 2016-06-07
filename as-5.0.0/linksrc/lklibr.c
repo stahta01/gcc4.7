@@ -341,7 +341,7 @@ search()
  *		int	fgets()		c_library
  *		FILE	*fopen()	c_library
  *		VOID	free()		c_library
- *		VOID	lkexit()	lkmain.c
+ *		VOID	lkerror()	lkmain.c
  *		VOID	loadfile()	lklibr.c
  *		VOID *	malloc()	c_library
  *		char *	sprintf()	c_library
@@ -380,9 +380,8 @@ char *name;
 
 /*1*/	for (lbnh=lbnhead; lbnh; lbnh=lbnh->next) {
 		if ((libfp = fopen(lbnh->libspc, "r")) == NULL) {
-			fprintf(stderr, "Cannot open library file %s\n",
+			lkerror("Cannot open library file \"%s\"",
 				lbnh->libspc);
-			lkexit(ER_FATAL);
 		}
 		path = lbnh->path;
 

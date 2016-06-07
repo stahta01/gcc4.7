@@ -84,7 +84,7 @@
  *
  *	functions called:
  *		a_uint	eval()		lkeval.c
- *		VOID	exit()		c_library
+ *		VOID	lkerror()	lkmain.c
  *		int	fprintf()	c_library
  *		VOID	getid()		lklex.c
  *		VOID	lkparea()	lkarea.c
@@ -123,8 +123,7 @@ newarea()
 	char opt[NCPS];
 
 	if (headp == NULL) {
-		fprintf(stderr, "No header defined\n");
-		lkexit(ER_FATAL);
+		lkerror("No header defined");
 	}
 	/*
 	 * Create Area entry
@@ -161,8 +160,7 @@ newarea()
 				if (iflags) {
 			 		if (aflags & A4_OVR) {
 						if (iflags != (aflags & A4_OVR)) {
-							fprintf(stderr, "Conflicting CON/OVR flags in area %s\n", id);
-							lkerr++;
+							lkwarning("Conflicting CON/OVR flags in area %s", id);
 						}
 					} else {
 						ap->a_flag |= iflags;
@@ -172,8 +170,7 @@ newarea()
 				if (iflags) {
 			 		if (aflags & A4_ABS) {
 						if (iflags != (aflags & A4_ABS)) {
-							fprintf(stderr, "Conflicting REL/ABS flags in area %s\n", id);
-							lkerr++;
+							lkwarning("Conflicting REL/ABS flags in area %s", id);
 						}
 					} else {
 						ap->a_flag |= iflags;
@@ -183,8 +180,7 @@ newarea()
 				if (iflags) {
 			 		if (aflags & A4_PAG) {
 						if (iflags != (aflags & A4_PAG)) {
-							fprintf(stderr, "Conflicting NOPAG/PAG flags in area %s\n", id);
-							lkerr++;
+							lkwarning("Conflicting NOPAG/PAG flags in area %s", id);
 						}
 					} else {
 						ap->a_flag |= iflags;
@@ -194,8 +190,7 @@ newarea()
 					iflags = (int) (i & (A4_DSEG | A4_WLMSK));
 				 	if (aflags & A4_DSEG) {
 						if (iflags != (aflags & (A4_DSEG | A4_WLMSK))) {
-							fprintf(stderr, "Conflicting CSEG/DSEG flags in area %s\n", id);
-							lkerr++;
+							lkwarning("Conflicting CSEG/DSEG flags in area %s", id);
 						}
 					} else {
 						ap->a_flag |= iflags;
@@ -215,22 +210,18 @@ newarea()
 		if (symeq("bank", opt, 1)) {
 			hblp = hp->b_list;
 			if (hblp == NULL) {
-				fprintf(stderr, "No banks defined\n");
-				lkexit(ER_FATAL);
+				lkerror("No banks defined");
 			}
 			if (i >= (unsigned) hp->h_nbank) {
-				fprintf(stderr, "Invalid bank number\n");
-				lkexit(ER_FATAL);
+				lkerror("Invalid bank number");
 			}
 			if (hblp[(int) i] == NULL) {
-				fprintf(stderr, "Bank not defined\n");
-				lkexit(ER_FATAL);
+				lkerror("Bank not defined");
 			}
 			if (ap->a_bp != NULL) {
 				if (ap->a_bp != hblp[(int) i]) {
-					fprintf(stderr, "Multiple Bank assignments for area %s ( %s / %s )\n",
+					lkwarning("Multiple bank assignments for area %s ( %s / %s )",
 						id, ap->a_bp->b_id, hblp[(int) i]->b_id);
-					lkerr++;
 				}
 			} else {
 				ap->a_bp = hblp[(int) i];
@@ -253,8 +244,7 @@ newarea()
 			return;
 		}
 	}
-	fprintf(stderr, "Header area list overflow\n");
-	lkexit(ER_FATAL);
+	lkerror("Header area list overflow");
 }
 
 /*)Function	VOID	lkparea(id)
@@ -506,10 +496,9 @@ struct area *tap;
 	size = 0;
 	addr = tap->a_addr;
 	if (((tap->a_flag & A4_PAG) == A4_PAG) && (addr & 0xFF)) {
-	    fprintf(stderr,
-		"\n?ASlink-Warning-Paged Area %s Boundary Error\n",
+	    lkwarning(
+		"Paged area %s boundary error",
 		tap->a_id);
-	    lkerr++;
 	}
 	taxp = tap->a_axp;
 	if ((tap->a_flag & A4_OVR) == A4_OVR) {
@@ -535,10 +524,9 @@ struct area *tap;
 	}
 	tap->a_size = size;
 	if (((tap->a_flag & A4_PAG) == A4_PAG) && (size > 256)) {
-	    fprintf(stderr,
-		"\n?ASlink-Warning-Paged Area %s Length Error\n",
+	    lkwarning(
+		"Paged area %s length error",
 		tap->a_id);
-	    lkerr++;
 	}
 }
 
@@ -594,16 +582,14 @@ setarea()
 					break;
 			}
 			if (ap == NULL) {
-				fprintf(stderr,
-				"No definition of area %s\n", id);
-				lkerr++;
+				lkwarning(
+				"No definition of area %s", id);
 			} else {
 				ap->a_addr = v;
 				ap->a_bset = 1;
 			}
 		} else {
-			fprintf(stderr, "No '=' in base expression");
-			lkerr++;
+			lkwarning("No '=' in base expression");
 		}
 		bsp = bsp->b_base;
 	}

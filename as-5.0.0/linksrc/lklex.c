@@ -407,7 +407,7 @@ int d;
  *		char *	fgets()		c_library
  *		int	fprintf()	c_library
  *		VOID	lkulist()	lklist.c
- *		VOID	lkexit()	lkmain.c
+ *		VOID	lkerror()	lkmain.c
  *
  *	side effects:
  *		The input stream is scanned.  The .rel files will be
@@ -468,11 +468,10 @@ loop:	if (cfp && cfp->f_type == F_STD)
 
 				gline = 1;
 			} else {
-				fprintf(stderr, "Invalid file type\n");
-				lkexit(ER_FATAL);
+				lkerror("Invalid file type");
 			}
 			if (sfp == NULL) {
-				lkexit(ER_FATAL);
+				lkerror("Cannot open input file");
 			}
 			goto loop;
 		} else {
