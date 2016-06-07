@@ -27,10 +27,12 @@
 # It basically translates ar style options into aslib format.
 
 set -e
+IFS=' '
 
 as_prefix=@AS_PREFIX@
-bindir=${as_prefix}/bin; export bindir
+bindir=${as_prefix}/bin
 
+# Output a message to stderr and exit with a faillure code.
 error ()
 {
 	echo "ar (m6809): $1" 1>&2
@@ -81,7 +83,7 @@ libcachetool ()
 	exit
 }
 
-# Parse and translate command-line options
+# Parse and translate command-line options.
 options=${1#-}
 if [ -n "$options" ]; then
 	case $options in
