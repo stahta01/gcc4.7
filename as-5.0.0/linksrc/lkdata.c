@@ -80,6 +80,10 @@ int	mflag;		/*	Map output flag
 			 */
 int	xflag;		/*	Map file radix type flag
 			 */
+int	aflag;		/*	add only the first library found
+			 */
+int	rflag;		/*	disallow multiple defined symbol
+			 */
 int	pflag;		/*	print linker command file flag
 			 */
 int	uflag;		/*	Listing relocation flag
