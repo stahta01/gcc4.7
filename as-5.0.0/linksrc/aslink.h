@@ -943,6 +943,10 @@ extern	int	yflag;		/*	-y, enable SDCC Debug output
 				 */
 #endif
 
+extern	int	aflag;		/*	add only the first library found
+				 */
+extern	int	rflag;		/*	disallow multiple defined symbol
+				 */
 extern	int	pflag;		/*	print linker command file flag
 				 */
 extern	int	uflag;		/*	Listing relocation flag

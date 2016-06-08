@@ -165,7 +165,7 @@ newsym()
 	if (c == 'D') {
 		ev = eval();
 		if (tsp->s_type & S_DEF) {
-			if (tsp->s_addr != ev) {
+			if (tsp->s_addr != ev || (rflag && !symeq(id, ".__.ABS.", zflag))) {
 				lkwarning("Multiple definition of %s\n", id);
 			}
 		} else {

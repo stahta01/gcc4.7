@@ -131,12 +131,12 @@ addlib()
 	} else {
 		for (lbph=lbphead; lbph; lbph=lbph->next) {
 			found |= addfile(lbph->path,ip);
-			if (found)
+			if (aflag && found)
 				break;
 		}
 	}
 
-	if (!found) {
+	if (aflag && !found) {
 		lkerror("Cannot find library \"%s\"", ip);
 	}
 }

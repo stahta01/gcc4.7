@@ -753,6 +753,8 @@ map()
  *		int	mflag		Map output flag
  *		int	oflag		Output file type flag
  *		int	objflg		Linked file/library output object flag
+ *		int	aflag		add only the first library found
+ *		int	rflag		disallow multiple defined symbol
  *		int	pflag		print linker command file flag
  *		FILE *	stderr		c_library
  *		int	uflag		Relocated listing flag
@@ -884,6 +886,16 @@ parse()
 				case 'n':
 				case 'N':
 					pflag = 0;
+					break;
+
+				case 'a':
+				case 'A':
+					aflag = 1;
+					break;
+
+				case 'r':
+				case 'R':
+					rflag = 1;
 					break;
 
 				case 'p':
@@ -1393,7 +1405,8 @@ char *usetxt[] = {
 	"Alternates to Command Line Input:",
 	"  -c                   ASlink >> prompt input",
 	"  -f   file[.lnk]      Command File input",
-	"Librarys:",
+	"Libraries:",
+	"  -a   Add only the first library found",
 	"  -k   Library path specification, one per -k",
 	"  -l   Library file specification, one per -l",
 	"Relocation:",
@@ -1419,7 +1432,8 @@ char *usetxt[] = {
 	"  -v   Linked file/library object output disable",
 	"List:",
 	"  -u   Update listing file(s) with link data as file(s)[.rst]",
-	"Case Sensitivity:",
+	"Symbols:",
+	"  -r   Disable Multiple Defined Symbols",
 	"  -z   Disable Case Sensitivity for Symbols",
 	"End:",
 	"  -e   or null line terminates input",
