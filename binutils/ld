@@ -32,17 +32,20 @@ IFS=' '
 as_prefix=@AS_PREFIX@
 bindir=${as_prefix}/bin
 
-# Output a message to stderr and optionally exit with a code.
+# Output a message to stdout or stderr and optionally exit with a code.
 msg ()
 {
+	out=1
 	text="ld (m6809)"
 	if [ -n "$1" ]; then
 		text="$text: $1"
 	fi
-	echo "$text" 1>&2
-	shift
-	if [ $# -gt 0 ]; then
-		exit $1
+	if [ "0$2" -ne 0 ]; then
+		out=2
+	fi
+	echo "$text" >&$out
+	if [ $# -gt 1 ]; then
+		exit $2
 	fi
 }
 
@@ -53,22 +56,25 @@ checkfilename ()
 	OIFS=$IFS; IFS=/
 	A=$1; shift; B=$*
 	IFS=$OIFS
-	if [ -n "$A" -a "$A" = "$B" ]; then
-		return
+	if [ -z "$A" -o "$A" != "$B" ]; then
+		msg "$MSG '$A'" 1
 	fi
-	msg "$MSG '$A'" 1
 }
 
 # Set output format.
 setformat ()
 {
 	case $1 in
-		s19)
+		s19)	# Motorola S Record 
 			aslink_options="${aslink_options}o"
 			exe_suffix=$1
 			;;
-		bin)
+		bin)	# Tandy CoCo Disk BASIC binary
 			aslink_options="${aslink_options}t"
+			exe_suffix=$1
+			;;
+		ihx)	# Intel Hex
+			aslink_options="${aslink_options}i"
 			exe_suffix=$1
 			;;
 		*)
@@ -79,7 +85,7 @@ setformat ()
 
 # Set defaults.  Some are based on the target type, which is 
 # determined by the name by which the program was invoked.
-aslink_options=-nwxs
+aslink_options=-nwxsar
 exe_suffix=
 options=
 target=
@@ -109,7 +115,6 @@ output_file=a.out
 args=
 asmap_file=
 asout_file=
-crt0_file=
 gen_map_file=
 input_files=
 libpaths=
@@ -117,6 +122,7 @@ libs=
 map_file=
 noargs=
 verbose=
+version=
 while [ $# -gt 0 ]; do
 	arg=$1; shift
 	case $arg in
@@ -191,10 +197,11 @@ while [ $# -gt 0 ]; do
 			true
 			;;
 		-v|--version)
-			msg ""
+			version=X
 			;;
 		--help)
-			msg "" 0
+			cat $0 # Better than nothing
+			exit 0
 			;;
 		-T)
 			options="$options -f $1"; shift
@@ -237,12 +244,6 @@ while [ $# -gt 0 ]; do
 		-*)
 			msg "unrecognized option '$arg'" 1
 			;;
-		*/crt0.o|crt0.o)
-			if [ -n "$crt0_file" ]; then
-				msg "more than one crt0.o given" 1
-			fi
-			crt0_file=$arg
-			;;
 		*)
 			checkfilename "invalid input file name" "$arg" $arg
 			if [ "${arg%.*}" = "$arg" ]; then
@@ -273,33 +274,41 @@ if [ -n "$noargs" ]; then
 	options="$options -g __argc=0 -g __argv=0"
 fi
 
-# Output some information when --verbose option is set.
+# Output version information.
+if [ -n "$version" -o -n "$verbose" ]; then
+	msg ""
+fi
+
+# Output more information when --verbose option is set.
 if [ -n "$verbose" ]; then
-	echo "$bindir/aslink $aslink_options $options $asout_file $crt0_file $input_files $libpaths $libs"
+	echo "$bindir/aslink $aslink_options $options $asout_file $input_files $libpaths $libs"
 	echo "Target: '$target'"
 	echo "Output format: '$exe_suffix'"
 	echo "Output file: '$output_file'"
 	if [ -n "$gen_map_file" ]; then
 		echo "Map file: '$map_file'"
 	fi
-	if [ -z "$input_files" ]; then
+fi
+
+# Exit if no input file.
+if [ -z "$input_files" ]; then
+	if [ -n "$version" -o -n "$verbose" ]; then
 		exit 0
 	fi
-fi
-
-if [ -z "$input_files" ]; then
 	msg "no input files" 1
 fi
-
-set +e
 
 if [ -n "$gen_map_file" ]; then
 	rm -f "$asmap_file"
 fi
 
+set +e
+
 # Run the real linker with translated options.
-$bindir/aslink $aslink_options $options "$asout_file" "$crt0_file" $input_files $libpaths $libs
+$bindir/aslink $aslink_options $options "$asout_file" $input_files $libpaths $libs
 rc=$?
+
+set -e
 
 if [ "$rc" != "0" ]; then
 	rm -f "$asout_file"
@@ -308,8 +317,6 @@ if [ "$rc" != "0" ]; then
 	fi
 	exit $rc
 fi
-
-set -e
 
 if [ "$asout_file" != "$output_file" ]; then
 	mv "$asout_file" "$output_file"
