@@ -1,6 +1,9 @@
-#!/bin/bash
+#!/bin/sh
 #
 # Copyright 2006 by Brian Dominy <brian@oddchange.com>
+#
+# Changes by David Flamand <dflamand@gmail.com> (June 2016)
+#  - more robust and verbose in case of error
 #
 # This file is part of GCC6809.
 #
@@ -19,37 +22,51 @@
 # Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 #
 
+# This script is a frontend to the as6809 assembler, to make it
+# look more like GNU as.  Not all as features are supported here.
+# It basically translates as style options into as6809 format.
+
+set -e
+IFS=' '
+
 as_prefix=@AS_PREFIX@
 bindir=${as_prefix}/bin
 
-show_version () {
+showversion () {
 cat <<END
-as6809 (GNU assembler frontend) 0.2 20061016
+as (m6809) [GNU assembler frontend] 0.3 20160608
 This program is free software; you may redistribute it under the terms of
 the GNU General Public License.  This program has absolutely no warranty.
 END
 }
 
-fatal_error () {
-	echo $* 1>&2
+# Output a message to stderr and exit with a failure code.
+error ()
+{
+	echo "as (m6809): $1" >&2
 	exit 1
 }
 
 # Assume nothing.
-
 input_file=
-output_file=
 list_file=
-options=
-list_file_enabled=n
+gen_list_file=
+output_file=
+verbose=
+version=
+
+# The -o option causes an object file to be created.
+# The -g option causes undefined symbols to be made global.
+options=-og
 
 # Parse the command-line options.  See the GNU 'as' man page for
 # an explanation of all these options.  Our goal is to translate
 # them into as6809 form.
-
-while [ "$1" != "" ]; do
+while [ $# -gt 0 ]; do
 	arg=$1; shift
 	case $arg in
+############################################################
+# these are custom assember options (no GNU as equivalent) #
 		-m6809)
 			true
 			;;
@@ -61,35 +78,39 @@ while [ "$1" != "" ]; do
 			# Generate SDCC debug symbols
 			options="${options}y"
 			;;
+############################################################
 		--globalize-symbols)
 			# Make all symbols global
 			options="${options}a"
 			;;
 		-m*)
-			fatal_error "invalid CPU option '$arg'"
+			error "invalid CPU option '$arg'"
 			;;
 		--)
-			fatal_error "standard input not supported"
+			error "standard input not supported"
 			;;
 		-a*)
 			options="${options}lc"
-			list_file_enabled=y
+			gen_list_file=X
 			;;
 		-I*)
-			#include_file=${arg#-I}
-			#echo "warning: include path '$include_file' ignored"
+#			#include_file=${arg#-I}
+#			#echo "warning: include path '$include_file' ignored"
 			;;
 		-MD)
-			fatal_error "assembler option '$arg' not supported"
+			error "assembler option '$arg' not supported"
 			;;
 		-o)
 			output_file=$1; shift
 			;;
-		-v|-version)
-			show_version
+		-v|-verbose|--verbose)
+			verbose=X
 			;;
-		--version)
-			show_version
+		-version|--version)
+			version=X
+			;;
+		-help|--help)
+			cat $0 # TODO
 			exit 0
 			;;
 		-D|-f|-K|--traditional-format|-w|-x|-Z|-W|--no-warn)
@@ -101,35 +122,62 @@ while [ "$1" != "" ]; do
 			list_file=${arg#=}
 			;;
 		-*)
-			echo "as (m6809): unrecognized option $arg"
-			exit 1
+			error "unrecognized option '$arg'"
 			;;
 		*)
-			input_file=$arg
-			asoutput_file=${input_file%\.[sS]}.rel
-			if [ "x$list_file_enabled" = "xy" ]; then
-				aslist_file=${input_file%\.[sS]}.lst
-				if [ "x$list_file" = "x" ]; then
-					list_file=$aslist_file
-				fi
+			if [ -n "$input_file" ]; then
+				error "more than one input file specified"
 			fi
+			if [ "${arg%.*}" = "$arg" ]; then
+				error "input file '$arg' without extension"
+			fi
+			input_file=$arg
 			;;
 	esac
 done
 
-# Complain if no input files given.  We don't support redirecting
-# from standard input.
-
-if [ "x$input_file" = "x" ]; then
-	fatal_error "no input file specified"
+# Setup various file name.
+asoutput_file=${input_file%\.*}.rel
+if [ -n "$gen_list_file" ]; then
+	aslist_file=${input_file%\.*}.lst
+	if [ -z "$list_file" ]; then
+		list_file=$aslist_file
+	fi
 fi
 
-# Invoke the real (as6809) assembler.
-# The -o option causes an object file to be created.
-# The -g option causes undefined symbols to be made global.
+# Output version information.
+if [ -n "$version" -o -n "$verbose" ]; then
+	showversion
+fi
+if [ -n "$version" ]; then
+	exit 0
+fi
 
-$bindir/as6809 -og$options $input_file
+# Output more information when --verbose option is set.
+if [ -n "$verbose" ]; then
+	echo "$bindir/as6809 $options $input_file"
+	echo "Output file: '$output_file'"
+	if [ -n "$gen_list_file" ]; then
+		echo "List file: '$list_file'"
+	fi
+fi
+
+# Exit if no input files given.
+# We don't support redirecting from standard input.
+if [ -z "$input_file" ]; then
+	if [ -n "$verbose" ]; then
+		exit 0
+	fi
+	error "no input file specified"
+fi
+
+set +e
+
+# Invoke the real assembler with translated options.
+$bindir/as6809 $options "$input_file"
 rc=$?
+
+set -e
 
 # OK, see if the assembler succeeded or not.
 # If it failed, the source is copied to /tmp/as6809_error.s
@@ -139,24 +187,28 @@ rc=$?
 #
 # Also, as6809 still creates a .o file even on an error;
 # that can confuse 'make'.  So delete the output file.
-
 if [ "$rc" != "0" ]; then
-	cp -p $input_file /tmp/as6809_error.s
-	rm -f $asoutput_file
+	# Make sure that the input file is valid before copying.
+	if [ -f "$input_file" ]; then
+		cp -p "$input_file" /tmp/as6809_error.s || true
+	fi
+	rm -f "$asoutput_file"
+	if [ -n "$gen_list_file" ]; then
+		rm -f "$aslist_file"
+	fi
 	exit $rc
 fi
 
 # as6809 creates the output file with the same name as the
-# input file, but with a .o extension.  The user may want
+# input file, but with a .rel extension.  The user may want
 # a different filename altogether, so honor that request here.
-
 if [ "$asoutput_file" != "$output_file" ]; then
-	mv $asoutput_file $output_file
+	mv "$asoutput_file" "$output_file"
 fi
 
-if [ "x$list_file_enabled" = "xy" ]; then
-	if [ "$aslist_file" != "$list_file" ]; then
-		mv $aslist_file $list_file
-	fi
+# Same as above but for the list file with a .lst extension.
+if [ -n "$gen_list_file" -a "$aslist_file" != "$list_file" ]; then
+	mv "$aslist_file" "$list_file"
 fi
 
+exit 0

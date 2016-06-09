@@ -2,7 +2,7 @@
 #
 # Copyright 2006, 2007 by Brian Dominy <brian@oddchange.com>
 #
-# Changes by David Flamand <dflamand@gmail.com> (May 2016)
+# Changes by David Flamand <dflamand@gmail.com> (June 2016)
 #  - added more options, more robust and verbose in case of error
 #
 # This file is part of GCC6809.
@@ -32,21 +32,19 @@ IFS=' '
 as_prefix=@AS_PREFIX@
 bindir=${as_prefix}/bin
 
-# Output a message to stdout or stderr and optionally exit with a code.
-msg ()
+showversion () {
+cat <<END
+ld (m6809) [GNU linker frontend] 0.3 20160608
+This program is free software; you may redistribute it under the terms of
+the GNU General Public License.  This program has absolutely no warranty.
+END
+}
+
+# Output an error message to stderr and exit with a failure code.
+error ()
 {
-	out=1
-	text="ld (m6809)"
-	if [ -n "$1" ]; then
-		text="$text: $1"
-	fi
-	if [ "0$2" -ne 0 ]; then
-		out=2
-	fi
-	echo "$text" >&$out
-	if [ $# -gt 1 ]; then
-		exit $2
-	fi
+	echo "ld (m6809): $1" >&2
+	exit 1
 }
 
 # Check if a given filename will survive a variable expansion.
@@ -57,7 +55,7 @@ checkfilename ()
 	A=$1; shift; B=$*
 	IFS=$OIFS
 	if [ -z "$A" -o "$A" != "$B" ]; then
-		msg "$MSG '$A'" 1
+		error "$MSG '$A'"
 	fi
 }
 
@@ -78,25 +76,42 @@ setformat ()
 			exe_suffix=$1
 			;;
 		*)
-			msg "unrecognized output format '$1'" 1
+			error "unrecognized output format '$1'"
 			;;
 	esac
 }
 
-# Set defaults.  Some are based on the target type, which is 
-# determined by the name by which the program was invoked.
-aslink_options=-nwxsar
+# Assume nothing.
+args=
+asmap_file=
+asoutput_file=
+crt0_file=
 exe_suffix=
+gen_map_file=
+input_files=
+libpaths=
+libs=
+map_file=
+noargs=
 options=
 target=
-case $0 in
-	*m6809-coco-*)
+verbose=
+version=
+
+# Set defaults.
+aslink_options=-nwxsar
+output_file=a.out
+
+# Try to guest the target type, which is determined
+# by the name by which the program was invoked.
+case ${0##*/} in
+	coco-*|*-coco-*|*-coco)
 		options="-b .text=0x2000 -b .data=0x7000 -b .bss=0x7C00 -b .ctors=0x7F00 -b .dtors=0x7F80 -b .vector=0x7FF0"
 		target=coco
 		setformat bin
 		LD_NOARGS=X
 		;;
-	*m6809-sim-*)
+	sim-*|*-sim-*|*-sim)
 		options="-b .text=0x10 -b .vector=0xFFF0"
 		target=sim
 		setformat s19
@@ -111,21 +126,36 @@ case $0 in
 esac
 
 # Parse and translate command-line options.
-output_file=a.out
-args=
-asmap_file=
-asout_file=
-gen_map_file=
-input_files=
-libpaths=
-libs=
-map_file=
-noargs=
-verbose=
-version=
 while [ $# -gt 0 ]; do
 	arg=$1; shift
 	case $arg in
+##########################################################
+# these are custom linker options (no GNU ld equivalent) #
+		-gn)
+			# Generate NoICE debug file
+			aslink_options="${aslink_options}j"
+			;;
+		-gs)
+			# Generate SDCC debug file
+			aslink_options="${aslink_options}y"
+			;;
+		--map)
+			# Generate map file
+			gen_map_file=X
+			;;
+		--args)
+			# Prototype of main():
+			#  if supplied main() prototype is
+			#    int main(int argc, char **argc)
+			#  if not supplied main() prototype is
+			#    int main(void)
+			args=X
+			;;
+		--noargs)
+			# The inverse of the above
+			noargs=X
+			;;
+##########################################################
 		-o|--output)
 			output_file=$1; shift
 			;;
@@ -189,18 +219,18 @@ while [ $# -gt 0 ]; do
 		-Ttext)
 			options="$options -b .text=$1"; shift
 			;;
-		--verbose)
-			verbose=X
-			;;
 		-g)
 			# Ignored by GNU ld; we should do the same
 			true
 			;;
-		-v|--version)
+		-v|-verbose|--verbose)
+			verbose=X
+			;;
+		-version|--version)
 			version=X
 			;;
-		--help)
-			cat $0 # Better than nothing
+		-help|--help)
+			cat $0 # TODO
 			exit 0
 			;;
 		-T)
@@ -214,48 +244,29 @@ while [ $# -gt 0 ]; do
 			map_file=${arg#*=}
 			gen_map_file=X
 			;;
-##########################################################
-# these are custom linker options (no GNU ld equivalent) #
-		-gn)
-			# Generate NoICE debug file
-			aslink_options="${aslink_options}j"
-			;;
-		-gs)
-			# Generate SDCC debug file
-			aslink_options="${aslink_options}y"
-			;;
-		--map)
-			# Generate map file
-			gen_map_file=X
-			;;
-		--args)
-			# Prototype of main():
-			#  if supplied main() prototype is
-			#    int main(int argc, char **argc)
-			#  if not supplied main() prototype is
-			#    int main(void)
-			args=X
-			;;
-		--noargs)
-			# The inverse of the above
-			noargs=X
-			;;
-##########################################################
 		-*)
-			msg "unrecognized option '$arg'" 1
+			error "unrecognized option '$arg'"
+			;;
+		*/crt0.o|crt0.o)
+			checkfilename "invalid input file name" "$arg" $arg
+			if [ -n "$crt0_file" ]; then
+				error "more than one crt0.o given"
+			fi
+			crt0_file=$arg
 			;;
 		*)
 			checkfilename "invalid input file name" "$arg" $arg
 			if [ "${arg%.*}" = "$arg" ]; then
-				msg "input file '$arg' without extension" 1
+				error "input file '$arg' without extension"
 			fi
 			input_files="$input_files $arg"
 			;;
 	esac
 done
 
-asout_file=${output_file%\.*}.$exe_suffix
-asmap_file=${asout_file%\.*}.map
+# Setup various file name.
+asoutput_file=${output_file%\.*}.$exe_suffix
+asmap_file=${asoutput_file%\.*}.map
 if [ -z "$map_file" ]; then
 	map_file=${output_file%\.*}.map
 fi
@@ -276,12 +287,15 @@ fi
 
 # Output version information.
 if [ -n "$version" -o -n "$verbose" ]; then
-	msg ""
+	showversion
+fi
+if [ -n "$version" ]; then
+	exit 0
 fi
 
 # Output more information when --verbose option is set.
 if [ -n "$verbose" ]; then
-	echo "$bindir/aslink $aslink_options $options $asout_file $input_files $libpaths $libs"
+	echo "$bindir/aslink $aslink_options $options $asoutput_file $crt0_file $input_files $libpaths $libs"
 	echo "Target: '$target'"
 	echo "Output format: '$exe_suffix'"
 	echo "Output file: '$output_file'"
@@ -290,38 +304,43 @@ if [ -n "$verbose" ]; then
 	fi
 fi
 
-# Exit if no input file.
+# Exit if no input files given.
 if [ -z "$input_files" ]; then
-	if [ -n "$version" -o -n "$verbose" ]; then
+	if [ -n "$verbose" ]; then
 		exit 0
 	fi
-	msg "no input files" 1
+	error "no input files"
 fi
 
-if [ -n "$gen_map_file" ]; then
+if [ -n "$gen_map_file" -a -e "$asmap_file" ]; then
 	rm -f "$asmap_file"
 fi
 
 set +e
 
-# Run the real linker with translated options.
-$bindir/aslink $aslink_options $options "$asout_file" $input_files $libpaths $libs
+# Invoke the real linker with translated options.
+$bindir/aslink $aslink_options $options "$asoutput_file" $crt0_file $input_files $libpaths $libs
 rc=$?
 
 set -e
 
+# Do some cleanup in case of error.
 if [ "$rc" != "0" ]; then
-	rm -f "$asout_file"
-	if [ -n "$gen_map_file" ]; then
+	rm -f "$asoutput_file"
+	if [ -n "$gen_map_file" -a -e "$asmap_file" ]; then
 		rm -f "$asmap_file"
 	fi
 	exit $rc
 fi
 
-if [ "$asout_file" != "$output_file" ]; then
-	mv "$asout_file" "$output_file"
+# aslink creates the output file with the same name as the
+# input file, but with a .s19|.bin|.ihx extension.  The user may want
+# a different filename altogether, so honor that request here.
+if [ "$asoutput_file" != "$output_file" ]; then
+	mv "$asoutput_file" "$output_file"
 fi
 
+# Same as above but for the map file with a .map extension.
 if [ -n "$gen_map_file" -a "$asmap_file" != "$map_file" ]; then
 	mv "$asmap_file" "$map_file"
 fi

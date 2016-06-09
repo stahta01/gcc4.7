@@ -2,7 +2,7 @@
 #
 # Copyright 2006 by Brian Dominy <brian@oddchange.com>
 #
-# Changes by David Flamand <dflamand@gmail.com> (May 2016)
+# Changes by David Flamand <dflamand@gmail.com> (June 2016)
 #  - cleanup, more robust and verbose in case of error
 #
 # This file is part of GCC6809.
@@ -32,10 +32,18 @@ IFS=' '
 as_prefix=@AS_PREFIX@
 bindir=${as_prefix}/bin
 
-# Output a message to stderr and exit with a faillure code.
+showversion () {
+cat <<END
+ar (m6809) [GNU archiver frontend] 0.3 20160608
+This program is free software; you may redistribute it under the terms of
+the GNU General Public License.  This program has absolutely no warranty.
+END
+}
+
+# Output a message to stderr and exit with a failure code.
 error ()
 {
-	echo "ar (m6809): $1" 1>&2
+	echo "ar (m6809): $1" >&2
 	exit 1
 }
 
@@ -87,6 +95,14 @@ libcachetool ()
 options=${1#-}
 if [ -n "$options" ]; then
 	case $options in
+		-version)
+			showversion
+			exit 0
+			;;
+		help|-help)
+			cat $0 # TODO
+			exit 0
+			;;
 		C|-cache)
 			shift; libcachetool "$@"
 			;;
@@ -111,5 +127,5 @@ if [ -z "$options" ]; then
 	error "no options given"
 fi
 
-# Run the real archiver with translated options.
+# Invoke the real assembler with translated options.
 exec $bindir/aslib $options "$@"
