@@ -49,6 +49,8 @@ error ()
 
 libcachetool ()
 {
+	install=$1; shift
+
 	if [ $# = 0 ]; then
 		error "no file given"
 	fi
@@ -58,7 +60,7 @@ libcachetool ()
 	fi
 
 	libpathname=$1
-	if [ ! -f "$libpathname" ]; then
+	if [ "$install" = 1 -a ! -f "$libpathname" ]; then
 		error "no such file '$libpathname'"
 	fi
 
@@ -73,21 +75,27 @@ libcachetool ()
 	fi
 	cd "$libdir"
 
-	if [ ! -f "$libfile" ]; then
-		error "'$libfile' does not exist in '$libdir'"
+	if [ "$install" = 1 ]; then
+		if [ ! -f "$libfile" ]; then
+			error "'$libfile' does not exist in '$libdir'"
+		fi
+
+		# Recreate the cache directory
+		rm -rf "$libcache"
+		mkdir -p "$libcache"
+
+		# Fill the cache
+		cd "$libcache"
+		$bindir/aslib x ../"$libfile"
+		cd ..
+
+		# Make the index file
+		find "$libcache" -name '*.o' | LC_ALL=C sort > "$reallibfile"
+	else
+		# Uninstalling the cache
+		rm -rf "$libcache" "$reallibfile"
 	fi
 
-	# Recreate the cache directory
-	rm -rf "$libcache"
-	mkdir -p "$libcache"
-
-	# Fill the cache
-	cd "$libcache"
-	$bindir/aslib x ../"$libfile"
-	cd ..
-
-	# Make the index file
-	find "$libcache" -name '*.o' | LC_ALL=C sort > "$reallibfile"
 	exit
 }
 
@@ -103,8 +111,11 @@ if [ -n "$options" ]; then
 			cat $0 # TODO
 			exit 0
 			;;
-		C|-cache)
-			shift; libcachetool "$@"
+		-cache)
+			shift; libcachetool 1 "$@"
+			;;
+		-uncache)
+			shift; libcachetool 0 "$@"
 			;;
 		rc|cr|rcu|cru)
 			shift; options="rc"
