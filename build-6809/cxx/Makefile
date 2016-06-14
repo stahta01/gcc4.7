@@ -13,7 +13,7 @@
 # ------------------------------------------------------------------
 # prefix                     Mandatory
 # target                     Mandatory
-# program_prefix             Mandatory
+# program_prefix             Optional
 # GCC_VERSION                Mandatory
 # SRCDIR                     Mandatory
 # SUDO                       Optional, sudo command
@@ -27,23 +27,11 @@ hosted ?= enable
 
 ##########################################################################
 
-AR := $(prefix)/bin/$(program_prefix)ar
-CXX := $(prefix)/bin/$(program_prefix)g++
-INCPATH := $(prefix)/$(target)/include
-LIBPATH := $(prefix)/$(target)/lib
-BLDDIR := $(PWD)/$(target)
-LIBNAME := libstdc++
-ARCHIVE := $(BLDDIR)/install/$(LIBNAME)-cache
-CXXCONFIG := $(BLDDIR)/install/c++/$(GCC_VERSION)/bits/c++config.h
-
 ifeq ($(target),)
 $(error null target)
 endif
 ifeq ($(prefix),)
 $(error null prefix)
-endif
-ifeq ($(program_prefix),)
-$(error null program_prefix)
 endif
 ifeq ($(GCC_VERSION),)
 $(error null GCC_VERSION)
@@ -52,76 +40,101 @@ ifeq ($(SRCDIR),)
 $(error null SRCDIR)
 endif
 
+CXX := $(prefix)/bin/$(program_prefix)g++
+CC := $(prefix)/bin/$(program_prefix)gcc
+AR := $(prefix)/bin/$(program_prefix)ar
+AS := $(prefix)/bin/$(program_prefix)as
+LD := $(prefix)/bin/$(program_prefix)ld
+RANLIB := $(prefix)/bin/$(program_prefix)ranlib
+INCPATH := $(prefix)/$(target)/include
+LIBPATH := $(prefix)/$(target)/lib
+BLDDIR := $(PWD)/$(target)
+LIBNAME := libstdc++
+CXXCONFIG := $(BLDDIR)/install/c++/$(GCC_VERSION)/bits/c++config.h
+MULTILIB := $(shell $(CC) -print-multi-lib | sed -n 's/\(^[^;]*\).*$$/\1/p')
+LIBSUPC := $(shell for lib in $(MULTILIB); do echo $(BLDDIR)/$$lib/build/libsupc++/.libs/libsupc++.a ; done)
+LIBSTDC := $(shell for lib in $(MULTILIB); do echo $(BLDDIR)/$$lib/build/$(LIBNAME).a ; done)
+
 ##########################################################################
 
 .PHONY: build
-build: $(ARCHIVE)
+build: $(LIBSTDC)
 
 .PHONY: clean
 clean:
-	cd $(BLDDIR)/libsupc++ && $(MAKE) clean
-	rm -rf $(BLDDIR)/install/*$(LIBNAME)* $(BLDDIR)/install/*libsupc++*
+	for lib in $(MULTILIB); do \
+		cd $(BLDDIR)/$$lib/build/libsupc++ && $(MAKE) clean && \
+		rm -f "$(BLDDIR)/$$lib/build/$(LIBNAME).a" ; \
+	done
 
 .PHONY: distclean
 distclean:
-	rm -rf '$(BLDDIR)'
+	rm -rf "$(BLDDIR)"
 
 .PHONY: install
 install: build
-	$(SUDO) cp -r '$(BLDDIR)/install/c++/' '$(INCPATH)/c++/'
-	$(SUDO) cp    '$(BLDDIR)/install/$(LIBNAME).a' '$(LIBPATH)'
-	$(SUDO) cp    '$(BLDDIR)/install/as-$(LIBNAME).a' '$(LIBPATH)'
-	$(SUDO) cp -r '$(BLDDIR)/install/$(LIBNAME)-cache/' '$(LIBPATH)'
+	echo "Installing includes $(INCPATH)/c++ ..." && \
+	$(SUDO) cp -r "$(BLDDIR)/install/c++/" "$(INCPATH)/c++/" && \
+	for lib in $(MULTILIB); do \
+		echo "Installing library $(LIBPATH)/$$lib/$(LIBNAME).a ..." && \
+		$(SUDO) cp "$(BLDDIR)/$$lib/build/$(LIBNAME).a" "$(LIBPATH)/$$lib" && \
+		$(SUDO) $(AR) --cache "$(LIBPATH)/$$lib/$(LIBNAME).a" ; \
+	done
 
 .PHONY: uninstall
 uninstall:
-	$(SUDO) rm -fr '$(INCPATH)/c++/'
-	$(SUDO) rm -f  '$(LIBPATH)/$(LIBNAME).a'
-	$(SUDO) rm -f  '$(LIBPATH)/as-$(LIBNAME).a'
-	$(SUDO) rm -fr '$(LIBPATH)/$(LIBNAME)-cache/'
+	echo "Uninstalling includes $(INCPATH)/c++ ..." && \
+	$(SUDO) rm -rf "$(INCPATH)/c++/" && \
+	for lib in $(MULTILIB); do \
+		echo "Uninstalling library $(LIBPATH)/$$lib/$(LIBNAME).a ..." && \
+		$(SUDO) rm -f "$(LIBPATH)/$$lib/$(LIBNAME).a" && \
+		$(SUDO) $(AR) --uncache "$(LIBPATH)/$$lib/$(LIBNAME).a" ; \
+	done
 
 ##########################################################################
 
-$(ARCHIVE): $(BLDDIR)/install/$(LIBNAME).a
-	@echo "Building $(LIBNAME) cache ..." && \
-	$(AR) --cache $(BLDDIR)/install/$(LIBNAME).a
+$(LIBSTDC): $(LIBSUPC)
+	for lib in $(MULTILIB); do \
+		echo "Building $$lib/build/$(LIBNAME).a ..." && \
+		cp $(BLDDIR)/$$lib/build/libsupc++/.libs/libsupc++.a \
+			$(BLDDIR)/$$lib/build/$(LIBNAME).a ; \
+	done
 
-$(BLDDIR)/install/$(LIBNAME).a: $(BLDDIR)/install/libsupc++.a
-	cp $< $@
-
-$(BLDDIR)/install/libsupc++.a: $(CXXCONFIG)
-	@echo "Building libsupc++ sources ..." && \
-	echo "#include <stdlib.h>\n"\
-	"char* __cxa_demangle(const char* __mangled_name, char* __output_buffer,\n"\
-	"	size_t* __length, int* __status)\n"\
-	"{ \n"\
-	"	*__status = -1;\n"\
-	"	return NULL;\n"\
-	"}" > $(BLDDIR)/libsupc++/cp-demangle.c && \
-	cd $(BLDDIR)/libsupc++ && $(MAKE) install
+$(LIBSUPC): $(CXXCONFIG)
+	for lib in $(MULTILIB); do \
+		echo "Building $$lib/build/libsupc++ ..." && \
+		echo "#include <stdlib.h>\n"\
+		"char* __cxa_demangle(const char* __mangled_name, char* __output_buffer,\n"\
+		"	size_t* __length, int* __status)\n"\
+		"{\n"\
+		"	*__status = -1;\n"\
+		"	return NULL;\n"\
+		"}" > $(BLDDIR)/$$lib/build/libsupc++/cp-demangle.c && \
+		cd $(BLDDIR)/$$lib/build/libsupc++ && $(MAKE) ; \
+	done
 
 ##########################################################################
 
-# TODO multilib support, need newlib multilib support
-$(BLDDIR)/config.status: $(CXX) | $(BLDDIR)
-	@echo "Configuring libsupc++ ..." && rm -rf $(BLDDIR)/* && cd $(BLDDIR) && \
+$(BLDDIR)/build/config.status: $(CXX) | $(BLDDIR)/build
+	@echo "Configuring libsupc++ ..." && rm -rf $(BLDDIR)/build/* && cd $(BLDDIR)/build && \
+		CXX=$(CXX) CC=$(CC) AR=$(AR) AS=$(AS) LD=$(LD) RANLIB=$(RANLIB) \
 		$(SRCDIR)/libstdc++-v3/configure --enable-sjlj-exceptions \
-			--disable-multilib --$(hosted)-hosted-libstdcxx --disable-nls \
+			--enable-multilib --$(hosted)-hosted-libstdcxx --disable-nls \
 			--disable-shared --disable-libstdcxx-pch --disable-long-long \
 			--with-newlib --prefix=$(BLDDIR)/install --host=$(target) \
-			--with-gxx-include-dir=$(BLDDIR)/install/include/c++ --libdir=$(BLDDIR)/install \
+			--with-gxx-include-dir=$(BLDDIR)/install/include/c++ \
 			CXXFLAGS='-Os -fno-function-sections -fno-data-sections'
 
-$(CXXCONFIG): $(BLDDIR)/config.status
+$(CXXCONFIG): $(BLDDIR)/build/config.status
 	@echo "Building libsupc++ headers ..." && \
-		cd $(BLDDIR)/include && $(MAKE) && $(MAKE) install-headers
+		cd $(BLDDIR)/build/include && $(MAKE) && $(MAKE) install-headers
 	mkdir -p $(BLDDIR)/install/c++/$(GCC_VERSION) $(BLDDIR)/install/c++/$(GCC_VERSION)/bits $(BLDDIR)/install/c++/$(GCC_VERSION)/ext
-	cd $(BLDDIR)/install/include/c++ && cp -r $(CXXINCLUDE) -t ../../c++/$(GCC_VERSION)
-	cd $(BLDDIR)/install/include/c++/bits && cp -r $(CXXINCBITS) -t ../../../c++/$(GCC_VERSION)/bits
-	cd $(BLDDIR)/install/include/c++/ext && cp -r $(CXXINCEXT) -t ../../../c++/$(GCC_VERSION)/ext
+	cd $(BLDDIR)/install/include/c++ && cp -r $(CXXINCLUDE) ../../c++/$(GCC_VERSION)
+	cd $(BLDDIR)/install/include/c++/bits && cp -r $(CXXINCBITS) ../../../c++/$(GCC_VERSION)/bits
+	cd $(BLDDIR)/install/include/c++/ext && cp -r $(CXXINCEXT) ../../../c++/$(GCC_VERSION)/ext
 	cp $(BLDDIR)/install/include/c++/$(target)/bits/c++config.h $(CXXCONFIG)
 
-$(BLDDIR):
+$(BLDDIR)/build:
 	mkdir -p $@
 
 CXXINCLUDE = \
