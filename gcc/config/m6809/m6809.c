@@ -254,35 +254,6 @@ print_direct_prefix (FILE * file, rtx addr)
 }
 
 
-/** Output instructions for logical operation (and/ior/xor). */
-void
-output_logical_insns (const char *op, rtx addr)
-{
-	char op0[32], op1[32];
-	rtx x, operands[2] = {NULL_RTX, NULL_RTX};
-	if (MEM_P (addr) && GET_CODE (XEXP (addr, 0)) == POST_INC &&
-		GET_CODE ((x = XEXP (XEXP (addr, 0), 0))) == REG) {
-		const char *reg = reg_names[REGNO (x)];
-		snprintf (op0, sizeof(op0), "%sa\t,%s++", op, reg);
-		snprintf (op1, sizeof(op1), "%sb\t-1,%s", op, reg);
-	}
-	else if (MEM_P (addr) && GET_CODE (XEXP (addr, 0)) == PRE_DEC &&
-		GET_CODE ((x = XEXP (XEXP (addr, 0), 0))) == REG) {
-		const char *reg = reg_names[REGNO (x)];
-		snprintf (op0, sizeof(op0), "%sa\t,--%s", op, reg);
-		snprintf (op1, sizeof(op1), "%sb\t1,%s", op, reg);
-	}
-	else {
-		snprintf(op0, sizeof(op0), "%sa\t%%0", op);
-		snprintf(op1, sizeof(op1), "%sb\t%%0", op);
-		operands[0] = gen_highpart (QImode, addr);
-		operands[1] = gen_lowpart (QImode, addr);
-	}
-	output_asm_insn (op0, &operands[0]);
-	output_asm_insn (op1, &operands[1]);
-}
-
-
 /** Prints an operand (that is not an address) in assembly from RTL. */
 void
 print_operand (FILE * file, rtx x, int code)
@@ -376,6 +347,7 @@ print_operand_address (FILE *file, rtx addr, rtx ofst)
 	register rtx offset = 0;
 	int regno;
 	int indirect_flag = 0;
+	enum machine_mode mode;
 
 	check_direct_prefix_flag = 0;
 
@@ -399,15 +371,19 @@ print_operand_address (FILE *file, rtx addr, rtx ofst)
 			break;
 
 		case PRE_DEC:
+			/* We use BLKmode as a special flag to force decrement by two */
+			mode = GET_MODE (addr);
 			regno = REGNO (XEXP (addr, 0));
-			fputs (((last_mem_size == 1) ? ",-" : ",--"), file);
+			fputs (((mode != BLKmode && last_mem_size == 1) ? ",-" : ",--"), file);
 			fprintf (file, "%s", reg_names[regno]);
 			break;
 
 		case POST_INC:
+			/* We use BLKmode as a special flag to force increment by two */
+			mode = GET_MODE (addr);
 			regno = REGNO (XEXP (addr, 0));
 			fprintf (file, ",%s", reg_names[regno]);
-			fputs (((last_mem_size == 1) ? "+" : "++"), file);
+			fputs (((mode != BLKmode && last_mem_size == 1) ? "+" : "++"), file);
 			break;
 
 		case PLUS:
