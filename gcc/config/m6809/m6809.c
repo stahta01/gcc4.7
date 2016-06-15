@@ -462,26 +462,25 @@ print_operand_address (FILE *file, rtx addr, rtx ofst)
 
 			break;
 
-   default:
+	default:
 		/* Set this global before calling output_addr_const() */
 		if (!indirect_flag)
 			check_direct_prefix_flag = 1;
 
-		/* When printing a SYMBOL_REF in PIC mode, do not print the leading
-		 * '#' and follow it by ',pcr' to enable relative addressing. */
-		if (flag_pic && pic_ok_for_addr_p && GET_CODE (addr) == SYMBOL_REF)
-		{
-			ASM_OUTPUT_SYMBOL_REF (file, addr);
+		output_addr_const (file, addr);
+
+		/* When printing a SYMBOL_REF in PIC mode follow it
+		   by ',pcr' to enable relative addressing. */
+		if (flag_pic && pic_ok_for_addr_p && (
+			GET_CODE (addr) == SYMBOL_REF ||
+			GET_CODE (addr) == CONST && GET_CODE (XEXP (addr, 0)) == PLUS && (
+				GET_CODE (XEXP (XEXP (addr, 0), 0)) == SYMBOL_REF && GET_CODE (XEXP (XEXP (addr, 0), 1)) == CONST_INT ||
+				GET_CODE (XEXP (XEXP (addr, 0), 1)) == SYMBOL_REF && GET_CODE (XEXP (XEXP (addr, 0), 0)) == CONST_INT )
+			))
 			fputs (",pcr", file);
-			pic_ok_for_addr_p = 1;
-		}
-		else
-		{
-      	output_addr_const (file, addr);
-		}
 
 		check_direct_prefix_flag = 0;
-      break;
+		break;
 	}
 
 	if (indirect_flag)
