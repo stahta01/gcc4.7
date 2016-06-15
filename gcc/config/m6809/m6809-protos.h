@@ -61,6 +61,7 @@ int m6809_init_cumulative_args (CUMULATIVE_ARGS cum, tree fntype, rtx libname);
 #endif /* TREE_CODE */
 
 #ifdef RTX_CODE
+void 					output_logical_insns (const char *op, rtx addr);
 void 					print_direct_prefix (FILE *file, rtx addr);
 void 					print_operand (FILE *file, rtx x, int code);
 void 					print_operand_address (FILE *file, rtx addr, rtx ofst);
