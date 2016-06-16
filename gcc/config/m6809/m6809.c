@@ -449,9 +449,9 @@ print_operand_address (FILE *file, rtx addr, rtx ofst)
 		   by ',pcr' to enable relative addressing. */
 		if (flag_pic && pic_ok_for_addr_p && (
 			GET_CODE (addr) == SYMBOL_REF ||
-			GET_CODE (addr) == CONST && GET_CODE (XEXP (addr, 0)) == PLUS && (
-				GET_CODE (XEXP (XEXP (addr, 0), 0)) == SYMBOL_REF && GET_CODE (XEXP (XEXP (addr, 0), 1)) == CONST_INT ||
-				GET_CODE (XEXP (XEXP (addr, 0), 1)) == SYMBOL_REF && GET_CODE (XEXP (XEXP (addr, 0), 0)) == CONST_INT )
+			(GET_CODE (addr) == CONST && GET_CODE (XEXP (addr, 0)) == PLUS && (
+				(GET_CODE (XEXP (XEXP (addr, 0), 0)) == SYMBOL_REF && GET_CODE (XEXP (XEXP (addr, 0), 1)) == CONST_INT) ||
+				(GET_CODE (XEXP (XEXP (addr, 0), 1)) == SYMBOL_REF && GET_CODE (XEXP (XEXP (addr, 0), 0)) == CONST_INT) ))
 			))
 			fputs (",pcr", file);
 
