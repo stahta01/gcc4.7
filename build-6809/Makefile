@@ -249,7 +249,7 @@ sudo-force :
 ##########################################################################
 
 .PHONY : distclean
-distclean :
+distclean : cxx-distclean
 	@echo "Cleaning everything ..." && rm -rf $(BLDDIR)/*
 
 ##########################################################################
