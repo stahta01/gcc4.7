@@ -51,7 +51,7 @@ LIBPATH := $(prefix)/$(target)/lib
 BLDDIR := $(PWD)/$(target)
 LIBNAME := libstdc++
 CXXCONFIG := $(BLDDIR)/install/c++/$(GCC_VERSION)/bits/c++config.h
-MULTILIB := $(shell $(CC) -print-multi-lib | sed -n 's/\(^[^;]*\).*$$/\1/p')
+MULTILIB := $(shell [ -x $(CC) ] && $(CC) -print-multi-lib | sed -n 's/\(^[^;]*\).*$$/\1/p' || echo . )
 LIBSUPC := $(shell for lib in $(MULTILIB); do echo $(BLDDIR)/$$lib/build/libsupc++/.libs/libsupc++.a ; done)
 LIBSTDC := $(shell for lib in $(MULTILIB); do echo $(BLDDIR)/$$lib/build/$(LIBNAME).a ; done)
 
