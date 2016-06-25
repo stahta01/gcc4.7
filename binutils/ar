@@ -44,9 +44,12 @@ END
 error ()
 {
 	echo "ar (m6809): $1" >&2
-	exit 1
+	if [ -z "$2" ]; then
+		exit 1
+	fi
 }
 
+# Install or uninstall library cache.
 libcachetool ()
 {
 	install=$1; shift
@@ -69,73 +72,121 @@ libcachetool ()
 	lib=${libfile%.*}
 	reallibfile=as-$libfile
 	libcache=${lib}-cache
+	tmplibcache=$libcache.tmp
 
 	if [ ! -d "$libdir" ]; then
 		error "no such directory '$libdir'"
 	fi
 	cd "$libdir"
 
+	# Check if library file exist
+	if [ ! -f "$libfile" ]; then
+		error "'$libfile' does not exist in '$libdir'"
+	fi
+
 	if [ "$install" = 1 ]; then
-		if [ ! -f "$libfile" ]; then
-			error "'$libfile' does not exist in '$libdir'"
+		### '--cache' option ###
+
+		# Check for cache directory
+		if [ -d "$libcache" ]; then
+			error "directory '$libcache' already exist"
 		fi
 
 		# Recreate the cache directory
-		rm -rf "$libcache"
-		mkdir -p "$libcache"
+		rm -rf "$tmplibcache"
+		mkdir -p "$tmplibcache"
 
 		# Fill the cache
-		cd "$libcache"
-		$bindir/aslib x ../"$libfile"
+		cd "$tmplibcache"
+		if ! $bindir/aslib x "../$libfile"; then
+			cd ..
+			rm -rf "$tmplibcache"
+			exit 1
+		fi
 		cd ..
 
+		# Overwrite cache with temp cache
+		rm -rf "$libcache"
+		mv "$tmplibcache" "$libcache"
+
 		# Make the index file
-		find "$libcache" -name '*.o' | LC_ALL=C sort > "$reallibfile"
+		find "$libcache" -name '*.o' | LC_ALL=C sort >"$reallibfile"
 	else
-		# Uninstalling the cache
+		### '--uncache' option ###
+
+		# Check for cache directory
+		if [ ! -d "$libcache" ]; then
+			error "directory '$libcache' does not exist"
+		fi
+
+		# Removing cache directory and library file
 		rm -rf "$libcache" "$reallibfile"
 	fi
 
 	exit
 }
 
-# Parse and translate command-line options.
+# Reorder and remove duplicate option letter.
 options=${1#-}
-if [ -n "$options" ]; then
-	case $options in
-		-version)
-			showversion
-			exit 0
-			;;
-		help|-help)
-			cat $0 # TODO
-			exit 0
-			;;
-		-cache)
-			shift; libcachetool 1 "$@"
-			;;
-		-uncache)
-			shift; libcachetool 0 "$@"
-			;;
-		rc|cr|rcu|cru)
-			shift; options="rc"
-			;;
-		rv|vr)
-			shift; options="rv"
-			;;
-		x)
-			shift; options="x"
-			;;
-		*.*)
-			options="rc"
-			;;
-		*)
-			error "invalid options '$options'"
-			;;
-	esac
+prefix=${1%$options}
+if [ "$options" = "${options#-}" ]; then
+	error=; c=; d=; p=; q=; r=; u=; v=; x=
+	while [ -n "$options" ]; do
+		remain=${options#?}
+		letter=${options%$remain}
+		case $letter in
+			c) c=c;; d) d=d;; p) p=p;; q) q=q;; r) r=r;; u) u=u;; v) v=v;; x) x=x;;
+			*) error=X; error "invalid option -- '$letter'" X;;
+		esac
+		options=$remain
+	done
+	if [ -n "$error" ]; then
+		exit 1
+	fi
+	options=$c$d$p$q$r$u$v$x
 fi
+
+# Make sure we have an option.
 if [ -z "$options" ]; then
 	error "no options given"
+fi
+
+# Parse and translate command-line options.
+shift
+case $options in
+############################################################
+# these are custom archiver options (no GNU ar equivalent) #
+	-cache)
+		libcachetool 1 "$@"
+		;;
+	-uncache)
+		libcachetool 0 "$@"
+		;;
+############################################################
+	-version)
+		showversion
+		exit 0
+		;;
+	-help)
+		cat $0 # TODO
+		exit 0
+		;;
+	cru)
+		options="cr"
+		;;
+	cruv)
+		options="crv"
+		;;
+	cr|crv|d|dv|p|pv|q|qv|r|rv|vx|x)
+		;;
+	*)
+		error "invalid options '$prefix$options'"
+		;;
+esac
+
+# Make sure we have an archive.
+if [ -z "$1" ]; then
+	error "no archive given"
 fi
 
 # Invoke the real assembler with translated options.

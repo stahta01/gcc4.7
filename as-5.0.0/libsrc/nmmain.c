@@ -4,29 +4,7 @@
 #include <string.h>
 #include "aslib.h"
 
-
-
-/* afile:
- *  Helper for opening a file.
- */
-FILE* afile(char *fn, char *ft, int wf)
-{
-   FILE *fp;
-   char fb[FILSPC];
-
-   strcpy(fb, fn);
-   if (ft) {
-      strcat(fb, ".");
-      strcat(fb, ft);
-   }
-
-   if (!(fp = fopen(fb, wf ? "w":"r"))) {
-      fprintf(stderr, "Error: cannot %s %s.\n", wf ? "create":"open", fb);
-      exit(1);
-   }
-
-   return fp;
-}
+#include "common.c"
 
 
 
