@@ -382,9 +382,9 @@ static void ranlib(char *filename)
 
 		/* Scan for all defined symbols, and add them to 'symbols'. */
 		*object = 0;
-		indexsize = 0;
 		objoff = 0;
 		nsymbols = 0;
+		indexsize = 1; /* for offset zero */
 		offset = FTELL(fp);
 		while (FGETS(line, MAX_LINE_SIZE, fp) != NULL) {
 			if (line[0] == 'E')
@@ -427,7 +427,6 @@ static void ranlib(char *filename)
 		hashsize = 1 << hashbit;
 		if (hashsize > 1) {
 			hashmask = hashsize - 1;
-			indexsize += hashmask;
 			symbol = symbols[0];
 			free(symbols);
 			free(symtail);
@@ -445,6 +444,10 @@ static void ranlib(char *filename)
 					symtail[h] = symtail[h]->next = symbol;
 				symbol = next;
 			}
+			/* Compute indexsize for the number of non-zero bin. */
+			for (i=0; i<hashsize; i++)
+				if (symbols[i])
+					indexsize++;
 		}
 
 		/* Compute the required number of digit for each symbol offset,
@@ -504,8 +507,9 @@ static void ranlib(char *filename)
 			ret = FPRINTF(tmpfp, "# HASH %X", hashbit);
 			err |= ret <= 0;
 			len = ret;
-			for (i=0, size=0; i<hashsize && !err; i++, size++) {
-				len2 = i != 0 ? gethexdigit(size)+1 : 0;
+			for (i=0, size=1; i<hashsize && !err; i++) {
+				symbol = symbols[i];
+				len2 = symbol ? gethexdigit(size)+1 : 1+1;
 				len += len2;
 				if (len >= MAX_HASH_LINE_SIZE) {
 					ret = FPRINTF(tmpfp, "\n# HASH");
@@ -513,10 +517,12 @@ static void ranlib(char *filename)
 					len = ret-1 + len2;
 				}
 				/* Skip the first hash bucket, the offset is always zero. */
-				if (i != 0)
-					err |= FPRINTF(tmpfp, " %lX", size) <= 0;
-				for (symbol = symbols[i]; symbol; symbol=symbol->next)
-					size += symbol->pos - symbol->name + symbol->digit + 1;
+				err |= FPRINTF(tmpfp, " %lX", symbol ? size : 0) <= 0;
+				if (symbol) {
+					for (; symbol; symbol=symbol->next)
+						size += symbol->pos - symbol->name + symbol->digit + 1;
+					size++;
+				}
 			}
 			err |= FPRINTF(tmpfp, "\n") <= 0;
 		}
@@ -525,15 +531,20 @@ static void ranlib(char *filename)
 
 		/* Output symbol table. */
 		if (nsymbols != 0) {
+			FPUTS("\n", tmpfp); /* offset zero */
 			for (i=0; i<hashsize; i++) {
-				for (symbol = symbols[i]; symbol; symbol=symbol->next) {
-					if (sprintf(symbol->pos, "%lX\n", symbol->offset + indexsize)
-						!= symbol->digit+1)
-						error("something wrong with sprintf");
-					if (FPUTS(symbol->name, tmpfp) == EOF)
-						break;
+				symbol = symbols[i];
+				if (symbol) {
+					for (symbol = symbols[i]; symbol; symbol=symbol->next) {
+						if (sprintf(symbol->pos, "%lX\n", symbol->offset + indexsize)
+							!= symbol->digit+1)
+							error("something wrong with sprintf");
+						if (FPUTS(symbol->name, tmpfp) == EOF)
+							break;
+					}
+					FPUTS("\n", tmpfp);
 				}
-				if (FERROR(tmpfp) || (i<hashsize-1 && FPUTS("\n", tmpfp) == EOF))
+				if (FERROR(tmpfp))
 					error("failed to write to temp file");
 			}
 		}
