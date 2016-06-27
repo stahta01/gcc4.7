@@ -507,7 +507,7 @@ static void ranlib(char *filename)
 			ret = FPRINTF(tmpfp, "# HASH %X", hashbit);
 			err |= ret <= 0;
 			len = ret;
-			for (i=0, size=1; i<hashsize && !err; i++) {
+			for (i=0, size=1 /* for zero offset */; i<hashsize && !err; i++) {
 				symbol = symbols[i];
 				len2 = symbol ? gethexdigit(size)+1 : 1+1;
 				len += len2;
@@ -516,7 +516,6 @@ static void ranlib(char *filename)
 					err |= ret <= 0;
 					len = ret-1 + len2;
 				}
-				/* Skip the first hash bucket, the offset is always zero. */
 				err |= FPRINTF(tmpfp, " %lX", symbol ? size : 0) <= 0;
 				if (symbol) {
 					for (; symbol; symbol=symbol->next)
