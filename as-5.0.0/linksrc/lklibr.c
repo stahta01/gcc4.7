@@ -413,8 +413,10 @@ int *phashptr;
 				}
 				nhashbin = lbnh->nhashbin;
 				hashbin = lbnh->hashbin;
-				while (hashptr<=nhashbin && (str=strchr(str, ' ')))
-					hashbin[hashptr++] = strtol(++str, NULL, 16);
+				while (hashptr<=(nhashbin+1) && (str=strchr(str, ' '))) {
+					hashbin[hashptr-1] = strtol(++str, NULL, 16);
+					hashptr++;
+				}
 			}
 			*phashptr = hashptr;
 		}
@@ -884,7 +886,11 @@ char *name;
 			}
 			/* Have an hash table? if so seek to to proper location. */
 			if (lbnh->hashbin) {
-				if (FSEEK (libfp, begin+lbnh->hashbin[djb2hash(name)&lbnh->nhashbin], SEEK_SET) != 0)
+				offset = lbnh->hashbin[djb2hash(name)&lbnh->nhashbin];
+				/* Offset zero mean no symbol for that bin, therefore skip. */
+				if (offset == 0)
+					break;
+				if (FSEEK (libfp, begin+offset, SEEK_SET) != 0)
 					lkerror("Cannot seek library file \"%s\"", lbnh->libspc);
 				if (FGETS (symname, NINPUT, libfp) == NULL)
 					break;
