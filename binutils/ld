@@ -136,7 +136,7 @@ while [ $# -gt 0 ]; do
 			aslink_options="${aslink_options}j"
 			;;
 		-gs)
-			# Generate SDCC debug file
+			# Generate SDCDB debug file
 			aslink_options="${aslink_options}y"
 			;;
 		--map)
@@ -156,6 +156,7 @@ while [ $# -gt 0 ]; do
 			noargs=X
 			;;
 		-Tcode)
+			# Same as -Ttext
 			options="$options -b .text=$1"; shift
 			;;
 ##########################################################
@@ -168,32 +169,32 @@ while [ $# -gt 0 ]; do
 		-L|--library-path)
 			path=$1; shift
 			checkfilename "invalid library path" "$path" $path
-			libpaths="$libpaths -k $path/"
+			libpaths="$libpaths -k $path"
 			;;
 		-L*)
 			path=${arg#-L}
 			checkfilename "invalid library path" "$path" $path
-			libpaths="$libpaths -k $path/"
+			libpaths="$libpaths -k $path"
 			;;
 		--library-path=*)
 			path=${arg#*=}
 			checkfilename "invalid library name" "$path" $path
-			libpaths="$libpaths -k $path/"
+			libpaths="$libpaths -k $path"
 			;;
 		-l|--library)
 			name=$1; shift
 			checkfilename "invalid library name" "$name" $name
-			libs="$libs -l as-lib$name.a"
+			libs="$libs -l lib$name.a"
 			;;
 		-l*)
 			name=${arg#-l}
 			checkfilename "invalid library name" "$name" $name
-			libs="$libs -l as-lib$name.a"
+			libs="$libs -l lib$name.a"
 			;;
 		--library=*)
 			name=${arg#*=}
 			checkfilename "invalid library name" "$name" $name
-			libs="$libs -l as-lib$name.a"
+			libs="$libs -l lib$name.a"
 			;;
 		--section-start)
 			options="$options -b $1"; shift

@@ -462,7 +462,7 @@ loop:	if (cfp && cfp->f_type == F_STD)
 
 #if SDCDB
 				if (sfp && (pass == 0)) {
-				  SDCDBcopy(fid);
+				  SDCDBcopy(fid, NULL);
 				}
 #endif
 
@@ -572,6 +572,19 @@ VOID
 chopcrlf(str)
 char *str;
 {
+#ifdef __unix__
+	int len;
+
+	len = strlen(str);
+	if (len > 0) {
+		if (str[len-1] == '\n')
+			str[--len] = 0;
+		if (len > 0) {
+			if (str[--len] == '\r')
+				str[len] = 0;
+		}
+	}
+#else
 	char *p;
 	char c;
 
@@ -582,5 +595,6 @@ char *str;
 			p--;
 		}
 	} while (c != 0);
+#endif
 }
 

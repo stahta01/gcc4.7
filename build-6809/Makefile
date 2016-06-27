@@ -75,6 +75,17 @@ as_prefix ?= $(prefix)
 # Set install location for the asxxxx programs.
 as_bindir := $(as_prefix)/bin
 
+# Enable/disable support for gziped library (require zlib).
+# When enabled gziped library are optional and transparent
+#  That means:
+#   - aslink can accept gziped and non-gziped libraries.
+#   - ranlib can convert between gziped and non-gziped libraries,
+#     default operation is: if the library was gziped then
+#     the ranlib'ed library is gziped and if the library was
+#     not gziped then the ranlib'ed library is not gziped.
+#     ranlib can also force gzip or non-gzip to the ranlib'ed library.
+gziplib ?= enable
+
 # Set the target CPU
 target_cpu := m6809
 
@@ -122,6 +133,11 @@ GCC_CURRENT_VERSION = $(GCC_VERSION)
 TARGET_GCC_VERSION = $(shell echo $(GCC_VERSION) | sed -e "s/\./00/" -e "s/\..*//")
 endif
 
+# Define various flags if gziplib is enabled.
+ifeq ($(gziplib),enable)
+	BINUTILS_CFLAGS = -DZLIBARCH -Wno-variadic-macros
+	BINUTILS_LDFLAGS = -lz
+endif
 
 # Select the flags to be used for building the compiler itself.
 # Normally, build optimized.
@@ -136,8 +152,6 @@ SRCDIR := $(abspath $(PWD)/..)
 BLDDIR := $(PWD)/$(target)
 DEJADIR=/usr/share/dejagnu
 TESTEXP := m6809-sim.exp
-MULTILIB_LIB = gcc gcov
-MULTILIB_DIR = $(shell $(call run_binutil,gcc) -print-multi-lib | sed -n 's/\(^[^;]*\).*$$/\1/p')
 
 ##########################################################################
 ##########################################################################
@@ -184,12 +198,6 @@ install : post-install
 
 .PHONY : post-install
 post-install: gccinstall
-	@for lib in $(MULTILIB_LIB); do \
-		echo "Installing $$lib cache..." && \
-		for dir in $(MULTILIB_DIR); do \
-			$(SUDO) $(call run_binutil,ar) --cache $(prefix)/lib/gcc/$(target)/$(GCC_CURRENT_VERSION)/$$dir/lib$$lib.a ;\
-		done \
-	done
 
 ##########################################################################
 
@@ -232,7 +240,7 @@ everything :
 
 .PHONY : all_binutils
 all_binutils:
-	$(MAKE) sequential ACTIONS="sudo-force asm-clean asm asm-install binutils"
+	$(MAKE) sequential ACTIONS="sudo-force asm-clean asm asm-install binutils-clean binutils"
 
 .PHONY : all_gcc
 all_gcc :
@@ -249,8 +257,8 @@ sudo-force :
 ##########################################################################
 
 .PHONY : distclean
-distclean : cxx-distclean
-	@echo "Cleaning everything ..." && rm -rf $(BLDDIR)/*
+distclean : asm-clean binutils-clean cxx-distclean
+	@echo "Cleaning everything else ..." && rm -rf $(BLDDIR)/*
 
 ##########################################################################
 
@@ -293,8 +301,6 @@ info :
 	@echo BLDDIR is $(BLDDIR)
 	@echo as_bindir is $(as_bindir)
 	@echo prefix is $(prefix)
-	@echo MULTILIB_DIR is $(MULTILIB_DIR)
-	@echo MULTILIB_LIB is $(MULTILIB_LIB)
 
 ##########################################################################
 
@@ -302,10 +308,18 @@ info :
 binutils:
 	@echo "Installing GNU wrappers for bintools..."
 	$(SUDO) mkdir -p $(prefix)/bin
+	cd ../binutils && $(MAKE) \
+		BINUTILS_CFLAGS="$(BINUTILS_CFLAGS)" \
+		BINUTILS_LDFLAGS="$(BINUTILS_LDFLAGS)" \
+		&& $(SUDO) cp -f ranlib $(call run_binutil,ranlib)
 	for prog in ar as ld; do \
 		$(SUDO) sed -e "s!@AS_PREFIX@!${as_prefix}!" < ../binutils/$$prog > $(call run_binutil,$$prog); \
 		$(SUDO) chmod a+x $(call run_binutil,$$prog); done
-	$(SUDO) ln -sf `which true` $(call run_binutil,ranlib)
+
+.PHONY : binutils-clean
+binutils-clean:
+	@echo "Cleaning in binutils ..." && \
+	cd ../binutils && $(MAKE) clean
 
 ##########################################################################
 
@@ -316,7 +330,9 @@ asm:
 	@echo "Building assembler, linker, and library tool..." && \
 		mkdir -p ../as-$(AS_VERSION)/asxmak/$(AS_HOST)/exe && \
 		cd $(ASBUILD) && \
-		$(MAKE) $(AS_TARGET) EXTRA_ASXXXX_CFLAGS="$(EXTRA_ASXXXX_CFLAGS)"
+		$(MAKE) $(AS_TARGET) \
+			EXTRA_ASXXXX_CFLAGS="$(BINUTILS_CFLAGS) -I$(SRCDIR)/binutils $(EXTRA_ASXXXX_CFLAGS)" \
+			EXTRA_ASXXXX_LDFLAGS="$(BINUTILS_LDFLAGS)"
 
 ##########################################################################
 

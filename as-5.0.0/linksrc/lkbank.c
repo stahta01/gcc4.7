@@ -375,6 +375,7 @@ VOID
 chkbank(fp)
 FILE *fp;
 {
+	char *msg;
 	a_uint alow, ahigh, blimit, bytes;
 
 	for (bp = bankp; bp != NULL; bp = bp->b_bp) {
@@ -404,8 +405,14 @@ FILE *fp;
 			}
 		}
 		if ((ahigh - alow) > blimit) {
-			lkwarning(
-			"Size limit exceeded in bank %s\n", bp->b_id);
+			msg = "Size limit exceeded in bank %s\n";
+			if (fp == stderr) {
+				lkwarning(msg, bp->b_id);
+			}
+			else {
+				fputs("\n", fp);
+				fprintf(fp, msg, bp->b_id);
+			}
 		}
 	}
 }

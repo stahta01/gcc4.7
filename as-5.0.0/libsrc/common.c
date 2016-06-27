@@ -1,6 +1,9 @@
 /* common.c */
 
 
+static FILE *sfp = NULL;
+
+
 
 static void *new(unsigned int n)
 {
@@ -17,15 +20,73 @@ static void *new(unsigned int n)
 
 
 
-static struct lfile *new_lfile(char *filename)
+static struct lfile *new_lfile(char *filename, char arch)
 {
 	struct lfile *lfilep;
 
 	lfilep = (struct lfile *)new(sizeof(struct lfile));
 	lfilep->f_idp = (char *)new(strlen(filename)+1);
 	strcpy(lfilep->f_idp, filename);
+	lfilep->f_arch = arch;
 
 	return lfilep;
+}
+
+
+
+/* striplineend:
+ *  Strip newline and carriage-return at end of line.
+ */
+static void striplineend(char *str)
+{
+	int i;
+	i = strlen(str);
+	if (i > 0) {
+		if (str[i-1] == '\n')
+			str[--i] = 0;
+		if (i > 0) {
+			if (str[--i] == '\r')
+				str[i] = 0;
+		}
+	}
+}
+
+
+
+/* skipheader:
+ *  Skip header and symbol index.
+ */
+static void skipheader(FILE *fp)
+{
+	char *str;
+	long offset = 0;
+	while (FGETS(ib, sizeof(ib), fp) != NULL) {
+		striplineend(ib);
+		/* process header */
+		if (*ib == '#') {
+			offset = FTELL(fp);
+			continue;
+		}
+		/* process symbol index */
+		do {
+			striplineend(ib);
+			str = strchr(ib, ' ');
+			if (!*ib || (str && strchr(str+1, ' '))) {
+				offset = FTELL(fp);
+				continue;
+			}
+			if (ib[0] != 'L' || (ib[1] >= '0' && ib[1] <= '9')) {
+				fprintf(stderr, "Error: wrong archive format '%s'.\n", ib);
+				exit(1);
+			}
+			break;
+		} while (FGETS(ib, sizeof(ib), fp) != NULL);
+		break;
+	}
+	if (FSEEK(fp, offset, SEEK_SET) < 0) {
+		fprintf(stderr, "Error: cannot seek archive.\n");
+		exit(1);
+	}
 }
 
 
@@ -75,18 +136,28 @@ static void getid(char *id, int c)
 
 
 
+static long as_offset(void)
+{
+	return cfp->f_arch ? FTELL(sfp) : ftell(sfp);
+}
+
+
+
 static int as_getline(void)
 {
-	static FILE *sfp = NULL;
-	int ret, i;
-
+	int ret;
 	ret = 1;
 
 loop:
-	if (sfp == NULL || fgets(ib, sizeof(ib), sfp) == NULL) {
+	if (sfp == NULL ||
+			(!cfp->f_arch && fgets(ib, sizeof(ib), sfp) == NULL) ||
+			 (cfp->f_arch && FGETS(ib, sizeof(ib), sfp) == NULL)) {
 		/* close just finished file */
 		if (sfp != NULL) {
-			fclose(sfp);
+			if (!cfp->f_arch)
+				fclose(sfp);
+			else
+				FCLOSE(sfp);
 			sfp = NULL;
 		}
 
@@ -102,11 +173,16 @@ loop:
 			if (verbose_level && verbose_action)
 				fprintf(stdout, "%c - %s\n", verbose_action, cfp->f_idp);
 #endif
-			sfp = fopen(cfp->f_idp, "r");
+			if (!cfp->f_arch)
+				sfp = fopen(cfp->f_idp, "r");
+			else
+				sfp = FOPEN(cfp->f_idp, "r");
 			if (!sfp) {
 				fprintf(stderr, "Error: cannot open '%s'.\n", cfp->f_idp);
 				exit(1);
 			}
+			if (cfp->f_arch)
+				skipheader(sfp);
 			ret = 2;
 			goto loop;
 		}
@@ -115,16 +191,7 @@ loop:
 		}
 	}
 
-	/* strip end of line */
-	i = strlen(ib);
-	if (i > 0) {
-		if (ib[i-1] == '\n')
-			ib[--i] = 0;
-		if (i > 0) {
-			if (ib[--i] == '\r')
-				ib[i] = 0;
-		}
-	}
+	striplineend(ib);
 
 	return ret;
 }

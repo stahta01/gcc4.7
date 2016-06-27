@@ -125,11 +125,11 @@ prep:
 
 
 CC=		gcc
-CCOPT=		-O3
+CCOPT=		-O3 $(EXTRA_ASXXXX_CFLAGS)
 CCFLAGS=	-Wall -funsigned-char $(CCOPT)
 
 LD=		gcc
-LDFLAGS=	-Wall
+LDFLAGS=	-Wall $(EXTRA_ASXXXX_CFLAGS)
 
 #  Set ASXBAS relative to this make file.
 
@@ -137,7 +137,7 @@ ASXBAS:=	../../../
 
 SRCASX:=	$(ASXBAS)asxxsrc/
 SRCLNK:=	$(ASXBAS)linksrc/
-SRCLIB:=    $(ASXBAS)libsrc/
+SRCLIB:=	$(ASXBAS)libsrc/
 SRCMISC:=	$(ASXBAS)asxxmisc/
 SRCS19OS9=	$(ASXBAS)s19os9/
 DSTEXE:=	$(ASXBAS)asxmak/linux/exe/
@@ -643,20 +643,22 @@ ASLINKSRC =	$(addprefix $(SRCLNK),$(ASLINK))
 $(ASLINK):	$(SRCMISC)alloc.h $(SRCLNK)aslink.h
 
 aslink.new:	$(ASLINKSRC)
-	$(LD) $(LDFLAGS) $(ASLINKSRC) -o aslink.new
+	$(LD) $(LDFLAGS) $(ASLINKSRC) $(EXTRA_ASXXXX_LDFLAGS) -o aslink.new
+
 
 ####################################################################
 # ASLIB
 ####################################################################
 
-ASLIB =        ardata.o arlex.o armem.o armain.o
+ASLIB =		ardata.o armain.o
 
-ASLIBSRC =     $(addprefix $(SRCLIB),$(ASLIB))
+ASLIBSRC =	$(addprefix $(SRCLIB),$(ASLIB))
 
-$(ASLIB): $(SRCLIB)aslib.h
+$(ASLIB):	$(SRCLIB)aslib.h
 
-aslib.new : $(ASLIBSRC)
-	$(LD) $(LDFLAGS) $(ASLIBSRC) -o aslib.new
+aslib.new:	$(ASLIBSRC)
+	$(LD) $(LDFLAGS) $(ASLIBSRC) $(EXTRA_ASXXXX_LDFLAGS) -o aslib.new
+
 
 ####################################################################
 # ASXCNV
@@ -685,6 +687,4 @@ s19os9.new:	$(SRCS19OS9)s19os9.o
 	$(LD) $(LDFLAGS) $(SRCS19OS9)s19os9.o -o s19os9.new
 
 
-### end #########################################################
-
-
+### end ############################################################

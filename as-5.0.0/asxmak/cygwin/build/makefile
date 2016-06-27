@@ -54,7 +54,7 @@ CCOPT=		-O3 $(EXTRA_ASXXXX_CFLAGS)
 CCFLAGS=	-Wall -funsigned-char $(CCOPT)
 
 LD=		gcc
-LDFLAGS=	$(EXTRA_ASXXXX_CFLAGS) -Wall
+LDFLAGS=	-Wall $(EXTRA_ASXXXX_CFLAGS)
 
 
 ####################################################################
@@ -67,7 +67,7 @@ ASXBAS=		../../../
 
 SRCASX=		$(ASXBAS)asxxsrc/
 SRCLNK=		$(ASXBAS)linksrc/
-SRCLIB=     $(ASXBAS)libsrc/
+SRCLIB=		$(ASXBAS)libsrc/
 SRCMISC=	$(ASXBAS)asxxmisc/
 SRCS19OS9=	$(ASXBAS)s19os9/
 DSTEXE=		../exe/
@@ -776,33 +776,31 @@ lksdcdb.o :	$(SRCLNK)lksdcdb.c $(SRCLNK)aslink.h
 		$(CC) $(CCFLAGS) -I$(SRCMISC) -c $< -o $(@F)
 lkbank.o  :	$(SRCLNK)lkbank.c  $(SRCLNK)aslink.h
 		$(CC) $(CCFLAGS) -I$(SRCMISC) -c $< -o $(@F)
-lkout.o  :	$(SRCLNK)lkout.c  $(SRCLNK)aslink.h
+lkout.o :	$(SRCLNK)lkout.c  $(SRCLNK)aslink.h
 		$(CC) $(CCFLAGS) -I$(SRCMISC) -c $< -o $(@F)
 
 aslink :	$(ASLINK)
-		$(LD) $(LDFLAGS) -o aslink $(ASLINK)
+		$(LD) $(LDFLAGS) $(ASLINK) $(EXTRA_ASXXXX_LDFLAGS) -o aslink
 		cp aslink.exe $(DSTEXE)aslink.exe
 		strip $(DSTEXE)aslink.exe
+
 
 ####################################################################
 # ASLIB
 ####################################################################
 
-ASLIB =        ardata.o arlex.o armem.o armain.o
+ASLIB =		ardata.o armain.o
 
-ardata.o :     $(SRCLIB)ardata.c $(SRCLIB)aslib.h
+ardata.o :	$(SRCLIB)ardata.c $(SRCLIB)aslib.h
 		$(CC) $(CCFLAGS) -I$(SRCMISC) -c $< -o $(@F)
-arlex.o :      $(SRCLIB)arlex.c $(SRCLIB)aslib.h
-		$(CC) $(CCFLAGS) -I$(SRCMISC) -c $< -o $(@F)
-armem.o :      $(SRCLIB)armem.c $(SRCLIB)aslib.h
-		$(CC) $(CCFLAGS) -I$(SRCMISC) -c $< -o $(@F)
-armain.o :     $(SRCLIB)armain.c $(SRCLIB)aslib.h
+armain.o :	$(SRCLIB)armain.c $(SRCLIB)aslib.h
 		$(CC) $(CCFLAGS) -I$(SRCMISC) -c $< -o $(@F)
 
-aslib : $(ASLIB)
-	$(LD) $(LDFLAGS) -o aslib $(ASLIB)
-	cp aslib.exe $(DSTEXE)aslib.exe
-	strip $(DSTEXE)aslib.exe
+aslib :		$(ASLIB)
+		$(LD) $(LDFLAGS) $(ASLIB) $(EXTRA_ASXXXX_LDFLAGS) -o aslib
+		cp aslib.exe $(DSTEXE)aslib.exe
+		strip $(DSTEXE)aslib.exe
+
 
 ####################################################################
 # ASXCNV
@@ -849,4 +847,4 @@ s19os9 :	$(S19OS9)
 		strip $(DSTEXE)s19os9.exe
 
 
-### end #########################################################
+### end ############################################################

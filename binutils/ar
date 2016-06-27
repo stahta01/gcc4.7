@@ -70,7 +70,7 @@ libcachetool ()
 	libfile=`basename "$libpathname"`
 	libdir=`dirname "$libpathname"`
 	lib=${libfile%.*}
-	reallibfile=as-$libfile
+	tmplibfile=$libfile.tmp
 	libcache=${lib}-cache
 	tmplibcache=$libcache.tmp
 
@@ -110,7 +110,7 @@ libcachetool ()
 		mv "$tmplibcache" "$libcache"
 
 		# Make the index file
-		find "$libcache" -name '*.o' | LC_ALL=C sort >"$reallibfile"
+		find "$libcache" -name '*.o' | LC_ALL=C sort >"$libfile"
 	else
 		### '--uncache' option ###
 
@@ -119,8 +119,30 @@ libcachetool ()
 			error "directory '$libcache' does not exist"
 		fi
 
+		# Separator set to newline
+		IFS='
+'
+		# Generate a list of object file
+		objects=`cat $libfile`
+
+		# Remove temp file
+		rm -f "$tmplibfile"
+
+		# Rename old library file
+		mv "$libfile" "$tmplibfile"
+
+		# Build a new library from object file
+		cd "$libcache"
+		if ! $bindir/aslib qc "../$libfile" $objects; then
+			cd ..
+			rm -rf "$libfile"
+			mv "$tmplibfile" "$libfile"
+			exit 1
+		fi
+		cd ..
+
 		# Removing cache directory and library file
-		rm -rf "$libcache" "$reallibfile"
+		rm -rf "$libcache" "$tmplibfile"
 	fi
 
 	exit
@@ -130,12 +152,14 @@ libcachetool ()
 options=${1#-}
 prefix=${1%$options}
 if [ "$options" = "${options#-}" ]; then
-	error=; c=; d=; p=; q=; r=; u=; v=; x=
+	error=; c=; d=; p=; q=; r=; t=; u=; v=; x=
 	while [ -n "$options" ]; do
 		remain=${options#?}
 		letter=${options%$remain}
 		case $letter in
-			c) c=c;; d) d=d;; p) p=p;; q) q=q;; r) r=r;; u) u=u;; v) v=v;; x) x=x;;
+			c) c=c;; d) d=d;; p) p=p;;
+			q) q=q;; r) r=r;; t) t=t;;
+			u) u=u;; v) v=v;; x) x=x;;
 			*) error=X; error "invalid option -- '$letter'" X;;
 		esac
 		options=$remain
@@ -143,7 +167,7 @@ if [ "$options" = "${options#-}" ]; then
 	if [ -n "$error" ]; then
 		exit 1
 	fi
-	options=$c$d$p$q$r$u$v$x
+	options=$c$d$p$q$r$t$u$v$x
 fi
 
 # Make sure we have an option.
@@ -177,7 +201,7 @@ case $options in
 	cruv)
 		options="crv"
 		;;
-	cr|crv|d|dv|p|pv|q|qv|r|rv|vx|x)
+	cr|crv|d|dv|p|pv|q|qv|r|rv|t|tv|vx|x)
 		;;
 	*)
 		error "invalid options '$prefix$options'"

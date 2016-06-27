@@ -38,7 +38,7 @@
  *		VOID	bassav()
  *		VOID	gblsav()
  *		int	intsiz()
- *		VOID	link()
+ *		VOID	lklink()
  *		VOID	lkexit()
  *		int	fndext()
  *		int	fndidx()
@@ -122,7 +122,7 @@
  *		int	fprintf()	c_library
  *		int	getline()	lklex.c
  *		VOID	library()	lklibr.c
- *		VOID	link()		lkmain.c
+ *		VOID	lklink()	lkmain.c
  *		VOID	lkexit()	lkmain.c
  *		VOID	lkfopen()	lkbank.c
  *		VOID	lnkarea()	lkarea.c
@@ -262,7 +262,7 @@ char *argv[];
 
 		while (as_getline()) {
 			ip = ib;
-			link();
+			lklink();
 		}
 		if (pass == 0) {
 			/*
@@ -389,9 +389,9 @@ int i;
 	exit(i);
 }
 
-/*)Function	link()
+/*)Function	lklink()
  *
- *	The function link() evaluates the directives for each line of
+ *	The function lklink() evaluates the directives for each line of
  *	text read from the .rel file(s).  The valid directives processed
  *	are:
  *		X, D, Q, H, G, B, M, A, S, T, R, and P.
@@ -426,7 +426,7 @@ int i;
  */
 
 VOID
-link()
+lklink()
 {
 	int c;
 

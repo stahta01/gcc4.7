@@ -1,11 +1,7 @@
+*\ *
 *.o
 *.new
-src/*
-build/*
-as-4.1.0/asxmak/darwin/build/*
-as-4.1.0/asxmak/linux/build/*
-as-4.1.0/asxmak/darwin/exe/*
-as-4.1.0/asxmak/linux/exe/*
+binutils/ranlib
 as-5.0.0/asxmak/darwin/build/*
 as-5.0.0/asxmak/linux/build/*
 as-5.0.0/asxmak/darwin/exe/*

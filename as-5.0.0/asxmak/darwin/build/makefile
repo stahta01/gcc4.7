@@ -60,7 +60,7 @@ clean:
 
 
 CC=		gcc
-CCOPT=	-O3 $(EXTRA_ASXXXX_CFLAGS)
+CCOPT=		-O3 $(EXTRA_ASXXXX_CFLAGS)
 CCFLAGS=	-Wall -funsigned-char $(CCOPT) -O -g -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc
 
 LD=		gcc
@@ -72,7 +72,7 @@ ASXBAS:=	../../../
 
 SRCASX:=	$(ASXBAS)asxxsrc/
 SRCLNK:=	$(ASXBAS)linksrc/
-SRCLIB:= $(ASXBAS)libsrc/
+SRCLIB:=	$(ASXBAS)libsrc/
 SRCMISC:=	$(ASXBAS)asxxmisc/
 DSTEXE:=	$(ASXBAS)asxmak/linux/exe/
 
@@ -529,21 +529,21 @@ ASLINKSRC =	$(addprefix $(SRCLNK),$(ASLINK))
 $(ASLINK):	$(SRCMISC)alloc.h $(SRCLNK)aslink.h
 
 aslink.new:	$(ASLINKSRC)
-	$(LD) $(LDFLAGS) $(ASLINKSRC) -o aslink.new
+	$(LD) $(LDFLAGS) $(ASLINKSRC) $(EXTRA_ASXXXX_LDFLAGS) -o aslink.new
 
 
 ####################################################################
 # ASLIB
 ####################################################################
 
-ASLIB =	ardata.o arlex.o armem.o armain.o
+ASLIB =		ardata.o armain.o
 
 ASLIBSRC =	$(addprefix $(SRCLIB),$(ASLIB))
 
-$(ASLIB): $(SRCLIB)aslib.h
+$(ASLIB):	$(SRCLIB)aslib.h
 
-aslib.new : $(ASLIBSRC)
-	$(LD) $(LDFLAGS) $(ASLIBSRC) -o aslib.new
+aslib.new:	$(ASLIBSRC)
+	$(LD) $(LDFLAGS) $(ASLIBSRC) $(EXTRA_ASXXXX_LDFLAGS) -o aslib.new
 
 
 ####################################################################
@@ -564,6 +564,4 @@ asxscn.new:	$(SRCMISC)asxxscan.o
 	$(LD) $(LDFLAGS) $(SRCMISC)asxxscan.o -o asxscn.new
 
 
-### end #########################################################
-
-
+### end ############################################################

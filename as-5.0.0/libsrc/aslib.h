@@ -17,9 +17,10 @@
 
 struct lfile
 {
-	char *f_idp;  /* Pointer to file spec */
+	char *f_idp;          /* Pointer to file spec */
 	struct lfile *f_flp;  /* lfile link */
-	char f_found; /* Module found flag */
+	char f_found;         /* Module found flag */
+	char f_arch;          /* Archive flag */
 };
 
 /*

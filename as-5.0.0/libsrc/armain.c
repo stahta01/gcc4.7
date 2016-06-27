@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include "aslib.h"
+#define ZLIBARCH_STATIC
+#include "zlibarch.h"
 
 static int creation_flag = 0;
 static int verbose_level = 0;
@@ -33,18 +35,10 @@ static char *basenam(char *filename)
  */
 static void copycontents(char *buffer, int buflen, FILE *src, FILE *dst)
 {
-	int len;
 	while (fgets(buffer, buflen, src)) {
-		len = strlen(buffer);
-		if (len > 0) {
-			if (buffer[len-1] == '\n')
-				buffer[--len] = 0;
-			if (len > 0) {
-				if (buffer[--len] == '\r')
-					buffer[len] = 0;
-			}
-		}
-		fprintf(dst, "%s\n", buffer);
+		striplineend(buffer);
+		FPUTS(buffer, dst);
+		FPUTS("\n", dst);
 	}
 }
 
@@ -98,52 +92,80 @@ static int name_in_list(char *name, struct lfile *list)
  */
 static void append(char *arname, struct lfile *memberp)
 {
-	FILE *libf;
+	FILE *libf, *libftmp;
 	char modname[NCPS];
 	char line[FILSPC];
+	char tmpfile[FILSPC];
 	int ret;
+	long offset;
 
 	verbose_action = 'a';
 
-	libf = fopen(arname, "r+");
+	libf = FOPEN(arname, "r");
 	if (!libf) {
 		create_archive(arname);
-		libf = fopen(arname, "r+");
+		libf = FOPEN(arname, "r");
 	}
 	if (!libf) {
 		fprintf(stderr, "Error: cannot open '%s'.\n", arname);
 		exit(1);
 	}
+	ret = snprintf(tmpfile, FILSPC, "%s.tmp", arname);
+	if (ret <= 0 || ret >= FILSPC-1)
+		*tmpfile = 0;
+#ifdef ZLIBARCH
+	libftmp = FOPEN(tmpfile, FDIRECT(libf) ?  "wT" : "w");
+#else
+	libftmp = FOPEN(tmpfile, "w");
+#endif
+	if (!libftmp) {
+		fprintf(stderr, "Error: cannot create temporary file.\n");
+		exit(1);
+	}
+
+	skipheader(libf);
 
 	/* seek 'END' marker */
-	while ((ret=getc(libf)) != 'E')
-		if (ret == EOF || fgets(line, FILSPC, libf) == NULL) {
-			fprintf(stderr, "Error: cannot seek 'END' marker.\n");
-			exit(1);
-		}
+	for (offset=0; FGETS(line, FILSPC, libf) != NULL && *line != 'E'; offset=FTELL(libf)) {
+		striplineend(line);
+		FPUTS(line, libftmp);
+		FPUTS("\n", libftmp);
+	}
+	if (FERROR(libf) || FEOF(libf) || FSEEK(libf, offset, SEEK_SET) < 0) {
+		fprintf(stderr, "Error: cannot seek 'END' marker.\n");
+		FCLOSE(libftmp);
+		remove(tmpfile);
+		exit(1);
+	}
 
-	fseek(libf, -1, SEEK_CUR);
+	FCLOSE(libf);
 
-	modname[0] = '\0';
+	*modname = 0;
 	filep = memberp;
 	cfp = NULL;
 
 	while ((ret = as_getline())) {
 		if (ret == 2) {
 			if (*modname)
-			fprintf(libf, "L1 %s\n", modname);
+				FPRINTF(libftmp, "L1 %s\n", modname);
 
 			strcpy(modname, basenam(cfp->f_idp));
-			fprintf(libf, "L0 %s\n", modname);
+			FPRINTF(libftmp, "L0 %s\n", modname);
 		}
 
-		fprintf(libf, "%s\n", ib);
+		FPUTS(ib, libftmp);
+		FPUTS("\n", libftmp);
 	}
 
-	fprintf(libf, "L1 %s\n", modname);
-	fprintf(libf, "END %s\n", basenam(arname));
-	fclose(libf);
+	FPRINTF(libftmp, "L1 %s\n", modname);
+	FPRINTF(libftmp, "END %s\n", basenam(arname));
+	FCLOSE(libftmp);
+
+	/* replace existing archive by new one */
+	remove(arname);
+	rename(tmpfile, arname);
 }
+
 
 
 /* replace:
@@ -155,14 +177,21 @@ static void replace(char *arname, struct lfile *memberp, int delete)
 	char modname[NCPS];
 	char newb[NINPUT];
 	char c;
-	int replaced;
+	int replaced, ret;
 	char tmpfile[FILSPC];
+#ifdef ZLIBARCH
+	int direct = 1;
+#endif
 
 	verbose_action = 0;
 
 	/* check that the archive exists */
-	if ((libf = fopen(arname, "r"))) {
-		fclose(libf);
+	if ((libf = FOPEN(arname, "r"))) {
+#ifdef ZLIBARCH
+		direct = FDIRECT(libf);
+#endif
+		FCLOSE(libf);
+		libf = NULL;
 	}
 	else {
 		if (delete) {
@@ -172,7 +201,8 @@ static void replace(char *arname, struct lfile *memberp, int delete)
 		create_archive(arname);
 	}
 
-	filep = new_lfile(arname);
+	filep = new_lfile(arname, 1);
+	cfp = NULL;
 
 	while (memberp) {
 		if (!delete) {
@@ -181,6 +211,10 @@ static void replace(char *arname, struct lfile *memberp, int delete)
 			newf = fopen(memberp->f_idp, "r");
 			if (!newf) {
 				fprintf(stderr, "Error: cannot open '%s'.\n", memberp->f_idp);
+				if (libf) {
+					FCLOSE(libf);
+					remove(tmpfile);
+				}
 				exit(1);
 			}
 		}
@@ -189,8 +223,14 @@ static void replace(char *arname, struct lfile *memberp, int delete)
 				fprintf(stdout, "d - %s\n", memberp->f_idp);
 		}
 
-		sprintf (tmpfile, "%s.tmp", arname);
-		libf = fopen(tmpfile, "w");
+		ret = snprintf(tmpfile, FILSPC, "%s.tmp", arname);
+		if (ret <= 0 || ret >= FILSPC-1)
+			*tmpfile = 0;
+#ifdef ZLIBARCH
+		libf = FOPEN(tmpfile, direct ? "wT" : "w");
+#else
+		libf = FOPEN(tmpfile, "w");
+#endif
 		if (!libf) {
 			fprintf(stderr, "Error: cannot create temporary file.\n");
 			exit(1);
@@ -211,7 +251,7 @@ static void replace(char *arname, struct lfile *memberp, int delete)
 					/* test whether the module name is the requested one */
 					if (!strcmp(modname, memberp->f_idp)) {
 						if (!delete) {
-							fprintf(libf, "%s\n", ib);  /* L0 .. */
+							FPRINTF(libf, "%s\n", ib);  /* L0 .. */
 
 							/* copy the contents */
 							copycontents(newb, NINPUT, newf, libf);
@@ -225,38 +265,40 @@ static void replace(char *arname, struct lfile *memberp, int delete)
 						}
 
 						if (!delete)
-							fprintf(libf, "%s\n", ib);   /* L1 .. */
+							FPRINTF(libf, "%s\n", ib);   /* L1 .. */
 
 						continue;
 					}
 				}
 
-				fprintf(libf, "%s\n", ib);
+				FPRINTF(libf, "%s\n", ib);
 				break;
 
 			case 'E':
 				if (!delete && !replaced) {
 					strcpy(modname, basenam(memberp->f_idp));
 
-					fprintf(libf, "L0 %s\n", modname);
+					FPRINTF(libf, "L0 %s\n", modname);
 
 					/* copy the contents */
 					copycontents(newb, NINPUT, newf, libf);
 
-					fprintf(libf, "L1 %s\n", modname);
-					fprintf(libf, "END %s\n", basenam(arname));
+					FPRINTF(libf, "L1 %s\n", modname);
+					FPRINTF(libf, "END %s\n", basenam(arname));
 
 					continue;
 				}
 				/* fall through ... */
 
 			default:
-				fprintf(libf, "%s\n", ib);
+				FPUTS(ib, libf);
+				FPUTS("\n", libf);
 				break;
 			}
 		}
 
-		fclose(libf);
+		FCLOSE(libf);
+		libf = NULL;
 		if (!delete)
 			fclose(newf);
 
@@ -280,10 +322,11 @@ static void extract(char *arname, struct lfile *memberp, int create)
 	char c;
 	struct lfile *lfp;
 	int err;
+	long begin, end;
 
 	verbose_action = 0;
 
-	filep = new_lfile(arname);
+	filep = new_lfile(arname, 1);
 	cfp = NULL;
 
 	while (as_getline()) {
@@ -296,29 +339,45 @@ static void extract(char *arname, struct lfile *memberp, int create)
 				getid(modname, -1);
 
 				if (!memberp || name_in_list(modname, memberp)) {
-					if (create) {
-						if (verbose_level)
-							fprintf(stdout, "x - %s\n", modname);
-						newf = fopen(modname, "w");
-						if (!newf) {
-							fprintf(stderr, "Error: cannot create '%s'.\n", modname);
-							exit(1);
+					if (create == 1) {
+						/* list files */
+						begin = end = as_offset();
+						while (as_getline()) {
+							if (ib[0] == 'L' && ib[1] == '1')
+								break;
+							end = as_offset();
 						}
+						if (verbose_level)
+							fprintf(stdout, "% 7li %s\n", end-begin, modname);
+						else
+							fprintf(stdout, "%s\n", modname);
 					}
 					else {
-						if (verbose_level)
-							fprintf(stdout, "\n<%s>\n\n", modname);
-						newf = stdout;
-					}
+						/* extract or print files */
+						if (create) {
+							if (verbose_level)
+								fprintf(stdout, "x - %s\n", modname);
+							newf = fopen(modname, "w");
+							if (!newf) {
+								fprintf(stderr, "Error: cannot create '%s'.\n", modname);
+								exit(1);
+							}
+						}
+						else {
+							if (verbose_level)
+								fprintf(stdout, "\n<%s>\n\n", modname);
+							newf = stdout;
+						}
 
-					while (as_getline()) {
-						if (ib[0] == 'L' && ib[1] == '1')
-							break;
-						fprintf(newf, "%s\n", ib);
-					}
+						while (as_getline()) {
+							if (ib[0] == 'L' && ib[1] == '1')
+								break;
+							fprintf(newf, "%s\n", ib);
+						}
 
-					if (create)
-						fclose(newf);
+						if (create)
+							fclose(newf);
+					}
 				}
 			}
 			break;
@@ -345,6 +404,7 @@ static char *usetxt[] = {
 	"    p   print contents of archive",
 	"    q   quick append file(s)",
 	"    r   insert file(s) with replacement",
+	"    t   list file(s)",
 	"    x   extract file(s)",
 	"  and mod must be one of:",
 	"    c   create new lib",
@@ -386,6 +446,7 @@ int main(int argc, char *argv[])
 		case 'p': /* print contents */
 		case 'q': /* append */
 		case 'r': /* insert and replace */
+		case 't': /* list */
 		case 'x': /* extract */
 			if (action && action != c)
 				usage();
@@ -418,11 +479,11 @@ int main(int argc, char *argv[])
 		}
 		else {
 			if (!memberp) {
-				memberp = new_lfile(name);
+				memberp = new_lfile(name, 0);
 				lfp = memberp;
 			}
 			else {
-				lfp->f_flp = new_lfile(name);
+				lfp->f_flp = new_lfile(name, 0);
 				lfp = lfp->f_flp;
 			}
 		}
@@ -436,7 +497,8 @@ int main(int argc, char *argv[])
 	case 'p': extract(arname, memberp, 0); break;
 	case 'q': append(arname, memberp);     break;
 	case 'r': replace(arname, memberp, 0); break;
-	case 'x': extract(arname, memberp, 1); break;
+	case 't': extract(arname, memberp, 1); break;
+	case 'x': extract(arname, memberp, 2); break;
 	}
 
 	return 0;

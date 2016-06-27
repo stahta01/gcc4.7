@@ -78,7 +78,7 @@ install: build
 	for lib in $(MULTILIB); do \
 		echo "Installing library $(LIBPATH)/$$lib/$(LIBNAME).a ..." && \
 		$(SUDO) cp "$(BLDDIR)/$$lib/build/$(LIBNAME).a" "$(LIBPATH)/$$lib" && \
-		$(SUDO) $(AR) --cache "$(LIBPATH)/$$lib/$(LIBNAME).a" ; \
+		$(SUDO) $(RANLIB) "$(LIBPATH)/$$lib/$(LIBNAME).a" ; \
 	done
 
 .PHONY: uninstall
@@ -88,7 +88,6 @@ uninstall:
 	for lib in $(MULTILIB); do \
 		echo "Uninstalling library $(LIBPATH)/$$lib/$(LIBNAME).a ..." && \
 		$(SUDO) rm -f "$(LIBPATH)/$$lib/$(LIBNAME).a" && \
-		$(SUDO) $(AR) --uncache "$(LIBPATH)/$$lib/$(LIBNAME).a" ; \
 	done
 
 ##########################################################################

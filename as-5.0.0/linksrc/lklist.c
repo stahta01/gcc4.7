@@ -826,7 +826,7 @@ loop:	if (tfp == NULL)
 	/*
 	 * Clear text line buffer
 	 */
-	for (i=0,rp=rb; i<sizeof(rb); i++) {
+	for (i=0,rp=rb; i<(int)sizeof(rb); i++) {
 		*rp++ = 0;
 	}
 
@@ -1089,7 +1089,7 @@ loop:	if (tfp == NULL)
 		/*
 		 * Clear text line buffer
 		 */
-		for (i=0,rp=rb; i<sizeof(rb); i++) {
+		for (i=0,rp=rb; i<(int)sizeof(rb); i++) {
 			*rp++ = 0;
 		}
 

@@ -3,13 +3,15 @@
 #include <stdlib.h>
 #include <string.h>
 #include "aslib.h"
+#define ZLIBARCH_STATIC
+#include "zlibarch.h"
 
 #include "common.c"
 
 
 
 /* dump:
- *  Dumps the contents of the archive on stdin.
+ *  Dumps the contents of the archive on stdout.
  */
 static void dump(struct lfile *objp)
 {
@@ -112,11 +114,11 @@ int main(int argc, char *argv[])
       }
       else {
 	 if (!objp) {
-	    objp = new_lfile(p);
+	    objp = new_lfile(p, 0);
 	    lfp = objp;
          }
 	 else {
-	    lfp->f_flp = new_lfile(p);
+	    lfp->f_flp = new_lfile(p, 0);
 	    lfp = lfp->f_flp;
 	 }
       }

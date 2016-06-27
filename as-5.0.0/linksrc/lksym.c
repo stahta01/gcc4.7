@@ -476,21 +476,21 @@ hash(p, cflag)
 char *p;
 int cflag;
 {
-	int h;
+	unsigned char h;
 
-	h = 0;
-	while (*p) {
-		if(cflag) {
-			/*
-			 * Case Insensitive Hash
-			 */
-			h += ccase[*p++ & 0x007F];
-		} else {
-			/*
-			 * Case Sensitive Hash
-			 */
-			h += *p++;
-		}
+	h = 6;
+	if (cflag) {
+		/*
+		 * Case Insensitive Hash
+		 */
+		while (*p)
+			h = ((h << 5) + h) + ccase[*p++ & 0x007F];
+	} else {
+		/*
+		 * Case Sensitive Hash
+		 */
+		while (*p)
+			h = ((h << 5) + h) + *p++;
 	}
 	return (h&HMASK);
 }
@@ -767,7 +767,9 @@ unsigned int n;
 #else
 
 
-char *strsto(char *str)
+char *
+strsto(str)
+char *str;
 {
 	char *p;
 	if ((p = strdup(str)) == NULL)
@@ -775,7 +777,9 @@ char *strsto(char *str)
 	return p;
 }
 
-char *new(unsigned int n)
+char *
+new(n)
+unsigned int n;
 {
 	char *p;
 	if ((p = (char *)calloc(1, n)) == NULL)
