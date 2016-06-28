@@ -267,7 +267,7 @@ as6808.new:	$(ASXXSRC) $(AS6808SRC)
 # AS6809
 ####################################################################
 
-AS6809 =	m09adr.o m09ext.o m09mch.o m09pst.o
+AS6809 =	m09adr.o m09mch.o m09pst.o
 
 AS6809SRC =	$(addprefix $(SRC6809),$(AS6809))
 

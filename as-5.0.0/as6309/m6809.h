@@ -1,8 +1,21 @@
 /* m6809.h */
 
 /*
- * (C) Copyright 1989-2006
- * All Rights Reserved
+ *  Copyright (C) 1989-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
@@ -10,17 +23,17 @@
  */
 
 /*)BUILD
-	$(PROGRAM) =	AS6809
+	$(PROGRAM) =	AS6309
 	$(INCLUDE) = {
 		ASXXXX.H
 		M6809.H
 	}
 	$(FILES) = {
-		M09EXT.C
 		M09MCH.C
 		M09ADR.C
 		M09PST.C
 		ASMAIN.C
+		ASMCRO.C
 		ASDBG.C
 		ASLEX.C
 		ASSYM.C
@@ -68,11 +81,11 @@
 #define	S_INH2	55
 #define	S_INH1	56
 #define	S_INH	57
-#define	S_LRQ 58
-#define	S_IR 59
-#define  S_IMM1 60
-#define  S_IMM2 61
-#define  S_STR2 62
+#define	S_LRQ	58
+#define	S_IR	59
+#define	S_IMM1	60
+#define	S_IMM2	61
+#define	S_STR2	62
 
 /*
  * Other Information
@@ -141,7 +154,6 @@ extern	int		mchpcr(struct expr *esp);
 extern	VOID		minit(void);
 extern	int		setbit(int b);
 extern	int		getbit(void);
-extern	int		comma(void);
 extern	struct	sdp	sdp;
 
 #else
@@ -161,7 +173,6 @@ extern	int		mchpcr();
 extern	VOID		minit();
 extern	int		setbit();
 extern	int		getbit();
-extern	int		comma();
 extern	struct	sdp	sdp;
 
 #endif

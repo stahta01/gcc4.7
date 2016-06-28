@@ -1,8 +1,21 @@
-/* M09MCH:C */
+/* M09MCH.C */
 
 /*
- * (C) Copyright 1989-2006
- * All Rights Reserved
+ *  Copyright (C) 1989-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
@@ -10,7 +23,10 @@
  */
 
 #include "asxxxx.h"
-#include "m6309.h"
+#include "m6809.h"
+
+char	*cpu	= "Hitachi 6309";
+char	*dsft	= "asm";
 
 #define	NB	512
 
@@ -239,7 +255,7 @@ struct mne *mp;
 			if ((t1 = admode(stks)) == 0 || v1 & t1)
 				aerr();
 			v1 |= t1;
-		} while (more() && comma());
+		} while (more() && comma(1));
 		outab(op);
 		outab(v1);
 		break;
@@ -250,14 +266,14 @@ struct mne *mp;
 			if ((t1 = admode(stku)) == 0 || v1 & t1)
 				aerr();
 			v1 |= t1;
-		} while (more() && comma());
+		} while (more() && comma(1));
 		outab(op);
 		outab(v1);
 		break;
 
 	case S_EXG:
 		v1 = admode(regs);
-		comma();
+		comma(1);
 		v2 = admode(regs);
 		if ((v1 & 0x08) != (v2 & 0x08))
 			aerr();
@@ -587,6 +603,11 @@ struct expr *esp;
 VOID
 minit()
 {
+	/*
+	 * Byte Order
+	 */
+	hilo = 1;
+
 	bp = bb;
 	bm = 1;
 }
@@ -632,14 +653,3 @@ getbit()
 	return (f);
 }
 
-/*
- * The next character must be a
- * comma.
- */
-int
-comma()
-{
-	if (getnb() != ',')
-		qerr();
-	return(1);
-}
