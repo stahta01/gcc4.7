@@ -1,8 +1,21 @@
-/* asxscn.c */
+/* asxxscan.c */
 
 /*
- * (C) Copyright 1989-2006
- * All Rights Reserved
+ *  Copyright (C) 1989-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
@@ -97,8 +110,6 @@ char *argv[];
 	vlines = 0;
 	aserr = 0;
 
-	printf("\n");
-
 	for (i=1; i<argc; ++i) {
 		p = argv[i];
 		if (*p == '-') {
@@ -143,14 +154,14 @@ char *argv[];
 				}
 		} else {
 			if (++inpfil > 1) {
-				fprintf(stderr, "too many input files\n\n");
+				fprintf(stderr, "Too many input files\n");
 				asexit(ER_FATAL);
 			}
 			sfp[0] = fopen(p, "r");
 			if (sfp[0] != NULL) {
 				strcpy(scfile, p);
 			} else {
-				fprintf(stderr, "File %s not found\n\n", p);
+				fprintf(stderr, "File %s not found\n", p);
 				asexit(ER_FATAL);
 			}
 		}
@@ -303,7 +314,7 @@ loop:
 				case 1:
 					if (iflag) { break; }
 				case 2:
-					printf("''%s''\r\n", scline);
+					fprintf(stderr, "''%s''\n", scline);
 					aserr += 1;
 					goto loop;
 				}
@@ -313,9 +324,9 @@ loop:
 		}
 	}
 	if (vlines) {
-		printf("%d code error(s) found in file %s\n\n", aserr, scfile);
+		printf("%d code error(s) found in file %s\n", aserr, scfile);
 	} else {
-		printf("?ASXSCN-E-Invalid File Format\n\n");
+		fprintf(stderr,"Invalid File Format\n");
 		aserr += 1;
 	}
 	asexit(aserr ? ER_ERROR : ER_NONE);
@@ -447,7 +458,7 @@ char *usetxt[] = {
 	"  d    decimal listing",
 	"  q    octal   listing",
 	"  x    hex     listing (default)",
-        "  2    16-Bit  address (default)",
+	"  2    16-Bit  address (default)",
 	"  3    24-Bit  address",
 	"  4    32-Bit  address",
 	"  i    ignore relocation flags",
@@ -483,7 +494,9 @@ int n;
 {
 	char **dp;
 
-	fprintf(stderr, "\nASxxxx Assembler Listing Scanner %s\n\n", VERSION);
+	fprintf(stderr, "ASxxxx Assembler Listing Scanner %s\n", VERSION);
+	fprintf(stderr, "Copyright (C) 2009  Alan R. Baldwin\n");
+	fprintf(stderr, "This program comes with ABSOLUTELY NO WARRANTY.\n\n");
 	for (dp = usetxt; *dp; dp++)
 		fprintf(stderr, "%s\n", *dp);
 	asexit(n);

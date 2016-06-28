@@ -1,8 +1,21 @@
-/* asxcnv.c */
+/* asxxconv.c */
 
 /*
- * (C) Copyright 1989-2006
- * All Rights Reserved
+ *  Copyright (C) 1989-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
@@ -19,12 +32,6 @@ int aserr;		/* Error Counter	*/
 
 FILE *nfp;		/* Input File Handle	*/
 FILE *dfp;		/* Output File Handle	*/
-
-/*
- * Opcode Cycle definitions (Must Be The Same As ASxxxx / ASLink)
- */
-#define	CYCNT_BGN	'['	/* Cycle count begin delimiter */
-#define	CYCNT_END	']'	/* Cycle count end   delimiter */
 
 char scline[256];	/* Input text line	*/
 
@@ -108,8 +115,6 @@ char *argv[];
 	inpfil = 0;
 	aserr = 0;
 
-	fprintf(stdout, "\n");
-
 	for (i=1; i<argc; ++i) {
 		p = argv[i];
 		if (*p == '-') {
@@ -149,17 +154,17 @@ char *argv[];
 				}
 		} else {
 			if (++inpfil > 1) {
-				fprintf(stderr, "\r\nToo many files.\r\n");
+				fprintf(stderr, "Too many files\n");
 				asexit(ER_FATAL);
 			}
 			nfp = fopen(p, "r");
 			if (nfp == NULL) {
-				printf("\r\nFile %s not found\r\n", p);
+				fprintf(stderr, "File %s not found\n", p);
 				asexit(ER_FATAL);
 			}
 			dfp = fopen("a.out", "w");
 			if (dfp == NULL) {
-				printf("\r\nFile a.out not opened\r\n");
+				fprintf(stderr, "File a.out not opened\n");
 				asexit(ER_FATAL);
 			}
 		}
@@ -469,7 +474,8 @@ char *str;
  *		none
  *
  *	global variables:
- *		FILE *	nfp		scan file
+ *		FILE *	nfp		Input  File Handle
+ *		FILE *	dfp		Output File Handle
  *
  *	functions called:
  *		int	fclose()	c-library
@@ -494,7 +500,7 @@ char *usetxt[] = {
 	"  d    decimal listing",
 	"  q    octal   listing",
 	"  x    hex     listing (default)",
-        "  2    16-Bit  address (default)",
+	"  2    16-Bit  address (default)",
 	"  3    24-Bit  address",
 	"  4    32-Bit  address",
 	"",
@@ -527,10 +533,11 @@ VOID
 usage(n)
 int n;
 {
-	char   **dp;
+	char **dp;
 
-	fprintf(stderr,
-		"\nASxxxx Assembler Listing Converter %s\n\n", VERSION);
+	fprintf(stderr, "ASxxxx Assembler Listing Converter %s\n", VERSION);
+	fprintf(stderr, "Copyright (C) 2009  Alan R. Baldwin\n");
+	fprintf(stderr, "This program comes with ABSOLUTELY NO WARRANTY.\n\n");
 	for (dp = usetxt; *dp; dp++)
 		fprintf(stderr, "%s\n", *dp);
 	asexit(n);
