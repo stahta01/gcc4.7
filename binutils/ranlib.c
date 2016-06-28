@@ -384,7 +384,7 @@ static void ranlib(char *filename)
 		*object = 0;
 		objoff = 0;
 		nsymbols = 0;
-		indexsize = 1; /* for offset zero */
+		indexsize = 0;
 		offset = FTELL(fp);
 		while (FGETS(line, MAX_LINE_SIZE, fp) != NULL) {
 			if (line[0] == 'E')
@@ -422,7 +422,7 @@ static void ranlib(char *filename)
 			error("cannot read file");
 
 		/* If hashsize > 1 then compute hash function on symbols
-		   and fill buckets. */
+		   and fill bins. */
 		hashbit = gethashbit(nsymbols);
 		hashsize = 1 << hashbit;
 		if (hashsize > 1) {
@@ -444,6 +444,8 @@ static void ranlib(char *filename)
 					symtail[h] = symtail[h]->next = symbol;
 				symbol = next;
 			}
+			/* For offset zero. */
+			indexsize++;
 			/* Compute indexsize for the number of non-zero bin. */
 			for (i=0; i<hashsize; i++)
 				if (symbols[i])
@@ -530,7 +532,8 @@ static void ranlib(char *filename)
 
 		/* Output symbol table. */
 		if (nsymbols != 0) {
-			FPUTS("\n", tmpfp); /* offset zero */
+			if (hashsize > 1)
+				FPUTS("\n", tmpfp); /* offset zero */
 			for (i=0; i<hashsize; i++) {
 				symbol = symbols[i];
 				if (symbol) {
@@ -541,7 +544,8 @@ static void ranlib(char *filename)
 						if (FPUTS(symbol->name, tmpfp) == EOF)
 							break;
 					}
-					FPUTS("\n", tmpfp);
+					if (hashsize > 1)
+						FPUTS("\n", tmpfp); /* end of bin */
 				}
 				if (FERROR(tmpfp))
 					error("failed to write to temp file");
