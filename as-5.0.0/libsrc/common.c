@@ -143,7 +143,7 @@ static long as_offset(void)
 
 
 
-static int as_getline(void)
+static int nxtline(void)
 {
 	int ret;
 	ret = 1;

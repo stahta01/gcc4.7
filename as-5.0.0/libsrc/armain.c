@@ -144,7 +144,7 @@ static void append(char *arname, struct lfile *memberp)
 	filep = memberp;
 	cfp = NULL;
 
-	while ((ret = as_getline())) {
+	while ((ret = nxtline())) {
 		if (ret == 2) {
 			if (*modname)
 				FPRINTF(libftmp, "L1 %s\n", modname);
@@ -239,7 +239,7 @@ static void replace(char *arname, struct lfile *memberp, int delete)
 		replaced = 0;
 		cfp = NULL;
 
-		while (as_getline()) {
+		while (nxtline()) {
 			ip = ib;
 			c = getnb();
 			switch(c) {
@@ -259,7 +259,7 @@ static void replace(char *arname, struct lfile *memberp, int delete)
 							replaced = 1;
 						}
 
-						while (as_getline()) {
+						while (nxtline()) {
 							if (ib[1] == '1')
 								break;
 						}
@@ -329,7 +329,7 @@ static void extract(char *arname, struct lfile *memberp, int create)
 	filep = new_lfile(arname, 1);
 	cfp = NULL;
 
-	while (as_getline()) {
+	while (nxtline()) {
 		ip = ib;
 		c = getnb();
 		switch(c) {
@@ -342,7 +342,7 @@ static void extract(char *arname, struct lfile *memberp, int create)
 					if (create == 1) {
 						/* list files */
 						begin = end = as_offset();
-						while (as_getline()) {
+						while (nxtline()) {
 							if (ib[0] == 'L' && ib[1] == '1')
 								break;
 							end = as_offset();
@@ -369,7 +369,7 @@ static void extract(char *arname, struct lfile *memberp, int create)
 							newf = stdout;
 						}
 
-						while (as_getline()) {
+						while (nxtline()) {
 							if (ib[0] == 'L' && ib[1] == '1')
 								break;
 							fprintf(newf, "%s\n", ib);
