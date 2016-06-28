@@ -1,8 +1,21 @@
-/* M09ADR:C */
+/* M09ADR.C */
 
 /*
- * (C) Copyright 1989-2006
- * All Rights Reserved
+ *  Copyright (C) 1989-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
@@ -10,7 +23,7 @@
  */
 
 #include "asxxxx.h"
-#include "m6309.h"
+#include "m6809.h"
 
 int aindx;
 
@@ -45,7 +58,7 @@ struct expr *esp;
 	int c;
 
 	if (admode(abd)) {
-		comma();
+		comma(1);
 		if (!admode(xyus))
 			aerr();
 		esp->e_mode = S_IND;
@@ -67,7 +80,7 @@ struct expr *esp;
 	if (c == '*') {
 		expr(esp, 0);
 		esp->e_mode = S_DIR;
-		if ((c = getnb()) == ',') {
+		if (comma(0)) {
 			if (admode(xyus)) {
 				esp->e_mode = S_OFST;
 			} else
@@ -79,13 +92,11 @@ struct expr *esp;
 			} else {
 				aerr();
 			}
-		} else {
-			unget(c);
 		}
 	} else {
 		unget(c);
 		expr(esp, 0);
-		if ((c = getnb()) == ',') {
+		if (comma(0)) {
 			if (admode(xyus)) {
 				esp->e_mode = S_OFST;
 			} else
@@ -98,7 +109,6 @@ struct expr *esp;
 				aerr();
 			}
 		} else {
-			unget(c);
 			esp->e_mode = S_EXT;
 		}
 	}
@@ -182,9 +192,9 @@ struct adsym	abd[] = {	/* a, b, or d indexed offset */
     {	"a",	0x06	},
     {	"b",	0x05	},
     {	"d",	0x0B	},
-	 { "e",  0x07  },
-	 { "f",  0x0A  },
-	 { "w",  0x0E  },
+    {	"e",	0x07	},
+    {	"f",	0x0A	},
+    {	"w",	0x0E	},
     {	"",	0x00	}
 };
 
@@ -237,16 +247,16 @@ struct adsym	regs[] = {	/* exg, tfr register coding */
     {	"u",	0x103	},
     {	"s",	0x104	},
     {	"pc",	0x105	},
-	 { "w",  0x106 },
-	 { "v",  0x107 },
+    {	"w",	0x106	},
+    {	"v",	0x107	},
     {	"a",	0x108	},
     {	"b",	0x109	},
     {	"cc",	0x10A	},
     {	"dp",	0x10B	},
-	 { "0",  0x10C },
-	 { "00", 0x10D },
-	 { "e",  0x10E },
-	 { "f",  0x10F },
+    {	"0",	0x10C	},
+    {	"00",	0x10D	},
+    {	"e",	0x10E	},
+    {	"f",	0x10F	},
     {	"",	0x000	}
 };
 
@@ -277,9 +287,9 @@ struct adsym	stku[] = {	/* push/pull on user stack */
 };
 
 struct adsym	bittr[] = {
-	{ "cc",	0x00 },
-	{ "a",	0x40 },
-	{ "b",	0x80 },
+    {	"cc",	0x00	},
+    {	"a",	0x40	},
+    {	"b",	0x80	},
     {	"",	0x00	}
 };
 

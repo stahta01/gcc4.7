@@ -1,8 +1,21 @@
-/* M09PST:C */
+/* M09PST.C */
 
 /*
- * (C) Copyright 1989-2006
- * All Rights Reserved
+ *  Copyright (C) 1989-2009  Alan R. Baldwin
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
  *
  * Alan R. Baldwin
  * 721 Berkeley St.
@@ -10,7 +23,7 @@
  */
 
 #include "asxxxx.h"
-#include "m6309.h"
+#include "m6809.h"
 
 /*
  * Coding Banks
@@ -50,15 +63,15 @@ char	mode0[32] = {	/* R_NORM */
 /*
  *     *m_def is a pointer to the bit relocation definition.
  *	m_flag indicates that bit position swapping is required.
- *	m_mask contains the active bit positions for the output.
- *	m_mbro contains the active bit positions for the input.
+ *	m_dbits contains the active bit positions for the output.
+ *	m_sbits contains the active bit positions for the input.
  *
  *	struct	mode
  *	{
  *		char *	m_def;		Bit Relocation Definition
- *		int	m_flag;		Bit Swapping Flag
- *		int	m_mask;		Bit Mask
- *		int	m_mbro;		Bit Range Overflow Mask
+ *		a_uint	m_flag;		Bit Swapping Flag
+ *		a_uint	m_dbits;	Destination Bit Mask
+ *		a_uint	m_sbits;	Source Bit Mask
  *	};
  */
 struct	mode	mode[1] = {
@@ -114,8 +127,9 @@ struct	mne	mne[] = {
     {	NULL,	".globl",	S_GLOBL,	0,	0	},
     {	NULL,	".local",	S_LOCAL,	0,	0	},
     {	NULL,	".if",		S_CONDITIONAL,	0,	O_IF	},
-    {	NULL,	".else",	S_CONDITIONAL,	0,	O_ELSE	},
-    {	NULL,	".endif",	S_CONDITIONAL,	0,	O_ENDIF	},
+    {	NULL,	".iff",		S_CONDITIONAL,	0,	O_IFF	},
+    {	NULL,	".ift",		S_CONDITIONAL,	0,	O_IFT	},
+    {	NULL,	".iftf",	S_CONDITIONAL,	0,	O_IFTF	},
     {	NULL,	".ifdef",	S_CONDITIONAL,	0,	O_IFDEF	},
     {	NULL,	".ifndef",	S_CONDITIONAL,	0,	O_IFNDEF},
     {	NULL,	".ifgt",	S_CONDITIONAL,	0,	O_IFGT	},
@@ -124,6 +138,28 @@ struct	mne	mne[] = {
     {	NULL,	".ifle",	S_CONDITIONAL,	0,	O_IFLE	},
     {	NULL,	".ifeq",	S_CONDITIONAL,	0,	O_IFEQ	},
     {	NULL,	".ifne",	S_CONDITIONAL,	0,	O_IFNE	},
+    {	NULL,	".ifb",		S_CONDITIONAL,	0,	O_IFB	},
+    {	NULL,	".ifnb",	S_CONDITIONAL,	0,	O_IFNB	},
+    {	NULL,	".ifidn",	S_CONDITIONAL,	0,	O_IFIDN	},
+    {	NULL,	".ifdif",	S_CONDITIONAL,	0,	O_IFDIF	},
+    {	NULL,	".iif",		S_CONDITIONAL,	0,	O_IIF	},
+    {	NULL,	".iiff",	S_CONDITIONAL,	0,	O_IIFF	},
+    {	NULL,	".iift",	S_CONDITIONAL,	0,	O_IIFT	},
+    {	NULL,	".iiftf",	S_CONDITIONAL,	0,	O_IIFTF	},
+    {	NULL,	".iifdef",	S_CONDITIONAL,	0,	O_IIFDEF},
+    {	NULL,	".iifndef",	S_CONDITIONAL,	0,	O_IIFNDEF},
+    {	NULL,	".iifgt",	S_CONDITIONAL,	0,	O_IIFGT	},
+    {	NULL,	".iiflt",	S_CONDITIONAL,	0,	O_IIFLT	},
+    {	NULL,	".iifge",	S_CONDITIONAL,	0,	O_IIFGE	},
+    {	NULL,	".iifle",	S_CONDITIONAL,	0,	O_IIFLE	},
+    {	NULL,	".iifeq",	S_CONDITIONAL,	0,	O_IIFEQ	},
+    {	NULL,	".iifne",	S_CONDITIONAL,	0,	O_IIFNE	},
+    {	NULL,	".iifb",	S_CONDITIONAL,	0,	O_IIFB	},
+    {	NULL,	".iifnb",	S_CONDITIONAL,	0,	O_IIFNB	},
+    {	NULL,	".iifidn",	S_CONDITIONAL,	0,	O_IIFIDN},
+    {	NULL,	".iifdif",	S_CONDITIONAL,	0,	O_IIFDIF},
+    {	NULL,	".else",	S_CONDITIONAL,	0,	O_ELSE	},
+    {	NULL,	".endif",	S_CONDITIONAL,	0,	O_ENDIF	},
     {	NULL,	".list",	S_LISTING,	0,	O_LIST	},
     {	NULL,	".nlist",	S_LISTING,	0,	O_NLIST	},
     {	NULL,	".equ",		S_EQU,		0,	O_EQU	},
@@ -157,15 +193,36 @@ struct	mne	mne[] = {
     {	NULL,	".undefine",	S_DEFINE,	0,	O_UNDEF	},
     {	NULL,	".even",	S_BOUNDARY,	0,	O_EVEN	},
     {	NULL,	".odd",		S_BOUNDARY,	0,	O_ODD	},
+    {	NULL,	".bndry",	S_BOUNDARY,	0,	O_BNDRY	},
     {	NULL,	".msg"	,	S_MSG,		0,	0	},
     {	NULL,	".assume",	S_ERROR,	0,	O_ASSUME},
     {	NULL,	".error",	S_ERROR,	0,	O_ERROR	},
 /*    {	NULL,	".msb",		S_MSB,		0,	0	},	*/
+/*    {	NULL,	".lohi",	S_MSB,		0,	O_LOHI	},	*/
+/*    {	NULL,	".hilo",	S_MSB,		0,	O_HILO	},	*/
 /*    {	NULL,	".8bit",	S_BITS,		0,	O_1BYTE	},	*/
 /*    {	NULL,	".16bit",	S_BITS,		0,	O_2BYTE	},	*/
 /*    {	NULL,	".24bit",	S_BITS,		0,	O_3BYTE	},	*/
 /*    {	NULL,	".32bit",	S_BITS,		0,	O_4BYTE	},	*/
     {	NULL,	".end",		S_END,		0,	0	},
+
+	/* Macro Processor */
+
+    {	NULL,	".macro",	S_MACRO,	0,	O_MACRO	},
+    {	NULL,	".endm",	S_MACRO,	0,	O_ENDM	},
+    {	NULL,	".mexit",	S_MACRO,	0,	O_MEXIT	},
+
+    {	NULL,	".narg",	S_MACRO,	0,	O_NARG	},
+    {	NULL,	".nchr",	S_MACRO,	0,	O_NCHR	},
+    {	NULL,	".ntyp",	S_MACRO,	0,	O_NTYP	},
+
+    {	NULL,	".irp",		S_MACRO,	0,	O_IRP	},
+    {	NULL,	".irpc",	S_MACRO,	0,	O_IRPC	},
+    {	NULL,	".rept",	S_MACRO,	0,	O_REPT	},
+
+    {	NULL,	".nval",	S_MACRO,	0,	O_NVAL	},
+
+    {	NULL,	".mdelete",	S_MACRO,	0,	O_MDEL	},
 
 	/* 6800 Compatibility */
 
@@ -230,7 +287,7 @@ struct	mne	mne[] = {
     {	NULL,	"ldd",		S_LR,		0,	0xCC	},
     {	NULL,	"ldx",		S_LR,		0,	0x8E	},
     {	NULL,	"ldu",		S_LR,		0,	0xCE	},
-    {	NULL,	"ldq",		S_LRQ,	0,	0xCD	},
+    {	NULL,	"ldq",		S_LRQ,		0,	0xCD	},
 
     {	NULL,	"leax",		S_LEA,		0,	0x30	},
     {	NULL,	"leay",		S_LEA,		0,	0x31	},
@@ -245,14 +302,14 @@ struct	mne	mne[] = {
     {	NULL,	"exg",		S_EXG,		0,	0x1E	},
     {	NULL,	"tfr",		S_EXG,		0,	0x1F	},
 
-    {	NULL,	"addr",		S_IR,			0,	0x30	},
-    {	NULL,	"adcr",		S_IR,			0,	0x31	},
-    {	NULL,	"subr",		S_IR,			0,	0x32	},
-    {	NULL,	"sbcr",		S_IR,			0,	0x33	},
-    {	NULL,	"andr",		S_IR,			0,	0x34	},
-    {	NULL,	"orr",		S_IR,			0,	0x35	},
-    {	NULL,	"eorr",		S_IR,			0,	0x36	},
-    {	NULL,	"cmpr",		S_IR,			0,	0x37	},
+    {	NULL,	"addr",		S_IR,		0,	0x30	},
+    {	NULL,	"adcr",		S_IR,		0,	0x31	},
+    {	NULL,	"subr",		S_IR,		0,	0x32	},
+    {	NULL,	"sbcr",		S_IR,		0,	0x33	},
+    {	NULL,	"andr",		S_IR,		0,	0x34	},
+    {	NULL,	"orr",		S_IR,		0,	0x35	},
+    {	NULL,	"eorr",		S_IR,		0,	0x36	},
+    {	NULL,	"cmpr",		S_IR,		0,	0x37	},
 
     {	NULL,	"cwai",		S_CC,		0,	0x3C	},
     {	NULL,	"orcc",		S_CC,		0,	0x1A	},
@@ -320,18 +377,18 @@ struct	mne	mne[] = {
     {	NULL,	"lbsr",		S_LBSR,		0,	0x17	},
 
     {	NULL,	"neg",		S_SOP,		0,	0x40	},
-	 { NULL,	"oim",		S_SOP,		0, 0x41  },
-	 { NULL,	"aim",		S_SOP,		0, 0x42  },
+    {	NULL,	"oim",		S_SOP,		0,	0x41	},
+    {	NULL,	"aim",		S_SOP,		0,	0x42	},
     {	NULL,	"com",		S_SOP,		0,	0x43	},
     {	NULL,	"lsr",		S_SOP,		0,	0x44	},
-	 { NULL,	"eim",		S_SOP,		0, 0x45  },
+    {	NULL,	"eim",		S_SOP,		0,	0x45	},
     {	NULL,	"ror",		S_SOP,		0,	0x46	},
     {	NULL,	"asr",		S_SOP,		0,	0x47	},
     {	NULL,	"asl",		S_SOP,		0,	0x48	},
     {	NULL,	"lsl",		S_SOP,		0,	0x48	},
     {	NULL,	"rol",		S_SOP,		0,	0x49	},
     {	NULL,	"dec",		S_SOP,		0,	0x4A	},
-	 { NULL,	"tim",		S_SOP,		0, 0x4B  },
+    {	NULL,	"tim",		S_SOP,		0,	0x4B	},
     {	NULL,	"inc",		S_SOP,		0,	0x4C	},
     {	NULL,	"tst",		S_SOP,		0,	0x4D	},
     {	NULL,	"clr",		S_SOP,		0,	0x4F	},
@@ -416,7 +473,7 @@ struct	mne	mne[] = {
 
 		/* New to the 6309 - prebyte 0x11 */
 
-    {	NULL,	"bitmd",		S_IMM2,		0,	0x3C	},
+    {	NULL,	"bitmd",	S_IMM2,		0,	0x3C	},
     {	NULL,	"ldmd",		S_IMM2,		0,	0x3D	},
 
     {	NULL,	"come",		S_INH2,		0,	0x43	},
@@ -446,7 +503,6 @@ struct	mne	mne[] = {
     {	NULL,	"addf",		S_LR2,		0,	0xCB	},
 
     {	NULL,	"bsr",		S_BRA,		S_EOL,	0x8D	},
-
 };
 
 struct opdata mc6800[] = {
