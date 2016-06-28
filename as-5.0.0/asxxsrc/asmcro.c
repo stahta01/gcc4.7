@@ -741,7 +741,7 @@ struct mcrdef * np;
 		maxmcr = mcrfil;
 	}
 	/*
-	 * Create an asmf structure for getline()
+	 * Create an asmf structure for nxtline()
 	 */
 	asmq = (struct asmf *) mstruct (sizeof (struct asmf));
 	asmq->next = asmc;

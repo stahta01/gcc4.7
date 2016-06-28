@@ -28,7 +28,7 @@ static void dump(struct lfile *objp)
    area[0] = '\0';
    label[0] = '\0';
 
-   while (as_getline()) {
+   while (nxtline()) {
       ip = ib;
       c = getnb();
       switch (c) {
