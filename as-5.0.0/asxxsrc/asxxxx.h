@@ -39,26 +39,15 @@
 /*
  * System Include Files
  */
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <setjmp.h>
 #include <string.h>
 
 /*
- * Config Include File
+ * Include Config File
  */
 #include "../config.h"
-
-/*
- * To include NoICE Debugging set non-zero
- */
-#define	NOICE	1
-
-/*
- * To include SDCC Debugging set non-zero
- */
-#define	SDCDB	1
 
 /*
  * The assembler requires certain variables to have
@@ -148,9 +137,9 @@
 #define	RTTERM	')'		/* Right expression delimeter */
 
 #define	HUGE	1000		/* A huge number */
-#define NERR	2		/* Errors per line */
-#define NCODE	(NINPUT)/* Listing code buffer size */
-#define NTITL	80		/* Title buffer size */
+#define	NERR	2		/* Errors per line */
+#define	NCODE	(NINPUT)/* Listing code buffer size */
+#define	NTITL	80		/* Title buffer size */
 #define	NSBTL	80		/* SubTitle buffer size */
 #define	NHASH	(1 << 6)	/* Buckets in hash table */
 #define	HMASK	(NHASH - 1)	/* Hash mask */
@@ -160,11 +149,11 @@
 #define	MAXMCR	20		/* Maximum nesting of macro expansions */
 #define	MAXIF	10		/* Maximum nesting of if/else/endif */
 
-#define NLIST	0		/* No listing */
-#define SLIST	1		/* Source only */
-#define ALIST	2		/* Address only */
+#define	NLIST	0		/* No listing */
+#define	SLIST	1		/* Source only */
+#define	ALIST	2		/* Address only */
 #define	BLIST	3		/* Address only with allocation */
-#define CLIST	4		/* Code */
+#define	CLIST	4		/* Code */
 #define	ELIST	5		/* Equate only */
 
 #define	LIST_ERR	0x0001	/* Error Code(s) */
@@ -982,7 +971,7 @@ extern	int	fflag;		/*	-f(f), relocations flagged flag
 				 */
 extern	int	gflag;		/*	-g, make undefined symbols global flag
 				 */
-extern	int	hflag;		/*	-h, diagnostic help printouts
+				/*	-h, usage help listed
 				 */
 
 #if NOICE
@@ -998,9 +987,11 @@ extern	int	pflag;		/*	-p, disable listing pagination
 				 */
 extern	int	sflag;		/*	-s, generate symbol table flag
 				 */
+extern	int	tflag;		/*	-t, output diagnostic parameters from assembler
+				 */
 extern	int	uflag;		/*	-u, disable .list/.nlist processing flag
 				 */
-extern	int	wflag;		/*	-w, enable wide format listing
+extern	int	wflag;		/*	-w, enable wide listing format
 				 */
 extern	int	xflag;		/*	-x, listing radix flag
 				 */
@@ -1219,8 +1210,8 @@ extern	a_uint		absexpr(void);
 extern	VOID		clrexpr(struct expr *esp);
 extern	int		digit(int c, int r);
 extern	VOID		exprmasks(int n);
-extern	int		is_abs(struct expr *esp);
 extern	VOID		expr(struct expr *esp, int n);
+extern	int		is_abs(struct expr *esp);
 extern	int		oprio(int c);
 extern	VOID		term(struct expr *esp);
 
@@ -1396,8 +1387,8 @@ extern	a_uint		absexpr();
 extern	VOID		clrexpr();
 extern	int		digit();
 extern	VOID		exprmasks();
-extern	int		is_abs();
 extern	VOID		expr();
+extern	int		is_abs();
 extern	int		oprio();
 extern	VOID		term();
 

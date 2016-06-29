@@ -434,7 +434,7 @@ FILE *fp;
  *		char *	frmt		temporary file type string
  *		char *	str[]		File Specification String
  *		struct bank *tbp	temporary bank pointer
- *
+ *		struct sym *sp		.__.END. symbol pointer
  *
  *	global variables:
  *		area	*ap		Pointer to the current
@@ -471,6 +471,7 @@ lkfopen()
 	char * frmt;
 	char str[NCPS+NCPS];
 	struct bank *tbp;
+	struct sym *sp;
 	FILE * fp;
 
 	if (oflag == 0) return;
@@ -489,6 +490,15 @@ lkfopen()
 		}
 		bp->b_fspec = strsto(str);
 		str[idx] = 0;
+	}
+
+	/*
+	 * If .__.END. is defined force
+	 * an output file to be opened.
+	 */
+	sp = lkpsym(".__.END.", 0);
+	if (sp) {
+		sp->s_axp->a_bap->a_flag |= A4_OUT;
 	}
 
 	/*
@@ -615,18 +625,6 @@ lkfclose()
 			lkout(0);
 			if (ofp != stderr) {
 				fclose(ofp);
-#if 0
-				/*
-				 * Remove files with no data
-				 */
-				if (bp->b_oflag == 0) {
-#ifdef	OTHERSYSTEM
-					remove(bp->b_ofspec);
-#else
-					delete(bp->b_ofspec);
-#endif
-				}
-#endif
 			}
 			/*
 			 * Scan bank structure for

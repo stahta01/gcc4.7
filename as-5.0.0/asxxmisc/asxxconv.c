@@ -535,8 +535,8 @@ int n;
 {
 	char **dp;
 
-	fprintf(stderr, "ASxxxx Assembler Listing Converter %s\n", VERSION);
-	fprintf(stderr, "Copyright (C) 2009  Alan R. Baldwin\n");
+	fprintf(stderr, "ASxxxx Assembler Listing Converter " VERSION "\n");
+	fprintf(stderr, "Copyright (C) " COPYRIGHT " Alan R. Baldwin\n");
 	fprintf(stderr, "This program comes with ABSOLUTELY NO WARRANTY.\n\n");
 	for (dp = usetxt; *dp; dp++)
 		fprintf(stderr, "%s\n", *dp);

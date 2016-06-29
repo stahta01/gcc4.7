@@ -34,19 +34,9 @@
 #include <string.h>
 
 /*
- * Config Include File
+ * Include Config File
  */
 #include "../config.h"
-
-/*
- * To include NoICE Debugging set non-zero
- */
-#define	NOICE	1
-
-/*
- * To include SDCC Debugging set non-zero
- */
-#define	SDCDB	1
 
 /*
  * The assembler requires certain variables to have

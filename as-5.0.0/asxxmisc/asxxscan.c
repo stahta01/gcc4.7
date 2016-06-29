@@ -248,8 +248,9 @@ loop:
 
 		/*
 		 * Check for 'SPACE' at beginning of line
+		 * (Skipping NERR error characters)
 		 */
-		for (i=0; i<n; i++) {
+		for (i=NERR,p+=NERR; i<n; i++) {
 			if (*p++ != ' ')
 				goto loop;
 		}
@@ -281,12 +282,10 @@ loop:
 		}
 
 		/*
-		 * Scan until ';' is found
+		 * Scan for last ';'
 		 */
-		q = p;
-		while (*q && (*q != ';')) {
-			q++;
-		}
+		if ((q = strrchr(p, ';')) == NULL)
+			goto loop;
 		if (*q++ != ';')
 			goto loop;
 		if (*q == '\0')
@@ -494,8 +493,8 @@ int n;
 {
 	char **dp;
 
-	fprintf(stderr, "ASxxxx Assembler Listing Scanner %s\n", VERSION);
-	fprintf(stderr, "Copyright (C) 2009  Alan R. Baldwin\n");
+	fprintf(stderr, "ASxxxx Assembler Listing Scanner " VERSION "\n");
+	fprintf(stderr, "Copyright (C) " COPYRIGHT " Alan R. Baldwin\n");
 	fprintf(stderr, "This program comes with ABSOLUTELY NO WARRANTY.\n\n");
 	for (dp = usetxt; *dp; dp++)
 		fprintf(stderr, "%s\n", *dp);
