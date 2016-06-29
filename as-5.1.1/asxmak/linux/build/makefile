@@ -3,7 +3,7 @@
 #		LINUX Version
 #		=============
 #
-#   16 January 2009			Created for LINUX     / make /
+#   8 October 2014			Created for LINUX     / make /
 #
 ######################################################################
 
@@ -12,6 +12,7 @@
 all:	as1802		\
 	as2650		\
 	as430		\
+	as6100		\
 	as61860		\
 	as6500		\
 	as6800		\
@@ -24,6 +25,7 @@ all:	as1802		\
 	as6812		\
 	as6816		\
 	as740		\
+	as78k0s		\
 	as8048		\
 	as8051		\
 	as8085		\
@@ -31,6 +33,7 @@ all:	as1802		\
 	asavr		\
 	asez80		\
 	asf2mc8		\
+	asf8		\
 	asgb		\
 	ash8		\
 	asm8c		\
@@ -38,13 +41,16 @@ all:	as1802		\
 	asrab		\
 	asscmp		\
 	ascheck		\
+	asst6		\
+	asst7		\
+	asst8		\
 	asz8		\
 	asz80		\
 	aslink		\
 	asxscn		\
 	asxcnv		\
 	s19os9
-	
+
 clean:
 	rm -f $(SRCASX)*.o
 	rm -f $(SRCLNK)*.o
@@ -54,7 +60,8 @@ clean:
 	rm -f $(SRC1802)*.o
 	rm -f $(SRC2650)*.o
 	rm -f $(SRC430)*.o
-	rm -f $(SRC6816)*.o
+	rm -f $(SRC6100)*.o
+	rm -f $(SRC61860)*.o
 	rm -f $(SRC6500)*.o
 	rm -f $(SRC6800)*.o
 	rm -f $(SRC6801)*.o
@@ -64,8 +71,9 @@ clean:
 	rm -f $(SRC6809)*.o
 	rm -f $(SRC6811)*.o
 	rm -f $(SRC6812)*.o
+	rm -f $(SRC6816)*.o
 	rm -f $(SRC740)*.o
-	rm -f $(SRC61860)*.o
+	rm -f $(SRC78K0S)*.o
 	rm -f $(SRC8048)*.o
 	rm -f $(SRC8051)*.o
 	rm -f $(SRC8085)*.o
@@ -74,12 +82,16 @@ clean:
 	rm -f $(SRCCHECK)*.o
 	rm -f $(SRCEZ80)*.o
 	rm -f $(SRCF2MC8)*.o
+	rm -f $(SRCF8)*.o
 	rm -f $(SRCGB)*.o
 	rm -f $(SRCH8)*.o
 	rm -f $(SRCM8C)*.o
 	rm -f $(SRCPIC)*.o
 	rm -f $(SRCRAB)*.o
 	rm -f $(SRCSCMP)*.o
+	rm -f $(SRCST6)*.o
+	rm -f $(SRCST7)*.o
+	rm -f $(SRCST8)*.o
 	rm -f $(SRCZ8)*.o
 	rm -f $(SRCZ80)*.o
 	rm -f *.new
@@ -93,7 +105,8 @@ prep:
 	rm -f $(SRC1802)*.o
 	rm -f $(SRC2650)*.o
 	rm -f $(SRC430)*.o
-	rm -f $(SRC6816)*.o
+	rm -f $(SRC6100)*.o
+	rm -f $(SRC61860)*.o
 	rm -f $(SRC6500)*.o
 	rm -f $(SRC6800)*.o
 	rm -f $(SRC6801)*.o
@@ -103,8 +116,9 @@ prep:
 	rm -f $(SRC6809)*.o
 	rm -f $(SRC6811)*.o
 	rm -f $(SRC6812)*.o
+	rm -f $(SRC6816)*.o
 	rm -f $(SRC740)*.o
-	rm -f $(SRC61860)*.o
+	rm -f $(SRC78K0S)*.o
 	rm -f $(SRC8048)*.o
 	rm -f $(SRC8051)*.o
 	rm -f $(SRC8085)*.o
@@ -113,12 +127,16 @@ prep:
 	rm -f $(SRCCHECK)*.o
 	rm -f $(SRCEZ80)*.o
 	rm -f $(SRCF2MC8)*.o
+	rm -f $(SRCF8)*.o
 	rm -f $(SRCGB)*.o
 	rm -f $(SRCH8)*.o
 	rm -f $(SRCM8C)*.o
 	rm -f $(SRCPIC)*.o
 	rm -f $(SRCRAB)*.o
 	rm -f $(SRCSCMP)*.o
+	rm -f $(SRCST6)*.o
+	rm -f $(SRCST7)*.o
+	rm -f $(SRCST8)*.o
 	rm -f $(SRCZ8)*.o
 	rm -f $(SRCZ80)*.o
 	rm -f *.new
@@ -139,12 +157,13 @@ SRCASX:=	$(ASXBAS)asxxsrc/
 SRCLNK:=	$(ASXBAS)linksrc/
 SRCLIB:=	$(ASXBAS)libsrc/
 SRCMISC:=	$(ASXBAS)asxxmisc/
-SRCS19OS9=	$(ASXBAS)s19os9/
+SRCS19OS9:=	$(ASXBAS)s19os9/
 DSTEXE:=	$(ASXBAS)asxmak/linux/exe/
 
 SRC1802=	$(ASXBAS)as1802/
 SRC2650=	$(ASXBAS)as2650/
 SRC430=		$(ASXBAS)as430/
+SRC6100=	$(ASXBAS)as6100/
 SRC61860=	$(ASXBAS)as61860/
 SRC6500=	$(ASXBAS)as6500/
 SRC6800=	$(ASXBAS)as6800/
@@ -157,6 +176,7 @@ SRC6811=	$(ASXBAS)as6811/
 SRC6812=	$(ASXBAS)as6812/
 SRC6816=	$(ASXBAS)as6816/
 SRC740=		$(ASXBAS)as740/
+SRC78K0S=	$(ASXBAS)as78k0s/
 SRC8048=	$(ASXBAS)as8048/
 SRC8051=	$(ASXBAS)as8051/
 SRC8085=	$(ASXBAS)as8085/
@@ -165,12 +185,16 @@ SRCAVR=		$(ASXBAS)asavr/
 SRCCHECK=	$(ASXBAS)ascheck/
 SRCEZ80=	$(ASXBAS)asez80/
 SRCF2MC8=	$(ASXBAS)asf2mc8/
+SRCF8=		$(ASXBAS)asf8/
 SRCGB=		$(ASXBAS)asgb/
 SRCH8=		$(ASXBAS)ash8/
 SRCM8C=		$(ASXBAS)asm8c/
 SRCPIC=		$(ASXBAS)aspic/
 SRCRAB=		$(ASXBAS)asrab/
 SRCSCMP=	$(ASXBAS)asscmp/
+SRCST6=		$(ASXBAS)asst6/
+SRCST7=		$(ASXBAS)asst7/
+SRCST8=		$(ASXBAS)asst8/
 SRCZ8=		$(ASXBAS)asz8/
 SRCZ80=		$(ASXBAS)asz80/
 
@@ -235,6 +259,20 @@ $(AS430SRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRC430)m430.h
 
 as430.new:	$(ASXXSRC) $(AS430SRC)
 	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS430SRC) -o as430.new
+
+
+####################################################################
+# AS6100
+####################################################################
+
+AS6100 =	i61adr.o i61mch.o i61pst.o
+
+AS6100SRC =	$(addprefix $(SRC6100),$(AS6100))
+
+$(AS6100SRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRC6100)i6100.h
+
+as6100.new:	$(ASXXSRC) $(AS6100SRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS6100SRC) -o as6100.new
 
 
 ####################################################################
@@ -406,6 +444,20 @@ as740.new:	$(ASXXSRC) $(AS740SRC)
 
 
 ####################################################################
+# AS78K0S
+####################################################################
+
+AS78K0S =	r78kadr.o r78kmch.o r78kpst.o
+
+AS78KSRC =	$(addprefix $(SRC78K0S),$(AS78K0S))
+
+$(AS78KSRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRC78K0S)r78k0s.h
+
+as78k0s.new:	$(ASXXSRC) $(AS78KSRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(AS78KSRC) -o as78k0s.new
+
+
+####################################################################
 # AS8048
 ####################################################################
 
@@ -507,7 +559,7 @@ asez80.new:	$(ASXXSRC) $(ASEZ80SRC)
 # ASF2MC8
 ####################################################################
 
-ASF2MC8 =	f8adr.o f8mch.o f8pst.o
+ASF2MC8 =	f2mc8adr.o f2mc8mch.o f2mc8pst.o
 
 ASF2MC8SRC =	$(addprefix $(SRCF2MC8),$(ASF2MC8))
 
@@ -515,6 +567,20 @@ $(ASF2MC8SRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRCF2MC8)f2mc8.h
 
 asf2mc8.new:	$(ASXXSRC) $(ASF2MC8SRC)
 	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASF2MC8SRC) -o asf2mc8.new
+
+
+####################################################################
+# ASF8
+####################################################################
+
+ASF8 =		f8adr.o f8mch.o f8pst.o
+
+ASF8SRC =	$(addprefix $(SRCF8),$(ASF8))
+
+$(ASF8SRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRCF8)f8.h
+
+asf8.new:	$(ASXXSRC) $(ASF8SRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASF8SRC) -o asf8.new
 
 
 ####################################################################
@@ -599,6 +665,48 @@ $(ASSCMPSRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRCSCMP)scmp.h
 
 asscmp.new:	$(ASXXSRC) $(ASSCMPSRC)
 	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASSCMPSRC) -o asscmp.new
+
+
+####################################################################
+# ASST6
+####################################################################
+
+ASST6 =		st6adr.o st6mch.o st6pst.o
+
+ASST6SRC =	$(addprefix $(SRCST6),$(ASST6))
+
+$(ASST6SRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRCST6)st6.h
+
+asst6.new:	$(ASXXSRC) $(ASST6SRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASST6SRC) -o asst6.new
+
+
+####################################################################
+# ASST7
+####################################################################
+
+ASST7 =		st7adr.o st7mch.o st7pst.o
+
+ASST7SRC =	$(addprefix $(SRCST7),$(ASST7))
+
+$(ASST7SRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRCST7)st7.h
+
+asst7.new:	$(ASXXSRC) $(ASST7SRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASST7SRC) -o asst7.new
+
+
+####################################################################
+# ASST8
+####################################################################
+
+ASST8 =		st8adr.o st8mch.o st8pst.o
+
+ASST8SRC =	$(addprefix $(SRCST8),$(ASST8))
+
+$(ASST8SRC):	$(SRCMISC)alloc.h $(SRCASX)asxxxx.h $(SRCST8)st8.h
+
+asst8.new:	$(ASXXSRC) $(ASST8SRC)
+	$(LD) $(LDFLAGS) $(ASXXSRC) $(ASST8SRC) -o asst8.new
 
 
 ####################################################################
