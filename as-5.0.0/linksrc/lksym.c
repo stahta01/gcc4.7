@@ -168,15 +168,14 @@ newsym()
 			if (tsp->s_addr != ev || (rflag && !symeq(id, ".__.ABS.", zflag))) {
 				lkwarning("Multiple definition of %s\n", id);
 			}
-		} else {
-			/*
-			 * Set value and area extension link.
-			 */
-			tsp->s_addr = ev;
-			tsp->s_axp = axp;
-			tsp->s_type |= S_DEF;
-			tsp->m_id = hp->m_id;
 		}
+		/*
+		 * Set value and area extension link.
+		 */
+		tsp->s_addr = ev;
+		tsp->s_axp = axp;
+		tsp->s_type |= S_DEF;
+		tsp->m_id = hp->m_id;
 	} else {
 		lkerror("Invalid symbol type %c for %s", c, id);
 	}

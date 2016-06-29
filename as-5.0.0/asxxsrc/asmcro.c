@@ -1234,9 +1234,7 @@ struct	macrofp *nfp;
 	return(0);
 }
 
-/*)Function	VOID *	mstruct(n)
- *
- *		unsigned int	n	number of bytes to allocate
+/*)Function	VOID *	mhunk()
  *
  *	Allocate space.
  *	Return a pointer to the allocated space.

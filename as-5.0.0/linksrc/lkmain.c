@@ -412,6 +412,7 @@ int i;
  *
  *	functions called:
  *		int	get()		lklex.c
+ *		int	getnb()		lklex.c
  *		VOID	module()	lkhead.c
  *		VOID	newarea()	lkarea.c
  *		VOID	newhead()	lkhead.c
@@ -419,6 +420,7 @@ int i;
  *		sym *	newsym()	lksym.c
  *		VOID	NoICEmagic()	lknoice.c
  *		VOID	reloc()		lkreloc.c
+ *		int	unget()		lklex.c
  *
  *	side effects:
  *		Head, area, and symbol structures are created and
@@ -745,6 +747,7 @@ map()
  *	global variables:
  *		char	ctype[]		array of character types, one per
  *				 	ASCII character
+ *		int	jflag		NoICE Debug output flag
  *		lfile	*lfp		pointer to current lfile structure
  *				 	being processed by parse()
  *		lfile	*linkp		pointer to first lfile structure
@@ -758,8 +761,9 @@ map()
  *		int	pflag		print linker command file flag
  *		FILE *	stderr		c_library
  *		int	uflag		Relocated listing flag
- *		int	xflag		Map file radix type flag
  *		int	wflag		Wide listing format
+ *		int	xflag		Map file radix type flag
+ *		int	yflag		SDCC Debug output flag
  *		int	zflag		Enable symbol case sensitivity
  *
  *	Functions called:
@@ -773,8 +777,10 @@ map()
  *		int	get()		lklex.c
  *		int	getnb()		lklex.c
  *		VOID	lkexit()	lkmain.c
+ *		char *	new()		lksym.c
  *		char *	strsto()	lksym.c
  *		int	strlen()	c_library
+ *		VOID	unget()		lklex.c
  *
  *	side effects:
  *		Various linker flags are updated and the linked
@@ -1018,7 +1024,6 @@ parse()
  *	Functions called:
  *		int	fclose()	c_library
  *		int	fprintf()	c_library
- *		VOID	getfid()	lklex.c
  *		int	nxtline()	lklex.c
  *		int	parse()		lkmain.c
  *
@@ -1232,9 +1237,9 @@ setgbl()
  *	local variables:
  *		int	c		character value
  *		FILE *	fp		filehandle for opened file
+ *		char *	frmt		file access format string
  *		char *	p1		pointer to filespec string fn
  *		char *	p2		pointer to filespec string fb
- *		char *	p3		pointer to filetype string ft
  *
  *	global variables:
  *		char	afspec[]	constructed file specification string
@@ -1415,7 +1420,7 @@ char *usetxt[] = {
 	"Map format:",
 	"  -m   Map output generated as (out)file[.map]",
 	"  -w   Wide listing format for map file",
-	"  -x   Hexidecimal (default)",
+	"  -x   Hexadecimal (default)",
 	"  -d   Decimal",
 	"  -q   Octal",
 	"Output:",
@@ -1466,11 +1471,11 @@ VOID
 usage(n)
 int n;
 {
-	char	**dp;
+	char **dp;
 
-	fprintf(stderr, "\nASxxxx Linker %s", VERSION);
-	fprintf(stderr, "\nCopyright (C) 2009  Alan R. Baldwin");
-	fprintf(stderr, "\nThis program comes with ABSOLUTELY NO WARRANTY.\n\n");
+	fprintf(stderr, "ASxxxx Linker " VERSION "\n");
+	fprintf(stderr, "Copyright (C) " COPYRIGHT " Alan R. Baldwin\n");
+	fprintf(stderr, "This program comes with ABSOLUTELY NO WARRANTY.\n\n");
 	for (dp = usetxt; *dp; dp++)
 		fprintf(stderr, "%s\n", *dp);
 	lkexit(n);

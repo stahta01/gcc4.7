@@ -66,13 +66,13 @@
  *
  *	local variables:
  *		char *	p		pointer to external string buffer
- *		int	c		current character value
  *
  *	global variables:
  *		char	ctype[]		a character array which defines the
  *					type of character being processed.
  *					This index is the character
  *					being processed.
+ *		char	id[]		string buffer
  *
  *	called functions:
  *		int	get()		lklex.c
@@ -118,7 +118,6 @@ char *id;
  *
  *	local variables:
  *		char *	p		pointer to external string buffer
- *		int	c		current character value
  *
  *	called functions:
  *		int	get()		lklex.c
@@ -377,7 +376,6 @@ int d;
  *	local variables:
  *		int	ftype		file type
  *		char *	fid		file name
- *		char *	p		temporary string pointer
  *
  *	global variables:
  *		lfile	*cfp		The pointer *cfp points to the
@@ -388,12 +386,12 @@ int d;
  *		int	gline		get a line from the LST file
  *					to translate for the RST file
  *		char	ib[NINPUT]	REL file text line
+ *		int	obj_flag	Linked file/library object flag
  *		int	pass		linker pass number
- *		int	pflag		print linker command file flag
  *		FILE	*rfp		The file handle to the current
  *					output RST file
- *		FILE	*sfp		The file handle sfp points to the
- *				 	currently open file
+ *		FILE	*sfp		The file handle to the current
+ *				 	input file
  *		FILE *	stdin		c_library
  *		FILE *	stdout		c_library
  *		FILE	*tfp		The file handle to the current
@@ -408,6 +406,7 @@ int d;
  *		int	fprintf()	c_library
  *		VOID	lkulist()	lklist.c
  *		VOID	lkerror()	lkmain.c
+ *		VOID	SDCDBcopy()	lksdcdb.c
  *
  *	side effects:
  *		The input stream is scanned.  The .rel files will be

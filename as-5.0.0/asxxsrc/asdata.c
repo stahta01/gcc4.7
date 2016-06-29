@@ -229,7 +229,7 @@ int	fflag;		/*	-f(f), relocations flagged flag
 			 */
 int	gflag;		/*	-g, make undefined symbols global flag
 			 */
-int	hflag;		/*	-h, diagnostic help printout flag
+			/*	-h, usage help listed
 			 */
 int	jflag;		/*	-j, enable NoICE Debug Symbols
 			 */
@@ -240,6 +240,8 @@ int	oflag;		/*	-o, generate relocatable output flag
 int	pflag;		/*	-p, disable listing pagination
 			 */
 int	sflag;		/*	-s, generate symbol table flag
+			 */
+int	tflag;		/*	-t, output diagnostic parameters from assembler
 			 */
 int	uflag;		/*	-u, disable .list/.nlist processing flag
 			 */

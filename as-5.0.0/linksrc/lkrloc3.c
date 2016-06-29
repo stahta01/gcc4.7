@@ -550,7 +550,7 @@ relr3()
 			rerr.rval = relv - reli;
 			relerr3(errmsg3[error]);
 
-			for (i=rtp; i<rtp+a_bytes-1; i++) {
+			for (i=rtp; i<rtp+a_bytes; i++) {
 				if (rtflg[i]) {
 					rterr[i] = error;
 					break;
