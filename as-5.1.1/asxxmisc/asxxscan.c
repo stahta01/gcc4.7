@@ -1,4 +1,4 @@
-/* asxxconv.c */
+/* asxscn.c */
 
 /*
  *  Copyright (C) 1989-2014  Alan R. Baldwin
@@ -25,15 +25,18 @@
 #include "asxxxx.h"
 
 
-int inpfil;		/* Input File Counter	*/
-int radix;		/* Radix Flag		*/
-int a_bytes;		/* Addressing Bytes	*/
-int aserr;		/* Error Counter	*/
+int inpfil;		/* Input File Counter		*/
+int radix;		/* Radix Value			*/
+int a_bytes;		/* Address Bytes		*/
+int iflag;		/* Ignore Relocation Flags	*/
+int vlines;		/* Valid Lines Scanned		*/
+int aserr;		/* Error Counter		*/
 
-FILE *nfp;		/* Input File Handle	*/
-FILE *dfp;		/* Output File Handle	*/
+FILE *sfp[MAXFIL];	/* Input File Handle		*/
 
-char scline[256];	/* Input text line	*/
+char scfile[80];	/* Input File Name		*/
+
+char scline[256];	/* Input text line		*/
 
 
 /*
@@ -87,14 +90,6 @@ char	ccase[128] = {
  *
  *		int	argc		argument count
  *		char *	argv		array of pointers to argument strings
- *
- * Convert a listing file to a test file by:
- *	(1)	stripping the listing headers
- *	(2)	removing the program counter, data bytes, and
- *		line numbers
- *	(3)	appending the data bytes to the source line
- *		as a comment.
- *	(4)	remove any symbol table or area table
  */
 
 int
@@ -102,17 +97,17 @@ main(argc, argv)
 int argc;
 char *argv[];
 {
-	char *p, *q, *r, *s;
-	int c, i, j, k, l, m, n;
-	int ldgt, pos, rdx;
-	unsigned int lcon, lnum;
+	char *p, *q;
+	int c, i, n, m, r;
 
 	/*
 	 * Set Defaults
 	 */
 	radix = 16;
 	a_bytes = 2;
+	iflag = 0;
 	inpfil = 0;
+	vlines = 0;
 	aserr = 0;
 
 	for (i=1; i<argc; ++i) {
@@ -149,22 +144,24 @@ char *argv[];
 					a_bytes = 4;
 					break;
 
+				case 'i':
+				case 'I':
+					iflag = 1;
+					break;
+
 				default:
 					usage(ER_FATAL);
 				}
 		} else {
 			if (++inpfil > 1) {
-				fprintf(stderr, "Too many files\n");
+				fprintf(stderr, "Too many input files\n");
 				asexit(ER_FATAL);
 			}
-			nfp = fopen(p, "r");
-			if (nfp == NULL) {
+			sfp[0] = fopen(p, "r");
+			if (sfp[0] != NULL) {
+				strcpy(scfile, p);
+			} else {
 				fprintf(stderr, "File %s not found\n", p);
-				asexit(ER_FATAL);
-			}
-			dfp = fopen("a.out", "w");
-			if (dfp == NULL) {
-				fprintf(stderr, "File a.out not opened\n");
 				asexit(ER_FATAL);
 			}
 		}
@@ -173,24 +170,12 @@ char *argv[];
 		usage(ER_WARNING);
 
 	/*
-	 * Convert listing file to a source file
-	 * with assembled data appended as comments.
+	 * Scan file to find assembler errors
 	 */
 loop:
-	while (fgets(scline, sizeof(scline), nfp)) {
+	while (fgets(scline, sizeof(scline), sfp[0])) {
 		chopcrlf(scline);
 		p = scline;
-
-		/* ldgt	Last Data Digit in Line		*/
-		/* lcon	Line Continuation Length	*/
-		/* lnum First Line Number Digit		*/
-
-		switch(a_bytes) {
-		default:
-		case 2: ldgt = 25; lnum=26; lcon = 32; break;
-		case 3:
-		case 4: ldgt = 33; lnum=34; lcon = 40; break;
-		}
 
 		/* The Output Formats
 		| Tabs- |       |       |       |       |       |
@@ -227,187 +212,161 @@ loop:
 				       DDDDDDDDDD
 		*/
 
-		/* p	Starting position of program counter	*/
-		/* n	Number of digits in program ccounter	*/
-		/* l	Number of digits in byte data		*/
-		/* m	Number of bytes per line		*/
-
+		/*
+		 * Define File Format from [XDQ234]
+		 */
 		switch(radix) {
 		default:
 		case 16:
-			rdx = RAD16;
+			r = RAD16;
 			switch(a_bytes) {
 			default:
-			case 2: p += 3; n = 4; l = 2; m = 6; break;
-			case 3: p += 6; n = 6; l = 2; m = 7; break;
-			case 4: p += 4; n = 8; l = 2; m = 7; break;
+			case 2: n = 3; m = 4; /* frmt = "%04X" */; break;
+			case 3: n = 6; m = 6; /* frmt = "%06X" */; break;
+			case 4: n = 4; m = 8; /* frmt = "%08X" */; break;
 			}
 			break;
-
-		case 8:
-			rdx = RAD8;
-			switch(a_bytes) {
-			default:
-			case 2: p += 3; n = 6; l = 3; m = 4; break;
-			case 3: p += 5; n = 8; l = 3; m = 5; break;
-			case 4: p += 2; n = 11; l = 3; m = 5; break;
-			}
-			break;
-
 		case 10:
-			rdx = RAD10;
+			r = RAD10;
 			switch(a_bytes) {
 			default:
-			case 2: p += 4; n = 5; l = 3; m = 4; break;
-			case 3: p += 5; n = 8; l = 3; m = 5; break;
-			case 4: p += 3; n = 10; l = 3; m = 5; break;
+			case 2: n = 4; m = 5; /* frmt = "%05u" */; break;
+			case 3: n = 5; m = 8; /* frmt = "%08u" */; break;
+			case 4: n = 3; m = 10; /* frmt = "%010u" */; break;
+			}
+			break;
+		case 8:
+			r = RAD8;
+			switch(a_bytes) {
+			default:
+			case 2: n = 3; m = 6; /* frmt = "%06o" */; break;
+			case 3: n = 5; m = 8; /* frmt = "%08o" */; break;
+			case 4: n = 2; m = 11; /* frmt = "%011o" */; break;
 			}
 			break;
 		}
 
 		/*
-		 * If the assembled line contains a cycle
-		 * count of the form '[__]' then update:
-		 *
-		 * ldgt	  Last Data Digit in Line
-		 * m	  Number of bytes per line
+		 * Check for 'SPACE' at beginning of line
+		 * (Skipping NERR error characters)
 		 */
-		if ((scline[ldgt-3] == CYCNT_BGN) && (scline[ldgt] == CYCNT_END)) {
-			switch(rdx) {
-			default:
-			case RAD16:
-				ldgt -= 3; 
-				break;
-
-			case RAD8:
-				ldgt -= 4; 
-				break;
-
-			case RAD10:
-				ldgt -= 4; 
-				break;
-			}
-			m -= 1;
-		}
-
-		/*
-		 * Verify this line has program counter
-		 * digits or spaces.  If not then this
-		 * line was generated by the assembler.
-		 * Strip the line.
-		 */
-		for (i=0; i<n; i++,p++) {
-			if ((ctype[*p & 0x007F] & rdx) != rdx &&
-			     ctype[*p & 0x007F] != SPACE) {
+		for (i=NERR,p+=NERR; i<n; i++) {
+			if (*p++ != ' ')
 				goto loop;
-			}
 		}
 
 		/*
-		 * Verify there is only data or spaces
-		 * in the data locations.  If the listing
-		 * file contains the symbol table then some
-		 * assembler lines may still get through.
+		 * Require Address
 		 */
-		r = p+1;
-		for (i=0; i<m; i++,r++) {
-			for (j=0; j<l; j++,r++) {
-				if ((ctype[*r & 0x007F] & rdx) != rdx &&
-				     ctype[*r & 0x007F] != SPACE) {
+		if (strncmp(&scline[n], "           ", m) == 0) {
+			goto loop;
+		}
+
+		/*
+		 * Address must be in proper radix
+		 */
+		if (!dgt(r, &scline[n], m)) {
+			goto loop;
+		}
+
+		/*
+		 * Position just after Address
+		 */
+		p += m;
+
+		/*
+		 * Data ?
+		 */
+		if (!dgt(r, p+1, 1)) {
+			goto loop;
+		}
+
+		/*
+		 * Scan for last ';'
+		 */
+		if ((q = strrchr(p, ';')) == NULL)
+			goto loop;
+		if (*q++ != ';')
+			goto loop;
+		if (*q == '\0')
+			goto loop;
+		vlines += 1;
+
+		/*
+		 * Check Mode of Listing:
+		 *	;nn nn
+		 * or	; nn nn
+		 */
+		if (dgt(r, q, 1)) {
+			p += 1;
+		}
+
+		/*
+		 * Compare Data Strings
+		 */
+		n = strlen(q);
+		for (i=0; i<n; i++) {
+			if (ccase[*p & 0x007F] != ccase[*q & 0x007F]) {
+				switch (dgt(r, p, 1) + dgt(r, q, 1)) {
+				default:
+				case 0:
+				case 1:
+					if (iflag) { break; }
+				case 2:
+					fprintf(stderr, "''%s''\n", scline);
+					aserr += 1;
 					goto loop;
 				}
 			}
+			p++;
+			q++;
 		}
-
-		/*
-		 * If there is NO data in line then:
-		 *   If there is an assembler line number then:
-		 *     copy line to output
-		 *   else
-		 *     skip line
-		 *   endif
-		 * else
-		 *   continue
-		 * endif
-		 */
-		r = p+1;
-		for (j=0; j<l; j++,r++) {
-			if ((ctype[*r & 0x007F] & rdx) != rdx) {
-				r = scline+lnum;
-				for (k=0; k<5; k++,r++) {
-					if ((ctype[*r & 0x007F] & RAD10) != RAD10 &&
-					     ctype[*r & 0x007F] != SPACE) {
-						goto loop;
-					}
-				}
-				fprintf(dfp, "%s\n", scline + lcon);
-				goto loop;
-			}
-		}
-
-		/*
-		 * Scan for the last data digit.
-		 */
-		s = q = scline;
-		for (i=0; *s && i<ldgt; i++) {
-			if ((ctype[*s++ & 0x007F] & rdx) == rdx)
-				q = s;
-		}
-
-		if (strlen(scline) <= lcon) {
-			/*
-			 * Line must be data continuation
-			 */
-			goto loop;
-		} else {
-			/*
-			 * Real source line
-			 */
-			s = scline + lcon;
-			/*
-			 * Remove any comment in line
-			 */
-			r = strchr(s, ';');
-			if (r != NULL) {
-				*r = '\0';
-				while( --r >= s && *r == SPACE) {
-					*r = '\0';
-				}
-			}
-			/*
-			 * Find line length
-			 */
-			pos = 0;
-			while (*s) {
-				if (*s == '\t') {
-					pos += 8;
-					pos = 8 * (pos/8);
-				} else {
-					pos += 1;
-				}
-				s++;
-			}
-			/*
-			 * Extend line to at least 32 characters
-			 * before appending data.
-			 */
-			while (pos < 32) {
-				strcat(scline,"\t");
-				pos += 8;
-				pos = 8 * (pos/8);
-			}
-
-			/*
-			 * Append assembler generated data to
-			 * source line.
-			 */
-			strcat(scline,";");
-			strncat(scline,p,(int) (q-p));
-			fprintf(dfp, "%s\n", scline + lcon);
-		}
+	}
+	if (vlines) {
+		printf("%d code error(s) found in file %s\n", aserr, scfile);
+	} else {
+		fprintf(stderr,"Invalid File Format\n");
+		aserr += 1;
 	}
 	asexit(aserr ? ER_ERROR : ER_NONE);
 	return(0);
+}
+
+/*)Function	int	dgt(rdx,str,n)
+ *
+ *		int	rdx		radix bit code
+ *		char	*str		pointer to the test string
+ *		int	n		number of characters to check
+ *
+ *	The function dgt() verifies that the string under test
+ *	is of the specified radix.
+ *
+ *	local variables:
+ *		int	i		loop counter
+ *
+ *	global variables:
+ *		ctype[]			array of character types
+ *
+ *	functions called:
+ *		none
+ *
+ *	side effects:
+ *		none
+ */
+
+int
+dgt(rdx, str, n)
+int rdx, n;
+char *str;
+{
+	int i;
+
+	for (i=0; i<n; i++) {
+		if ((ctype[*str++ & 0x007F] & rdx) == 0) {
+			return(0);
+		}
+	}
+	return(1);
 }
 
 /*)Function	VOID	chopcrlf(str)
@@ -474,8 +433,7 @@ char *str;
  *		none
  *
  *	global variables:
- *		FILE *	nfp		Input  File Handle
- *		FILE *	dfp		Output File Handle
+ *		FILE *	sfp		scan file
  *
  *	functions called:
  *		int	fclose()	c-library
@@ -489,20 +447,20 @@ VOID
 asexit(i)
 int i;
 {
-	if (nfp != NULL) fclose(nfp);
-	if (dfp != NULL) fclose(dfp);
+	if (sfp[0] != NULL) fclose(sfp[0]);
 
 	exit(i);
 }
 
 char *usetxt[] = {
-	"Usage: [-dqx234] file",
+	"Usage: [-dqx234i] file",
 	"  d    decimal listing",
 	"  q    octal   listing",
 	"  x    hex     listing (default)",
 	"  2    16-Bit  address (default)",
 	"  3    24-Bit  address",
 	"  4    32-Bit  address",
+	"  i    ignore relocation flags",
 	"",
 	NULL
 };
@@ -535,7 +493,7 @@ int n;
 {
 	char **dp;
 
-	fprintf(stderr, "ASxxxx Assembler Listing Converter " VERSION "\n");
+	fprintf(stderr, "ASxxxx Assembler Listing Scanner " VERSION "\n");
 	fprintf(stderr, "Copyright (C) " COPYRIGHT " Alan R. Baldwin\n");
 	fprintf(stderr, "This program comes with ABSOLUTELY NO WARRANTY.\n\n");
 	for (dp = usetxt; *dp; dp++)

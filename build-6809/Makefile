@@ -54,7 +54,7 @@ GCC_LANGUAGES ?= c,c++
 GCC_VERSION ?= $(shell cat ../gcc/BASE-VER)
 
 # Set default assembler version to build.
-AS_VERSION ?= 5.1.0
+AS_VERSION ?= 5.1.1
 
 # Set assembler/linker/library program names
 AS_TARGET ?= as6809 aslink aslib
