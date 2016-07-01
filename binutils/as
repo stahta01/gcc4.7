@@ -93,9 +93,17 @@ while [ $# -gt 0 ]; do
 			options="${options}lc"
 			gen_list_file=X
 			;;
+		-I)
+			if [ $# -lt 1 ]; then
+				error "missing path after '$arg'"
+			fi
+#			include_file=$1
+#			echo "warning: include path '$include_file' ignored"
+			shift
+			;;
 		-I*)
-#			#include_file=${arg#-I}
-#			#echo "warning: include path '$include_file' ignored"
+#			include_file=${arg#-I}
+#			echo "warning: include path '$include_file' ignored"
 			;;
 		-MD)
 			error "assembler option '$arg' not supported"
