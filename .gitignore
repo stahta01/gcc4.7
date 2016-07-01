@@ -2,7 +2,11 @@
 *.o
 *.new
 binutils/ranlib
-as-5.0.0/asxmak/darwin/build/*
-as-5.0.0/asxmak/linux/build/*
-as-5.0.0/asxmak/darwin/exe/*
-as-5.0.0/asxmak/linux/exe/*
+as-5.1.1/asxmak/cygwin/build/*
+as-5.1.1/asxmak/darwin/build/*
+as-5.1.1/asxmak/djgpp/build/*
+as-5.1.1/asxmak/linux/build/*
+as-5.1.1/asxmak/cygwin/exe/*
+as-5.1.1/asxmak/darwin/exe/*
+as-5.1.1/asxmak/djgpp/exe/*
+as-5.1.1/asxmak/linux/exe/*
