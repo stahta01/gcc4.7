@@ -51,9 +51,11 @@ error ()
 input_file=
 list_file=
 gen_list_file=
-output_file=
 verbose=
 version=
+
+# Default output filename.
+output_file=a.out
 
 # The -o option causes an object file to be created.
 # The -g option causes undefined symbols to be made global.

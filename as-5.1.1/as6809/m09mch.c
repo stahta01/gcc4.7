@@ -151,11 +151,13 @@ static char m09idx[32] = {
 /*   ---	*/	0,	/*  [n]		*/	5
 };
 
+#if	!M6809STRICT
 static char m00cyc[24] = {
 	12,12, 3, 3, 3, 5, 5, 5,
 	 5, 6, 6, 6, 6,12, 3, 3,
 	 3, 8, 6, 8, 6, 6, 6,20
 };
+#endif
 
 
 /*
@@ -331,10 +333,12 @@ struct mne *mp;
 		aerr();
 		break;
 
+#if	!M6809STRICT
 	case S_6800:
 		m68out(op);
 		opcycles = m00cyc[op];
 		break;
+#endif
 
 	default:
 		opcycles = OPCY_ERR;
@@ -545,6 +549,7 @@ struct expr *esp;
 /*
  * mc6800 compatibility output routine
  */
+#if	!M6809STRICT
 VOID
 m68out(i)
 int i;
@@ -561,6 +566,7 @@ int i;
 		}
 	}
 }
+#endif
 
 /*
  * Branch/Jump PCR Mode Check

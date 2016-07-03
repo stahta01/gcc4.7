@@ -226,6 +226,7 @@ struct	mne	mne[] = {
 
 	/* 6800 Compatibility */
 
+#if	!M6809STRICT
     {	NULL,	"ldaa",		S_ACC,		0,	0x86	},
     {	NULL,	"ldab",		S_ACC,		0,	0xC6	},
     {	NULL,	"oraa",		S_ACC,		0,	0x8A	},
@@ -259,6 +260,7 @@ struct	mne	mne[] = {
     {	NULL,	"tsx",		S_6800,		0,	21	},
     {	NULL,	"txs",		S_6800,		0,	22	},
     {	NULL,	"wai",		S_6800,		0,	23	},
+#endif
 
 	/* 6809 */
 
@@ -283,7 +285,9 @@ struct	mne	mne[] = {
     {	NULL,	"subd",		S_LR,		0,	0x83	},
     {	NULL,	"addd",		S_LR,		0,	0xC3	},
     {	NULL,	"cmpx",		S_LR,		0,	0x8C	},
+#if	!M6809STRICT
     {	NULL,	"cpx",		S_LR,		0,	0x8C	},
+#endif
     {	NULL,	"ldd",		S_LR,		0,	0xCC	},
     {	NULL,	"ldx",		S_LR,		0,	0x8E	},
     {	NULL,	"ldu",		S_LR,		0,	0xCE	},
@@ -307,7 +311,9 @@ struct	mne	mne[] = {
 
     {	NULL,	"swi3",		S_INH2,		0,	0x3F	},
     {	NULL,	"swi2",		S_INH1,		0,	0x3F	},
+#if	!M6809STRICT
     {	NULL,	"swi1",		S_INH,		0,	0x3F	},
+#endif
 
     {	NULL,	"abx",		S_INH,		0,	0x3A	},
     {	NULL,	"asla",		S_INH,		0,	0x48	},
@@ -346,10 +352,14 @@ struct	mne	mne[] = {
     {	NULL,	"lbrn",		S_LBRA,		0,	0x21	},
     {	NULL,	"lbhi",		S_LBRA,		0,	0x22	},
     {	NULL,	"lbls",		S_LBRA,		0,	0x23	},
+#if	!M6809STRICT
     {	NULL,	"lblos",	S_LBRA,		0,	0x23	},
+#endif
     {	NULL,	"lbcc",		S_LBRA,		0,	0x24	},
     {	NULL,	"lbhs",		S_LBRA,		0,	0x24	},
+#if	!M6809STRICT
     {	NULL,	"lbhis",	S_LBRA,		0,	0x24	},
+#endif
     {	NULL,	"lbcs",		S_LBRA,		0,	0x25	},
     {	NULL,	"lblo",		S_LBRA,		0,	0x25	},
     {	NULL,	"lbne",		S_LBRA,		0,	0x26	},
@@ -405,10 +415,14 @@ struct	mne	mne[] = {
     {	NULL,	"brn",		S_BRA,		0,	0x21	},
     {	NULL,	"bhi",		S_BRA,		0,	0x22	},
     {	NULL,	"bls",		S_BRA,		0,	0x23	},
+#if	!M6809STRICT
     {	NULL,	"blos",		S_BRA,		0,	0x23	},
+#endif
     {	NULL,	"bcc",		S_BRA,		0,	0x24	},
     {	NULL,	"bhs",		S_BRA,		0,	0x24	},
+#if	!M6809STRICT
     {	NULL,	"bhis",		S_BRA,		0,	0x24	},
+#endif
     {	NULL,	"bcs",		S_BRA,		0,	0x25	},
     {	NULL,	"blo",		S_BRA,		0,	0x25	},
     {	NULL,	"bne",		S_BRA,		0,	0x26	},
@@ -424,6 +438,7 @@ struct	mne	mne[] = {
     {	NULL,	"bsr",		S_BRA,		S_EOL,	0x8D	}
 };
 
+#if	!M6809STRICT
 struct opdata mc6800[] = {
 
     {{	(char) 0x34, (char) 0x04,	/*	pshs	b	;aba	*/
@@ -498,3 +513,4 @@ struct opdata mc6800[] = {
     {{	(char) 0x3c, (char) 0xff,	/*	cwai	#0xFF	;wai	*/
 	(char) 0x00, (char) 0x00	}}
 };
+#endif
