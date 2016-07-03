@@ -90,7 +90,9 @@
 /*
  * 6800 Instruction types
  */
+#if	!M6809STRICT
 #define	S_6800	70
+#endif
 
 /*
  * Set Direct Pointer
@@ -127,7 +129,9 @@ struct opdata
 	char	opcode[4];	/* byte data */
 };
 
+#if	!M6809STRICT
 extern struct opdata mc6800[];
+#endif
 
 
 	/* machine dependent functions */
