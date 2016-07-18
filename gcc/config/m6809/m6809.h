@@ -176,12 +176,12 @@ extern unsigned int m6809_abi_version;
 
 /* Which registers can hold 8-bits */
 #define BYTE_REGSET \
-	(Z_REGBIT | A_REGBIT | D_REGBIT | CC_REGBIT | DP_REGBIT | SOFT_M_REGBITS)
+	(Z_REGBIT | A_REGBIT | B_REGBIT | D_REGBIT | CC_REGBIT | DP_REGBIT | SOFT_M_REGBITS)
 
 /* Which registers can hold 16-bits.
  * Note: D_REGBIT is defined as both an 8-bit and 16-bit register */
 #define WORD_REGSET \
-	(D_REGBIT | X_REGBIT | Y_REGBIT | U_REGBIT | S_REGBIT | PC_REGBIT | SOFT_FP_REGBIT | SOFT_AP_REGBIT | RSVD1_REGBIT)
+	(D_REGBIT | X_REGBIT | Y_REGBIT | U_REGBIT | S_REGBIT | PC_REGBIT | SOFT_FP_REGBIT | SOFT_AP_REGBIT)
 
 /* Returns nonzero if a given REGNO is in the REGSET. */
 #define REGSET_CONTAINS_P(regno, regset)  (((1 << (regno)) & (regset)) != 0)
@@ -235,7 +235,7 @@ extern unsigned int m6809_abi_version;
 	For the 6809, we distinguish between word-length and byte-length
 	registers. */
 #define HARD_REGNO_NREGS(REGNO, MODE) \
-   (REGSET_CONTAINS_P (REGNO, WORD_REGSET) ? \
+   (WORD_REGNO_P (REGNO) ? \
 		((GET_MODE_SIZE (MODE) + UNITS_PER_WORD - 1) / UNITS_PER_WORD) : \
       (GET_MODE_SIZE (MODE)))
 
@@ -325,11 +325,11 @@ of machine-mode MODE. */
  * byte, and thus one extra cycle to execute.
  */
 #define REG_ALLOC_ORDER \
-   {  HARD_X_REGNUM, HARD_U_REGNUM, HARD_Y_REGNUM, HARD_D_REGNUM, \
-	   HARD_M_REGNUMS, HARD_S_REGNUM, HARD_PC_REGNUM, \
-		HARD_B_REGNUM, HARD_A_REGNUM, HARD_CC_REGNUM, \
-		HARD_DP_REGNUM, SOFT_FP_REGNUM, SOFT_AP_REGNUM, \
-		6, HARD_Z_REGNUM }
+ { HARD_X_REGNUM, HARD_U_REGNUM, HARD_Y_REGNUM, \
+   HARD_D_REGNUM, HARD_M_REGNUMS, HARD_S_REGNUM, \
+   HARD_PC_REGNUM, HARD_B_REGNUM, HARD_A_REGNUM, \
+   HARD_CC_REGNUM, HARD_DP_REGNUM, SOFT_FP_REGNUM, \
+   SOFT_AP_REGNUM, HARD_Z_REGNUM, HARD_RSVD1_REGNUM }
 
 /*--------------------------------------------------------------
 	classes of registers
@@ -481,6 +481,9 @@ enum reg_class {
 
 /* Redefine this in terms of BYTE_REGSET */
 #define BYTE_REGNO_P(REGNO) (REGSET_CONTAINS_P (REGNO, BYTE_REGSET))
+
+/* Redefine this in terms of WORD_REGSET */
+#define WORD_REGNO_P(REGNO) (REGSET_CONTAINS_P (REGNO, WORD_REGSET))
 
 /* The class value for index registers, and the one for base regs.  */
 #define INDEX_REG_CLASS I_REGS
@@ -1238,13 +1241,13 @@ do { \
 
 /* This is how to output an assembler line defining an `int' constant.  */
 #define ASM_OUTPUT_INT(FILE,VALUE) \
-( fprintf (FILE, "\t.word "), \
+( fprintf (FILE, "\t.word\t"), \
   output_addr_const (FILE, (VALUE)), \
   fprintf (FILE, "\n"))
 
 /* Likewise for `char' and `short' constants.  */
 #define ASM_OUTPUT_SHORT(FILE,VALUE) \
-( fprintf (FILE, "\t.word "), \
+( fprintf (FILE, "\t.word\t"), \
   output_addr_const (FILE, (VALUE)), \
   fprintf (FILE, "\n"))
 
@@ -1266,12 +1269,12 @@ do { \
 /* This is how to output an element of a case-vector that is absolute. */
 
 #define ASM_OUTPUT_ADDR_VEC_ELT(FILE, VALUE) \
-  fprintf (FILE, "\t.word L%u\n", VALUE)
+  fprintf (FILE, "\t.word\tL%u\n", VALUE)
 
 /* This is how to output an element of a case-vector that is relative. */
 
 #define ASM_OUTPUT_ADDR_DIFF_ELT(FILE, BODY, VALUE, REL) \
-  fprintf (FILE, "\t.word L%u-L%u\n", VALUE, REL)
+  fprintf (FILE, "\t.word\tL%u-L%u\n", VALUE, REL)
 
 
 /*****************************************************************************

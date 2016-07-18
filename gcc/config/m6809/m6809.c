@@ -333,7 +333,8 @@ print_operand (FILE * file, rtx x, int code)
 			x = gen_rtx_CONST_INT (VOIDmode, ((INTVAL(x) >> 8) & 0xff));
 		}
 
-		putc ('#', file);
+		if (code != 'C')
+			putc ('#', file);
 		output_addr_const (file, x);
 	}
 }
@@ -687,9 +688,9 @@ m6809_get_regs_size (unsigned int regs)
 		{
 			/* Add 1 or 2 byte, depending on the size of the register.
 			 * Since 'D' may be in both sets, check for WORD_REGSET first. */
-			if (REGSET_CONTAINS_P(regno, WORD_REGSET))
+			if (WORD_REGNO_P(regno))
 				size += 2;
-			else if (REGSET_CONTAINS_P(regno, BYTE_REGSET))
+			else if (BYTE_REGNO_P(regno))
 				size++;
 		}
 	}
@@ -2762,22 +2763,22 @@ m6809_hard_regno_mode_ok (unsigned int regno, enum machine_mode mode)
    }
 
    /* VOIDmode can be stored anywhere */
-   else if (mode == VOIDmode)
+   if (mode == VOIDmode)
       return 1;
 
    /* Zero is a reserved register, but problems occur if we don't
    say yes here??? */
-   else if (regno == 0)
+   if (regno == HARD_RSVD1_REGNUM)
       return 1;
 
    /* For other registers, return true only if the requested size
    exactly matches the hardware size. */
-   else if ((G_REGNO_P (regno)) && (GET_MODE_SIZE (mode) == 2))
+   if ((WORD_REGNO_P (regno)) && (GET_MODE_SIZE (mode) == 2))
       return 1;
-   else if ((BYTE_REGNO_P (regno)) && (GET_MODE_SIZE (mode) == 1))
+   if ((BYTE_REGNO_P (regno)) && (GET_MODE_SIZE (mode) == 1))
       return 1;
-   else
-      return 0;
+
+   return 0;
 }
 
 
