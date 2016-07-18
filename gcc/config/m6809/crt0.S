@@ -299,14 +299,14 @@ vectors:
 	.area	.noinit
 	.globl	__reloc_offset
 __reloc_offset:
-	.rmb	2
+	.blkb	2
 #endif
 
 #ifdef TARGET_UNKNOWN
 	.area	.noinit
 	.globl	__stack_ptr
 __stack_ptr:
-	.rmb	2
+	.blkb	2
 #endif
 
 	;; Set up the entry point for the linked binary
