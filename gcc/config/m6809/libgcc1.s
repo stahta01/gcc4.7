@@ -26,7 +26,14 @@ along with GCC; see the file COPYING3.  If not see
 
 	.module libgcc1.s
 
-#define SIGFPE jmp _abort
+#ifdef __PIC__
+#define JUMP lbra
+#define CALL lbsr
+#else
+#define JUMP jmp
+#define CALL jsr
+#endif
+#define SIGFPE JUMP _abort
 
 
 	; Shift functions
@@ -262,7 +269,7 @@ ___clzsi2:
 	ldx	2,s
 	lbne	___clzhi2
 	ldx	4,s
-	jsr	___clzhi2
+	CALL	___clzhi2
 	leax	16,x
 	rts
 #endif
@@ -285,7 +292,7 @@ ___ctzhi2:
 	andb	,s+
 	anda	,s+
 	tfr	d,x
-	jsr	___clzhi2
+	CALL	___clzhi2
 	tfr	x,d
 	subd	#16
 	coma
@@ -310,7 +317,7 @@ ___ctzsi2:
 	ldx	4,s
 	lbne	___ctzhi2
 	ldx	2,s
-	jsr	___ctzhi2
+	CALL	___ctzhi2
 	leax	16,x
 	rts
 #endif
@@ -361,7 +368,7 @@ _divhi3:
 	SIGFPE
 do_div:
 	pshs	x
-	jsr	_seuclid
+	CALL	_seuclid
 	puls	x,pc
 #endif
 
@@ -380,7 +387,7 @@ _modhi3:
 	SIGFPE
 do_mod:
 	pshs	x
-	jsr	_seuclid
+	CALL	_seuclid
 	leas	2,s
 	tfr	d,x
 	rts
@@ -402,7 +409,7 @@ _udivhi3:
 	SIGFPE
 do_udiv:
 	pshs	x
-	jsr	_euclid
+	CALL	_euclid
 	puls	x,pc
 #endif
 
@@ -421,7 +428,7 @@ _umodhi3:
 	SIGFPE
 do_umod:
 	pshs	x
-	jsr	_euclid
+	CALL	_euclid
 	leas	2,s
 	tfr	d,x
 	rts
@@ -509,7 +516,7 @@ mod_abs:
 	dec	quot_sign+2,s	; sign(quot) = sign(left) XOR sign(right)
 	bsr	negd		; abs(right) -> D
 quot_abs:
-	jsr	_euclid		; call (unsigned) euclidean division
+	CALL	_euclid		; call (unsigned) euclidean division
 	std	right+2,s
 	puls	a,b		; quot -> D
 	tst	quot_sign,s	; all references no longer shifted
