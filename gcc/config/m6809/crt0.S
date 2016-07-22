@@ -94,6 +94,7 @@ supported machines. */
 	.area .noinit           (BANK=prog)
 	.area .vector
 
+	.area	.text
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
 ;;; __exit : Exit point from the program
@@ -101,7 +102,6 @@ supported machines. */
 ;;; the simulator interprets as end-of-program.
 ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	.area	.text
 	.globl	__exit
 __exit:
 #ifdef TARGET_COCO
@@ -124,7 +124,6 @@ __exit:
 ;;; __start : Entry point to the program
 ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-	.area	.text
 	.globl	__start
 __start:
 
@@ -137,7 +136,7 @@ __start:
 
 #ifdef HAVE_DIRECT
 	;; Initialize the direct page pointer
-	lda	#<s_.direct
+	lda	#s_.direct/0x100
 	tfr	a,dp
 #endif
 
@@ -273,17 +272,16 @@ __dtors_done:
 	;;;
 	;;; __crt0_vector : Default handler for interrupts
 	;;;
-	.area	.text
 ___crt0_vector:
 	;; The default behavior is to simply ignore all
 	;; non-reset interrupts.
 	rti
 
+	.area .vector
 	;;;
 	;;; .vector : The interrupt vector table
 	;;; The linker will ensure that this gets loaded at address 0xFFF0.
 	;;;
-	.area .vector
 vectors:
 	.word ___crt0_vector
 	.word ___crt0_vector
@@ -293,6 +291,7 @@ vectors:
 	.word ___crt0_vector
 	.word ___crt0_vector
 	.word __start
+	.area	.text
 #endif
 
 #ifdef __PIC__
@@ -300,6 +299,7 @@ vectors:
 	.globl	__reloc_offset
 __reloc_offset:
 	.blkb	2
+	.area	.text
 #endif
 
 #ifdef TARGET_UNKNOWN
@@ -307,8 +307,8 @@ __reloc_offset:
 	.globl	__stack_ptr
 __stack_ptr:
 	.blkb	2
+	.area	.text
 #endif
 
 	;; Set up the entry point for the linked binary
-.__.END. .gblequ __start
 	.end	__start
