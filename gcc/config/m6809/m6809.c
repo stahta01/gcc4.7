@@ -1245,13 +1245,15 @@ output_branch_insn (enum rtx_code code, rtx *operands, int length)
 	 */
 	switch (code)
 	{
-		case LABEL_REF: 
-			if (shortform)
+		case LABEL_REF:
+			/* Let the assembler try to optimize long to short branch. */
+			output_branch_insn1 ("bra", operands, !shortform);
+			/*if (shortform)
 				output_branch_insn1 ("bra", operands, 0);
 			else if (flag_pic)
 				output_branch_insn1 ("bra", operands, 1);
 			else
-				output_branch_insn1 ("jmp", operands, 0);
+				output_branch_insn1 ("jmp", operands, 0);*/
 			break;
 		case EQ:
 			output_branch_insn1 ("beq", operands, !shortform);
