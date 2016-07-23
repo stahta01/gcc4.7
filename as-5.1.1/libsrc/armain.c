@@ -6,6 +6,19 @@
 #define ZLIBARCH_STATIC
 #include "zlibarch.h"
 
+#if 1
+#define PREFIX_C '!'
+#define PREFIX_S "!"
+#else
+#undef PREFIX_C
+#define PREFIX_S
+#endif
+#define TAG_LIBBEG PREFIX_S"LIB"
+#define TAG_LIBEND PREFIX_S"END"
+#define TAG_OBJBEG PREFIX_S"L0"
+#define TAG_OBJEND PREFIX_S"L1"
+#define CMPTAG(STR,TAG) strncmp(STR, TAG, sizeof(TAG)-1)
+
 static int creation_flag = 0;
 static int verbose_level = 0;
 static int verbose_action = 0;
@@ -62,8 +75,8 @@ static void create_archive(char *filename)
 		fprintf(stderr, "Warning: '%s' did not exist.\n", filename);
 
 	name = basenam(filename);
-	fprintf(libf, "LIB %s\n", name);
-	fprintf(libf, "END %s\n", name);
+	fprintf(libf, TAG_LIBBEG" %s\n", name);
+	fprintf(libf, TAG_LIBEND" %s\n", name);
 	fclose(libf);
 }
 
@@ -126,7 +139,7 @@ static void append(char *arname, struct lfile *memberp)
 	skipheader(libf);
 
 	/* seek 'END' marker */
-	for (offset=0; FGETS(line, FILSPC, libf) != NULL && *line != 'E'; offset=FTELL(libf)) {
+	for (offset=0; FGETS(line, FILSPC, libf) != NULL && CMPTAG(line, TAG_LIBEND); offset=FTELL(libf)) {
 		striplineend(line);
 		FPUTS(line, libftmp);
 		FPUTS("\n", libftmp);
@@ -147,18 +160,18 @@ static void append(char *arname, struct lfile *memberp)
 	while ((ret = nxtline())) {
 		if (ret == 2) {
 			if (*modname)
-				FPRINTF(libftmp, "L1 %s\n", modname);
+				FPRINTF(libftmp, TAG_OBJEND" %s\n", modname);
 
 			strcpy(modname, basenam(cfp->f_idp));
-			FPRINTF(libftmp, "L0 %s\n", modname);
+			FPRINTF(libftmp, TAG_OBJBEG" %s\n", modname);
 		}
 
 		FPUTS(ib, libftmp);
 		FPUTS("\n", libftmp);
 	}
 
-	FPRINTF(libftmp, "L1 %s\n", modname);
-	FPRINTF(libftmp, "END %s\n", basenam(arname));
+	FPRINTF(libftmp, TAG_OBJEND" %s\n", modname);
+	FPRINTF(libftmp, TAG_LIBEND" %s\n", basenam(arname));
 	FCLOSE(libftmp);
 
 	/* replace existing archive by new one */
@@ -242,6 +255,12 @@ static void replace(char *arname, struct lfile *memberp, int delete)
 		while (nxtline()) {
 			ip = ib;
 			c = getnb();
+#ifdef PREFIX_C
+			if (c == PREFIX_C)
+				c = getnb();
+			else
+				c = 0;
+#endif
 			switch(c) {
 			case 'L':
 				c = getnb();
@@ -260,7 +279,7 @@ static void replace(char *arname, struct lfile *memberp, int delete)
 						}
 
 						while (nxtline()) {
-							if (ib[1] == '1')
+							if (!CMPTAG(ib, TAG_OBJEND))
 								break;
 						}
 
@@ -278,13 +297,13 @@ static void replace(char *arname, struct lfile *memberp, int delete)
 				if (!delete && !replaced) {
 					strcpy(modname, basenam(memberp->f_idp));
 
-					FPRINTF(libf, "L0 %s\n", modname);
+					FPRINTF(libf, TAG_OBJBEG" %s\n", modname);
 
 					/* copy the contents */
 					copycontents(newb, NINPUT, newf, libf);
 
-					FPRINTF(libf, "L1 %s\n", modname);
-					FPRINTF(libf, "END %s\n", basenam(arname));
+					FPRINTF(libf, TAG_OBJEND" %s\n", modname);
+					FPRINTF(libf, TAG_LIBEND" %s\n", basenam(arname));
 
 					continue;
 				}
@@ -332,6 +351,12 @@ static void extract(char *arname, struct lfile *memberp, int create)
 	while (nxtline()) {
 		ip = ib;
 		c = getnb();
+#ifdef PREFIX_C
+		if (c == PREFIX_C)
+			c = getnb();
+		else
+			c = 0;
+#endif
 		switch(c) {
 		case 'L':
 			c = getnb();
@@ -343,7 +368,7 @@ static void extract(char *arname, struct lfile *memberp, int create)
 						/* list files */
 						begin = end = as_offset();
 						while (nxtline()) {
-							if (ib[0] == 'L' && ib[1] == '1')
+							if (!CMPTAG(ib, TAG_OBJEND))
 								break;
 							end = as_offset();
 						}
@@ -370,7 +395,7 @@ static void extract(char *arname, struct lfile *memberp, int create)
 						}
 
 						while (nxtline()) {
-							if (ib[0] == 'L' && ib[1] == '1')
+							if (!CMPTAG(ib, TAG_OBJEND))
 								break;
 							fprintf(newf, "%s\n", ib);
 						}

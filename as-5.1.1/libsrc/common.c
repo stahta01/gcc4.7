@@ -75,7 +75,7 @@ static void skipheader(FILE *fp)
 				offset = FTELL(fp);
 				continue;
 			}
-			if (ib[0] != 'L' || (ib[1] >= '0' && ib[1] <= '9')) {
+			if (CMPTAG(ib, TAG_LIBBEG)) {
 				fprintf(stderr, "Error: wrong archive format '%s'.\n", ib);
 				exit(1);
 			}
