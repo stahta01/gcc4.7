@@ -75,7 +75,10 @@ static void skipheader(FILE *fp)
 				offset = FTELL(fp);
 				continue;
 			}
-			if (CMPTAG(ib, TAG_LIBBEG)) {
+			if (strncmp(ib, tag_libbeg, tag_libsz)) {
+				str = strchr(ib, ' ');
+				if (str)
+					*str = 0;
 				fprintf(stderr, "Error: wrong archive format '%s'.\n", ib);
 				exit(1);
 			}
@@ -107,7 +110,7 @@ static int getnb(void)
 {
 	int c;
 
-	while (((c=get())==' ') || (c=='\t'));
+	while ((c=get())==' ');
 
 	return c;
 }

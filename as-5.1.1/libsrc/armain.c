@@ -6,18 +6,12 @@
 #define ZLIBARCH_STATIC
 #include "zlibarch.h"
 
-#if 0
-#define PREFIX_C '!'
-#define PREFIX_S "!"
-#else
-#undef PREFIX_C
-#define PREFIX_S
-#endif
-#define TAG_LIBBEG PREFIX_S"LIB"
-#define TAG_LIBEND PREFIX_S"END"
-#define TAG_OBJBEG PREFIX_S"L0"
-#define TAG_OBJEND PREFIX_S"L1"
-#define CMPTAG(STR,TAG) strncmp(STR, TAG, sizeof(TAG)-1)
+static char tag_libbeg[6] = "LIB";
+static char tag_libend[6] = "END";
+static char tag_objbeg[6] = "L0";
+static char tag_objend[6] = "L1";
+static int tag_libsz = sizeof("LIB")-1;
+static int tag_objsz = sizeof("L0")-1;
 
 static int creation_flag = 0;
 static int verbose_level = 0;
@@ -75,8 +69,8 @@ static void create_archive(char *filename)
 		fprintf(stderr, "Warning: '%s' did not exist.\n", filename);
 
 	name = basenam(filename);
-	fprintf(libf, TAG_LIBBEG" %s\n", name);
-	fprintf(libf, TAG_LIBEND" %s\n", name);
+	fprintf(libf, "%s %s\n", tag_libbeg, name);
+	fprintf(libf, "%s %s\n", tag_libend, name);
 	fclose(libf);
 }
 
@@ -139,7 +133,7 @@ static void append(char *arname, struct lfile *memberp)
 	skipheader(libf);
 
 	/* seek 'END' marker */
-	for (offset=0; FGETS(line, FILSPC, libf) != NULL && CMPTAG(line, TAG_LIBEND); offset=FTELL(libf)) {
+	for (offset=0; FGETS(line, FILSPC, libf) != NULL && strncmp(line, tag_libend, tag_libsz); offset=FTELL(libf)) {
 		striplineend(line);
 		FPUTS(line, libftmp);
 		FPUTS("\n", libftmp);
@@ -160,18 +154,18 @@ static void append(char *arname, struct lfile *memberp)
 	while ((ret = nxtline())) {
 		if (ret == 2) {
 			if (*modname)
-				FPRINTF(libftmp, TAG_OBJEND" %s\n", modname);
+				FPRINTF(libftmp, "%s %s\n", tag_objend, modname);
 
 			strcpy(modname, basenam(cfp->f_idp));
-			FPRINTF(libftmp, TAG_OBJBEG" %s\n", modname);
+			FPRINTF(libftmp, "%s %s\n", tag_objbeg, modname);
 		}
 
 		FPUTS(ib, libftmp);
 		FPUTS("\n", libftmp);
 	}
 
-	FPRINTF(libftmp, TAG_OBJEND" %s\n", modname);
-	FPRINTF(libftmp, TAG_LIBEND" %s\n", basenam(arname));
+	FPRINTF(libftmp, "%s %s\n", tag_objend, modname);
+	FPRINTF(libftmp, "%s %s\n", tag_libend, basenam(arname));
 	FCLOSE(libftmp);
 
 	/* replace existing archive by new one */
@@ -189,7 +183,6 @@ static void replace(char *arname, struct lfile *memberp, int delete)
 	FILE * libf, *newf = NULL;
 	char modname[NCPS];
 	char newb[NINPUT];
-	char c;
 	int replaced, ret;
 	char tmpfile[FILSPC];
 #ifdef ZLIBARCH
@@ -253,67 +246,50 @@ static void replace(char *arname, struct lfile *memberp, int delete)
 		cfp = NULL;
 
 		while (nxtline()) {
-			ip = ib;
-			c = getnb();
-#ifdef PREFIX_C
-			if (c == PREFIX_C)
-				c = getnb();
-			else
-				c = 0;
-#endif
-			switch(c) {
-			case 'L':
-				c = getnb();
-				if (c == '0') {
-					getid(modname, -1);
+			if (!strncmp(ib, tag_objbeg, tag_objsz)) {
+				ip = ib + tag_objsz;
+				getid(modname, -1);
 
-					/* test whether the module name is the requested one */
-					if (!strcmp(modname, memberp->f_idp)) {
-						if (!delete) {
-							FPRINTF(libf, "%s\n", ib);  /* L0 .. */
+				/* test whether the module name is the requested one */
+				if (!strcmp(modname, memberp->f_idp)) {
+					if (!delete) {
+						FPRINTF(libf, "%s\n", ib);  /* L0 .. */
 
-							/* copy the contents */
-							copycontents(newb, NINPUT, newf, libf);
+						/* copy the contents */
+						copycontents(newb, NINPUT, newf, libf);
 
-							replaced = 1;
-						}
-
-						while (nxtline()) {
-							if (!CMPTAG(ib, TAG_OBJEND))
-								break;
-						}
-
-						if (!delete)
-							FPRINTF(libf, "%s\n", ib);   /* L1 .. */
-
-						continue;
+						replaced = 1;
 					}
+
+					while (nxtline()) {
+						if (!strncmp(ib, tag_objend, tag_objsz))
+							break;
+					}
+
+					if (!delete)
+						FPRINTF(libf, "%s\n", ib);   /* L1 .. */
+
+					continue;
 				}
-
-				FPRINTF(libf, "%s\n", ib);
-				break;
-
-			case 'E':
+			}
+			else
+			if (!strncmp(ib, tag_libend, tag_libsz)) {
 				if (!delete && !replaced) {
 					strcpy(modname, basenam(memberp->f_idp));
 
-					FPRINTF(libf, TAG_OBJBEG" %s\n", modname);
+					FPRINTF(libf, "%s %s\n", tag_objbeg, modname);
 
 					/* copy the contents */
 					copycontents(newb, NINPUT, newf, libf);
 
-					FPRINTF(libf, TAG_OBJEND" %s\n", modname);
-					FPRINTF(libf, TAG_LIBEND" %s\n", basenam(arname));
+					FPRINTF(libf, "%s %s\n", tag_objend, modname);
+					FPRINTF(libf, "%s %s\n", tag_libend, basenam(arname));
 
 					continue;
 				}
-				/* fall through ... */
-
-			default:
-				FPUTS(ib, libf);
-				FPUTS("\n", libf);
-				break;
 			}
+			FPUTS(ib, libf);
+			FPUTS("\n", libf);
 		}
 
 		FCLOSE(libf);
@@ -338,7 +314,6 @@ static void extract(char *arname, struct lfile *memberp, int create)
 {
 	FILE *newf;
 	char modname[NCPS];
-	char c;
 	struct lfile *lfp;
 	int err;
 	long begin, end;
@@ -349,63 +324,51 @@ static void extract(char *arname, struct lfile *memberp, int create)
 	cfp = NULL;
 
 	while (nxtline()) {
-		ip = ib;
-		c = getnb();
-#ifdef PREFIX_C
-		if (c == PREFIX_C)
-			c = getnb();
-		else
-			c = 0;
-#endif
-		switch(c) {
-		case 'L':
-			c = getnb();
-			if (c == '0') {
-				getid(modname, -1);
+		if (!strncmp(ib, tag_objbeg, tag_objsz)) {
+			ip = ib + tag_objsz;
+			getid(modname, -1);
 
-				if (!memberp || name_in_list(modname, memberp)) {
-					if (create == 1) {
-						/* list files */
-						begin = end = as_offset();
-						while (nxtline()) {
-							if (!CMPTAG(ib, TAG_OBJEND))
-								break;
-							end = as_offset();
-						}
+			if (!memberp || name_in_list(modname, memberp)) {
+				if (create == 1) {
+					/* list files */
+					begin = end = as_offset();
+					while (nxtline()) {
+						if (!strncmp(ib, tag_objend, tag_objsz))
+							break;
+						end = as_offset();
+					}
+					if (verbose_level)
+						fprintf(stdout, "% 7li %s\n", end-begin, modname);
+					else
+						fprintf(stdout, "%s\n", modname);
+				}
+				else {
+					/* extract or print files */
+					if (create) {
 						if (verbose_level)
-							fprintf(stdout, "% 7li %s\n", end-begin, modname);
-						else
-							fprintf(stdout, "%s\n", modname);
+							fprintf(stdout, "x - %s\n", modname);
+						newf = fopen(modname, "w");
+						if (!newf) {
+							fprintf(stderr, "Error: cannot create '%s'.\n", modname);
+							exit(1);
+						}
 					}
 					else {
-						/* extract or print files */
-						if (create) {
-							if (verbose_level)
-								fprintf(stdout, "x - %s\n", modname);
-							newf = fopen(modname, "w");
-							if (!newf) {
-								fprintf(stderr, "Error: cannot create '%s'.\n", modname);
-								exit(1);
-							}
-						}
-						else {
-							if (verbose_level)
-								fprintf(stdout, "\n<%s>\n\n", modname);
-							newf = stdout;
-						}
-
-						while (nxtline()) {
-							if (!CMPTAG(ib, TAG_OBJEND))
-								break;
-							fprintf(newf, "%s\n", ib);
-						}
-
-						if (create)
-							fclose(newf);
+						if (verbose_level)
+							fprintf(stdout, "\n<%s>\n\n", modname);
+						newf = stdout;
 					}
+
+					while (nxtline()) {
+						if (!strncmp(ib, tag_objend, tag_objsz))
+							break;
+						fprintf(newf, "%s\n", ib);
+					}
+
+					if (create)
+						fclose(newf);
 				}
 			}
-			break;
 		}
 	}
 
