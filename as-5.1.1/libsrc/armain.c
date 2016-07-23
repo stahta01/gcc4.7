@@ -6,7 +6,7 @@
 #define ZLIBARCH_STATIC
 #include "zlibarch.h"
 
-#if 1
+#if 0
 #define PREFIX_C '!'
 #define PREFIX_S "!"
 #else
