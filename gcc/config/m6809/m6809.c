@@ -2302,7 +2302,7 @@ m6809_output_ascii (FILE *fp, const char *str, unsigned long size)
 	/* Check for 8-bit codes, which cannot be embedded in an .ascii */
 	for (i = 0; i < size; i++)
 	{
-		int c = str[i] & 0377;
+		int c = str[i] & 0xFF;
 		if (c >= 0x80)
 		{
 			use_ascii = false;
@@ -2311,53 +2311,62 @@ m6809_output_ascii (FILE *fp, const char *str, unsigned long size)
 	}
 
 	if (use_ascii)
-		fprintf (fp, "\t.ascii \"");
-
-	for (i = 0; i < size; i++)
 	{
-		int c = str[i] & 0377;
-
-		if (use_ascii)
+		fputs ("\t.ascii\t\"", fp);
+		for (i = 0; i < size; i++)
 		{
-		/* Just output the plain character if it is printable,
-		otherwise output the escape code for the character.
-		The assembler recognizes the same C-style octal escape sequences,
-		except that it only supports 7-bit codes. */
-		if (c >= ' ' && c < 0177 && c != '\\' && c != '"')
-  			putc (c, fp);
-		else switch (c) 
-		{
-			case '\n':
+			int c = str[i] & 0xFF;
+			/* Just output the plain character if it is printable,
+			otherwise output the escape code for the character.
+			The assembler recognizes the same C-style octal escape sequences,
+			except that it only supports 7-bit codes. */
+			if (c >= ' ' && c < 0x7F && c != '\\' && c != '"')
+				putc (c, fp);
+			else switch (c)
+			{
+				case '\n':
 #ifndef TARGET_COCO
-				fputs ("\\n", fp);
-				break;
+					fputs ("\\n", fp);
+					break;
 #endif
 				/* On the CoCo, we fallthrough and treat '\n' like '\r'. */
-			case '\r':
-				fputs ("\\r", fp);
-				break;
-			case '\t':
-				fputs ("\\t", fp);
-				break;
-			case '\f':
-				fputs ("\\f", fp);
-				break;
-			case 0:
-				fputs ("\\0", fp);
-				break;
-			default:
-				fprintf (fp, "\\%03o", c);
-				break;
+				case '\r':
+					fputs ("\\r", fp);
+					break;
+				case '\t':
+					fputs ("\\t", fp);
+					break;
+				case '\f':
+					fputs ("\\f", fp);
+					break;
+				case 0:
+					fputs ("\\0", fp);
+					break;
+				default:
+					fprintf (fp, "\\%03o", c);
+					break;
+			}
 		}
-		}
-		else
-		{
-			fprintf (fp, "\t.byte\t0x%02X\n", c);
-		}
+		fputs ("\"\n", fp);
 	}
-
-	if (use_ascii)
-		fprintf (fp, "\"\n");
+	else
+	{
+		for (i = 0; i < size; i++)
+		{
+			int c = str[i];
+			/* Try to output 8 bytes by line. */
+			if (!(i&7))
+			{
+				if (i)
+					putc ('\n', fp);
+				fputs ("\t.byte\t", fp);
+			}
+			else
+				putc (',', fp);
+			fprintf (fp, "%d", c);
+		}
+		putc ('\n', fp);
+	}
 }
 
 

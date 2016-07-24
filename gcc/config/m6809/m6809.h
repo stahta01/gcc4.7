@@ -1239,18 +1239,6 @@ do { \
 #define ASM_GENERATE_INTERNAL_LABEL(LABEL,PREFIX,NUM) \
   sprintf (LABEL, "*%s%lu", PREFIX, (unsigned long int)NUM)
 
-/* This is how to output an assembler line defining an `int' constant.  */
-#define ASM_OUTPUT_INT(FILE,VALUE) \
-( fprintf (FILE, "\t.word\t"), \
-  output_addr_const (FILE, (VALUE)), \
-  fprintf (FILE, "\n"))
-
-/* Likewise for `char' and `short' constants.  */
-#define ASM_OUTPUT_SHORT(FILE,VALUE) \
-( fprintf (FILE, "\t.word\t"), \
-  output_addr_const (FILE, (VALUE)), \
-  fprintf (FILE, "\n"))
-
 /* This is how to output a string. */ 
 #define ASM_OUTPUT_ASCII(FILE,STR,SIZE) m6809_output_ascii (FILE, STR, SIZE)
 
