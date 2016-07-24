@@ -2071,14 +2071,15 @@ m6809_asm_file_start (void)
 	fprintf (asm_out_file, ";;; gcc for m6809 : %s %s\n",
 		__DATE__, __TIME__);
 	fprintf (asm_out_file, ";;; %s\n", version_string);
-
 	fprintf (asm_out_file, ";;; ABI version %d\n", m6809_abi_version);
-	fprintf (asm_out_file, ";;; %s\n",
-		(TARGET_BYTE_INT ? "-mint8" : "-mint16"));
-	if (TARGET_WPC)
-		fprintf (asm_out_file, ";;; -mwpc\n");
-	if (TARGET_6309)
-		fprintf (asm_out_file, ";;; -m6309\n");
+	fprintf (asm_out_file,
+		optimize_size ? ";;; %s%s%s%s%s -Os\n" : ";;; %s%s%s%s%s -O%d\n",
+		TARGET_BYTE_INT ? "-mint8" : "-mint16",
+		TARGET_WPC ? " -mwpc" : "",
+		TARGET_6309 ? " -m6309" : "",
+		TARGET_DRET ? " -mdret" : "",
+		flag_pic ? " -fpic" : "",
+		optimize);
 
 	/* Print the name of the module, which is taken as the base name
 	 * of the input file.
