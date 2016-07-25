@@ -133,9 +133,9 @@ int section_changed = 0;
 
 /* Section names.  The defaults here are used until an
  * __attribute__((section)) is seen that changes it. */
-char code_section_op[128] = "\t.area .text";
-char data_section_op[128] = "\t.area .data";
-char bss_section_op[128] = "\t.area .bss";
+char code_section_op[128] = "\t.area\t.text";
+char data_section_op[128] = "\t.area\t.data";
+char bss_section_op[128] = "\t.area\t.bss";
 const char *code_bank_option = 0;
 
 /* TRUE if the direct mode prefix might be valid in this context.
@@ -194,11 +194,11 @@ m6809_override_options (void)
 
 	/* Handle -mcode-section, -mdata-section, and -mbss-section */
 	if (code_section_ptr != 0)
-		sprintf (code_section_op, "\t.area %s", code_section_ptr);
+		sprintf (code_section_op, "\t.area\t%s", code_section_ptr);
 	if (data_section_ptr != 0)
-		sprintf (data_section_op, "\t.area %s", data_section_ptr);
+		sprintf (data_section_op, "\t.area\t%s", data_section_ptr);
 	if (bss_section_ptr != 0)
-		sprintf (bss_section_op, "\t.area %s", bss_section_ptr);
+		sprintf (bss_section_op, "\t.area\t%s", bss_section_ptr);
 
 	/* Handle -mcode-bank */
 	if (code_bank_option != 0)
@@ -803,18 +803,18 @@ m6809_declare_function_name (FILE *asm_out_file, const char *name, tree decl)
 		 * when the bank actually changes. */
 		if (strcmp (bank_name, current_bank_name))
 		{
-			fprintf (asm_out_file, "__self_bank\t.equ %s\n", bank_name);
+			fprintf (asm_out_file, "__self_bank\t.equ\t%s\n", bank_name);
 			strcpy (current_bank_name, bank_name);
 		}
 
 		/* Declare a global assembler value that denotes which bank the
 		 * named function is in. */
-		fprintf (asm_out_file, "__%s_bank\t.gblequ %s\n", name, bank_name);
+		fprintf (asm_out_file, "__%s_bank\t.gblequ\t%s\n", name, bank_name);
 
 		/* Force the current function into a new area */
-		fprintf (asm_out_file, "\t.bank bank_%s (FSFX=_%s)\n",
+		fprintf (asm_out_file, "\t.bank\tbank_%s (FSFX=_%s)\n",
 			bank_name, bank_name);
-		fprintf (asm_out_file, "\t.area bank_%s (BANK=bank_%s)\n",
+		fprintf (asm_out_file, "\t.area\tbank_%s (BANK=bank_%s)\n",
 			bank_name, bank_name);
 	}
 
@@ -2046,8 +2046,8 @@ m6809_function_arg_on_stack (CUMULATIVE_ARGS *cump)
 /*
  * Trampoline output:
  *
- * ldu #&cxt      4 bytes   --LDY- ?? ??
- * jmp fnaddr     3 bytes   JMP ?? ??
+ *  ldy #&cxt      4 bytes
+ *  jmp fnaddr     3 bytes
  */
 void
 m6809_initialize_trampoline (rtx tramp, rtx fnaddr ATTRIBUTE_UNUSED, rtx cxt)
