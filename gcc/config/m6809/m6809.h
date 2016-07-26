@@ -1280,19 +1280,21 @@ enum reg_class {
  * So use the .byte and .word directives instead of .blkb */
 #define ASM_OUTPUT_SKIP(FILE,SIZE) \
   do { \
-    int __size = SIZE; \
-    while (__size > 0) { \
-      if (__size >= 2) \
-      { \
-        fprintf (FILE, "\t.word\t0\t;skip space %d\n", __size); \
-        __size -= 2; \
+    int __size = SIZE, __i; \
+    for (__i = 0; __i < (__size&-2); __i += 2) { \
+      if (!(__i&31)) { \
+        if (__i) \
+          putc ('\n', FILE); \
+        fputs ("\t.word\t", FILE); \
       } \
       else \
-      { \
-        fprintf (FILE, "\t.byte\t0\t;skip space\n"); \
-        __size--; \
-      } \
+        putc (',', FILE); \
+      putc ('0', FILE); \
     } \
+    if (__i) \
+      putc ('\n', FILE); \
+    if (__size&1) \
+      fputs ("\t.byte\t0\n", FILE); \
   } while (0)
 
 /* This says how to output an assembler line
