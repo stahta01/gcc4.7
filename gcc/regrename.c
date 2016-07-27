@@ -1322,6 +1322,10 @@ maybe_mode_change (enum machine_mode orig_mode, enum machine_mode copy_mode,
 		   enum machine_mode new_mode, unsigned int regno,
 		   unsigned int copy_regno ATTRIBUTE_UNUSED)
 {
+/* Added this check to work around bad register move problem.
+   TODO find the cause of the issue. Not sure if it's a bug in GGC
+   or a bug in the m6809 target. */
+#ifndef HAVE_m6809_sync
   if (GET_MODE_SIZE (copy_mode) < GET_MODE_SIZE (orig_mode)
       && GET_MODE_SIZE (copy_mode) < GET_MODE_SIZE (new_mode))
     return NULL_RTX;
@@ -1346,6 +1350,7 @@ maybe_mode_change (enum machine_mode orig_mode, enum machine_mode copy_mode,
 							   offset,
 							   new_mode));
     }
+#endif
   return NULL_RTX;
 }
 
