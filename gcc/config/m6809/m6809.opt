@@ -75,7 +75,7 @@ mbss-section=
 Target RejectNegative Joined Var(bss_section_ptr)
 Sets the name of the section for uninitialized data
 
-mabi_version=
+mabi=
 Target RejectNegative Joined Var(m6809_abi_version_ptr)
 Sets the calling convention
 

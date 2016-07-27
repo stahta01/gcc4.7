@@ -161,7 +161,7 @@ static char default_code_bank_name[8] = "-1";
 unsigned int m6809_soft_regs = 0;
 
 /* ABI version */
-unsigned int m6809_abi_version = M6809_ABI_VERSION_REGS;
+unsigned int m6809_abi_version = M6809_ABI_VERSION_BX;
 
 
 /* Character class test functions */
@@ -176,6 +176,25 @@ static inline int isalpha(int c)
 static inline int isalnum(int c)
 {
 	return isalpha(c) || isdigit(c);
+}
+
+
+/* Return the ABI string from version number */
+const char *m6809_abi_version_to_str(int version)
+{
+	const char *str = NULL;
+	switch(version)
+	{
+		case M6809_ABI_VERSION_STACK:
+			str = "stack";
+			break;
+		case M6809_ABI_VERSION_BX:
+			str = "bx";
+			break;
+		default:
+			abort();
+	}
+	return str;
 }
 
 
@@ -204,28 +223,38 @@ m6809_override_options (void)
 	if (code_bank_option != 0)
 		sprintf (default_code_bank_name, "%s", code_bank_option);
 
-	/* Handle -mabi-version or -mno-reg-args */
+	/* Handle -mabi or -mno-reg-args */
 	if (m6809_abi_version_ptr != 0)
 	{
 		if (!strcmp (m6809_abi_version_ptr, "stack"))
 			m6809_abi_version = M6809_ABI_VERSION_STACK;
 		else if (!strcmp (m6809_abi_version_ptr, "regs"))
+		{
+			warning (WARNING_OPT "-mabi=regs deprecated; use -mabi=bx instead.");
 			m6809_abi_version = M6809_ABI_VERSION_REGS;
+		}
 		else if (!strcmp (m6809_abi_version_ptr, "bx"))
 			m6809_abi_version = M6809_ABI_VERSION_BX;
 		else if (!strcmp (m6809_abi_version_ptr, "latest"))
 			m6809_abi_version = M6809_ABI_VERSION_LATEST;
 		else
-			m6809_abi_version = atoi (m6809_abi_version_ptr);
+		{
+			if (!isdigit(*m6809_abi_version_ptr))
+				error ("ABI version not recognized `%s'", m6809_abi_version_ptr);
+			else
+				m6809_abi_version = atoi (m6809_abi_version_ptr);
+		}
+		if (m6809_abi_version > M6809_ABI_VERSION_LATEST)
+			m6809_abi_version = M6809_ABI_VERSION_LATEST;
 	}
 
-	/* The older -mno-reg-args option is deprecated, and treated
-	as -mabi=stack. */
+	/* The older -mno-reg-args option is deprecated,
+	   and treated as -mabi=stack. */
 	if (!TARGET_REG_ARGS)
-   {
-      warning (WARNING_OPT "-mno-reg-args deprecated; use -mabi=stack instead.");
-      m6809_abi_version = M6809_ABI_VERSION_STACK;
-   }
+	{
+		warning (WARNING_OPT "-mno-reg-args deprecated; use -mabi=stack instead.");
+		m6809_abi_version = M6809_ABI_VERSION_STACK;
+	}
 
 #if !CONFIG_SJLJ_EXCEPTIONS
 	/* -fexceptions is unsupported */
@@ -2073,7 +2102,8 @@ m6809_asm_file_start (void)
 	fprintf (asm_out_file, ";;; %s\n", version_string);
 	fprintf (asm_out_file, ";;; ABI version %d\n", m6809_abi_version);
 	fprintf (asm_out_file,
-		optimize_size ? ";;; %s%s%s%s%s -Os\n" : ";;; %s%s%s%s%s -O%d\n",
+		optimize_size ? ";;; -mabi=%s %s%s%s%s%s -Os\n" : ";;; -mabi=%s %s%s%s%s%s -O%d\n",
+		m6809_abi_version_to_str(m6809_abi_version),
 		TARGET_BYTE_INT ? "-mint8" : "-mint16",
 		TARGET_WPC ? " -mwpc" : "",
 		TARGET_6309 ? " -m6309" : "",
@@ -2259,13 +2289,11 @@ m6809_cpu_cpp_builtins (void)
 	switch (m6809_abi_version)
 	{
 		case M6809_ABI_VERSION_STACK:
-			builtin_define_std ("__regargs__");
+			builtin_define_std ("__regargs__"); /* deprecated */
 			builtin_define_std ("__ABI_STACK__");
 			break;
-		case M6809_ABI_VERSION_REGS:
-			builtin_define_std ("__ABI_REGS__");
-			break;
 		case M6809_ABI_VERSION_BX:
+			builtin_define_std ("__ABI_REGS__"); /* deprecated */
 			builtin_define_std ("__ABI_BX__");
 			break;
 		default:
