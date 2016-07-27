@@ -77,8 +77,8 @@ extern unsigned int m6809_abi_version;
 /* ABI versions */
 
 #define M6809_ABI_VERSION_STACK 0
-#define M6809_ABI_VERSION_REGS 1
-#define M6809_ABI_VERSION_BX 2
+#define M6809_ABI_VERSION_REGS 1 /* deprecated, same as BX */
+#define M6809_ABI_VERSION_BX 1
 #define M6809_ABI_VERSION_LATEST  (M6809_ABI_VERSION_BX)
 
 /* Allow $ in identifiers */
