@@ -2105,13 +2105,14 @@ m6809_asm_file_start (void)
 	fprintf (asm_out_file, ";;; %s\n", version_string);
 	fprintf (asm_out_file, ";;; ABI version %d\n", m6809_abi_version);
 	fprintf (asm_out_file,
-		optimize_size ? ";;; -mabi=%s %s%s%s%s%s -Os\n" : ";;; -mabi=%s %s%s%s%s%s -O%d\n",
+		optimize_size ? ";;; -mabi=%s %s%s%s%s%s -f%somit-frame-pointer -Os\n" : ";;; -mabi=%s %s%s%s%s%s -f%somit-frame-pointer -O%d\n",
 		m6809_abi_version_to_str(m6809_abi_version),
 		TARGET_BYTE_INT ? "-mint8" : "-mint16",
 		TARGET_WPC ? " -mwpc" : "",
 		TARGET_6309 ? " -m6309" : "",
 		TARGET_DRET ? " -mdret" : "",
 		flag_pic ? " -fpic" : "",
+		flag_omit_frame_pointer ? "" : "no-",
 		optimize);
 
 	/* Print the name of the module, which is taken as the base name
@@ -2281,16 +2282,16 @@ emit_epilogue_insns (bool sibcall_p)
 void
 m6809_cpu_cpp_builtins (void)
 {
+	/* Always defined */
+	builtin_define_std ("__M6809__");
+	builtin_define_std ("__m6809__");
+
 	if (TARGET_6309)
 	{
 		builtin_define_std ("__M6309__");
 		builtin_define_std ("__m6309__");
 	}
-	else
-	{
-		builtin_define_std ("__M6809__");
-		builtin_define_std ("__m6809__");
-	}
+
 
 	if (TARGET_BYTE_INT)
 		builtin_define_std ("__int8__");
@@ -2316,6 +2317,9 @@ m6809_cpu_cpp_builtins (void)
 
 	if (TARGET_DRET)
 		builtin_define_std ("__DRET__");
+
+	if (flag_omit_frame_pointer)
+		builtin_define_std ("__OMIT_FRAME_POINTER__");
 }
 
 
