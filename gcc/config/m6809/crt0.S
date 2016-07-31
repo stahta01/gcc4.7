@@ -162,12 +162,25 @@ __start:
 	clrb
 	pshs	x,d
 	LEA	(x,s_.bss)
+#ifdef __ABI_STACK__
+	pshs	x
+#endif
 	CALL	_memset
+#ifdef __ABI_STACK__
+	leas	6,s
+#else
 	leas	4,s
+#endif
 
 	;; Register finalizer callback
 	LEA	(x,__do_dtors)
+#ifdef __ABI_STACK__
+	pshs	x
+#endif
 	CALL	_atexit
+#ifdef __ABI_STACK__
+	leas	2,s
+#endif
 #endif
 
 	;; Call any initializer functions
@@ -202,8 +215,13 @@ __ctors_done:
 	;;   int _argc = 1;
 	;;   char *_argv[] = {"param1", NULL};
 	LEA	(x,__argv)
+#ifdef __ABI_STACK__
+	ldd	MEM(__argc)
+	pshs	x,d
+#else
 	pshs	x
 	ldx	MEM(__argc)
+#endif
 #endif
 
 	;; Call the main function.  The exit code will
@@ -212,7 +230,11 @@ __ctors_done:
 	CALL	_main
 
 #ifdef TARGET_UNKNOWN
+#ifdef __ABI_STACK__
+	leas	4,s
+#else
 	leas	2,s
+#endif
 #endif
 
 #ifndef TARGET_UNKNOWN
@@ -236,10 +258,20 @@ __dtors_loop:
 	leay	-2,y
 	bne	__dtors_loop
 __dtors_done:
+#ifndef __ABI_STACK__
 	puls	x
+#endif
+#else
+#ifdef __ABI_STACK__
+#ifdef __DRET__
+	pshs	d
+#else
+	pshs	x
+#endif
 #else
 #ifdef __DRET__
 	tfr	d,x
+#endif
 #endif
 #endif
 
