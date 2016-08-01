@@ -2053,6 +2053,10 @@ m6809_init_cumulative_args (CUMULATIVE_ARGS cum ATTRIBUTE_UNUSED,
 		cum |= (CUM_X_MASK | CUM_B_MASK | CUM_STACK_ONLY);
 	}
 
+	/* libcall use registers if possible */
+	if (libname != NULL)
+		return cum;
+
 	if (m6809_abi_version == M6809_ABI_VERSION_STACK)
 	{
 		/* cannot use registers ; only use the stack */
