@@ -37,10 +37,6 @@ You should have received a copy of the GNU General Public License
 along with GCC; see the file COPYING3.  If not see
 <http://www.gnu.org/licenses/>.  */
 
-#include <string.h>
-#include <time.h>
-#include <sys/types.h>
-#include <sys/timeb.h>
 #include "config.h"
 #include "system.h"
 #include "coretypes.h"
@@ -70,6 +66,7 @@ along with GCC; see the file COPYING3.  If not see
 #include "version.h"
 #include "df.h"
 #include "rtlhooks-def.h"
+#include "langhooks.h"
 
 /* macro to return TRUE if length of operand mode is one byte */
 #define BYTE_MODE(X) ((GET_MODE_SIZE (GET_MODE (X))) == 1)
@@ -2286,6 +2283,8 @@ emit_epilogue_insns (bool sibcall_p)
 void
 m6809_cpu_cpp_builtins (void)
 {
+	extern void builtin_define_std (const char *macro); /* c-cppbuiltin.c */
+
 	/* Always defined */
 	builtin_define_std ("__M6809__");
 	builtin_define_std ("__m6809__");
