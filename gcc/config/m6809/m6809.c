@@ -1741,8 +1741,9 @@ m6809_init_builtins (void)
 	 * void_ftype_void = void f(void)
 	 * void_ftype_uchar = void f(unsigned char)
 	 * uchar_ftype_uchar2 = unsigned char f (unsigned char, unsigned char)
+	 * uint_ftype_uchar2 = unsigned int f (unsigned char, unsigned char)
 	 */
-	tree void_ftype_void = 
+	tree void_ftype_void =
 		build_function_type (void_type_node, void_list_node);
 
 	tree void_ftype_uchar =
@@ -1751,7 +1752,12 @@ m6809_init_builtins (void)
 
 	tree uchar_ftype_uchar2 =
 		build_function_type (unsigned_char_type_node,
-			tree_cons (NULL_TREE, unsigned_char_type_node, 
+			tree_cons (NULL_TREE, unsigned_char_type_node,
+				tree_cons (NULL_TREE, unsigned_char_type_node, void_list_node)));
+
+	tree uint_ftype_uchar2 =
+		build_function_type (unsigned_type_node,
+			tree_cons (NULL_TREE, unsigned_char_type_node,
 				tree_cons (NULL_TREE, unsigned_char_type_node, void_list_node)));
 
 	/* Register each builtin function. */
@@ -1769,6 +1775,9 @@ m6809_init_builtins (void)
 
 	add_builtin_function ("__builtin_sync", void_ftype_void,
 		M6809_SYNC, BUILT_IN_MD, NULL, NULL_TREE);
+
+	add_builtin_function ("__builtin_mul", uint_ftype_uchar2,
+		M6809_MUL, BUILT_IN_MD, NULL, NULL_TREE);
 
 	add_builtin_function ("__builtin_nop", void_ftype_void,
 		M6809_NOP, BUILT_IN_MD, NULL, NULL_TREE);
@@ -1849,6 +1858,14 @@ m6809_expand_builtin (tree exp,
 
 		case M6809_SYNC:
 			emit_insn (target = gen_m6809_sync ());
+			return target;
+
+		case M6809_MUL:
+			r0 = m6809_builtin_operand (arglist, QImode, 0);
+			r1 = m6809_builtin_operand (arglist, QImode, 1);
+			if (!target)
+				target = gen_reg_rtx (HImode);
+			emit_insn (gen_m6809_mul (target, r0, r1));
 			return target;
 
 		case M6809_ADD_CARRY:

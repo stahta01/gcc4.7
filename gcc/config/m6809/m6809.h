@@ -491,7 +491,7 @@ enum reg_class {
 
 /* Get reg_class from a letter in the machine description.  */
 #define REG_CLASS_FROM_LETTER(C) \
-  (((C) == 'a' ? A_REGS : \
+ (((C) == 'a' ? A_REGS : \
   ((C) == 'd' ? D_REGS : \
   ((C) == 'x' ? I_REGS : \
   ((C) == 't' ? M_REGS : \
@@ -1347,6 +1347,7 @@ enum m6809_builtins
     M6809_SWI3,
     M6809_CWAI,
     M6809_SYNC,
+    M6809_MUL,
     M6809_ADD_CARRY,
     M6809_SUB_CARRY,
     M6809_ADD_DECIMAL,
