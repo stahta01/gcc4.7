@@ -1962,6 +1962,73 @@ far_functionp (rtx x)
 }
 
 
+/** Outputs the assembly language for a far call. */
+void
+output_far_call_insn (rtx *operands, int has_return)
+{
+	static char page_data[64];
+	const char *called_page;
+
+	/* The logic is the same for functions whether or not there
+	 * is a return value.  Skip over the return value in this
+	 * case, so that the call location is always operands[0].  */
+	if (has_return)
+		operands++;
+
+	/* Get the name of the page being called */
+	called_page = far_functionp (operands[0]);
+
+#if 0 /* TODO : broken logic */
+	/* See if the called page name is a 'bank' */
+	if (isdigit (*called_page))
+	{
+		/* New style banking */
+		if (!strcmp (called_page, current_bank_name))
+		{
+			/* Same page */
+			output_asm_insn ("jsr\t%0", operands);
+		}
+		else
+		{
+			/* Different page */
+			output_asm_insn ("jsr\t__far_call_handler\t;new style", operands);
+			output_asm_insn ("\t.word\t%0", operands);
+			sprintf (page_data, "\t.byte\t%s", called_page);
+			output_asm_insn (page_data, operands);
+		}
+		return;
+	}
+#endif
+
+	/* Are we calling a different page than we are running in? */
+	if (!strcmp (called_page, far_code_page))
+	{
+		/* Same page : no need to execute a far call */
+		if (flag_pic)
+			output_asm_insn ("lbsr\t%C0", operands);
+		else
+			output_asm_insn ("jsr\t%0", operands);
+	}
+	else
+	{
+		/* Different page : need to emit far call thunk */
+
+		/* First output a call to the thunk for making far calls. */
+		if (flag_pic)
+			output_asm_insn ("lbsr\t__far_call_handler", operands);
+		else
+			output_asm_insn ("jsr\t__far_call_handler", operands);
+
+		/* Now output the name of the call site */
+		output_asm_insn (".word\t%C0", operands);
+
+		/* Finally output the page number */
+		snprintf (page_data, sizeof(page_data), ".byte\t%s", far_functionp (operands[0]));
+		output_asm_insn (page_data, operands);
+	}
+}
+
+
 /** Outputs the assembly language for a call. */
 void
 output_call_insn (rtx *operands)
@@ -1971,74 +2038,7 @@ output_call_insn (rtx *operands)
 
 	/* Finally output the operand and a new line */
 	print_operand_address (asm_out_file, XEXP (operands[0], 0), operands[1]);
-	fputs ("\n", asm_out_file);
-}
-
-
-/** Outputs the assembly language for a far call. */
-void
-output_far_call_insn (rtx *operands, int has_return)
-{
-	static char page_data[64];
-	const char *called_page;
-
-  /* The logic is the same for functions whether or not there
-	* is a return value.  Skip over the return value in this
-	* case, so that the call location is always operands[0].  */
-  if (has_return)
-	  operands++;
-
-  /* Get the name of the page being called */
-  called_page = far_functionp (operands[0]);
-
-#if 0 /* TODO : broken logic */
-  /* See if the called page name is a 'bank' */
-  if (isdigit (*called_page))
-  {
-    /* New style banking */
-	 if (!strcmp (called_page, current_bank_name))
-	 {
-	 	/* Same page */
-  	  	output_asm_insn ("jsr\t%0", operands);
-	 }
-	 else
-	 {
-	 	/* Different page */
-		output_asm_insn ("jsr\t__far_call_handler\t;new style", operands);
-  	  	output_asm_insn ("\t.dw\t%0", operands);
-		sprintf (page_data, "\t.db\t%s", called_page);
-	 	output_asm_insn (page_data, operands);
-	 }
-	 return;
-  }
-#endif
-
-  /* Are we calling a different page than we are running in? */
-  if (!strcmp (called_page, far_code_page))
-  {
-    /* Same page : no need to execute a far call */
-		if (flag_pic)
-			output_asm_insn ("lbsr\t%C0", operands);
-		else
-			output_asm_insn ("jsr\t%0", operands);
-  }
-  else
-  {
-    /* Different page : need to emit far call thunk */
-
-    /* First output a call to the thunk for making far calls. */
-		if (flag_pic)
-			output_asm_insn ("lbsr\t__far_call_handler", operands);
-		else
-			output_asm_insn ("jsr\t__far_call_handler", operands);
-  
-    /* Now output the name of the call site */
-    output_asm_insn ("\t.dw\t%C0", operands);
-  
-    /* Finally output the page number */
-    sprintf (page_data, "\t.db\t%s", far_functionp (operands[0]));
-    output_asm_insn (page_data, operands);
-  }
+	putc ('\n', asm_out_file);
 }
 
 
