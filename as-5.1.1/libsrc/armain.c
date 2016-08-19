@@ -456,9 +456,8 @@ int main(int argc, char *argv[])
 
 	for (i=2; i<argc; ++i) {
 		p = argv[i];
-		name = basenam(p);
-		if (strchr(name, ' ')) {
-			fprintf(stderr, "Error: filename '%s' contain a space character.\n", name);
+		if (strchr(basenam(p), ' ')) {
+			fprintf(stderr, "Error: filename '%s' contain a space character.\n", p);
 			exit(1);
 		}
 		if (!arname) {
@@ -466,6 +465,7 @@ int main(int argc, char *argv[])
 			strcpy(arname, p);
 		}
 		else {
+			name = action == 'd' || action == 'x' ? basenam(p) : p;
 			if (!memberp) {
 				memberp = new_lfile(name, 0);
 				lfp = memberp;
