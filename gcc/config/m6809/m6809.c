@@ -520,9 +520,10 @@ notice_update_cc (rtx exp, rtx insn ATTRIBUTE_UNUSED)
 		if (SET_DEST (exp) == pc_rtx)
 			return;
 
-		/* Moving one register into another register (tfr):
-		Doesn't alter the cc's.  */
-		if (REG_P (SET_DEST (exp)) && (REG_P (SET_SRC (exp))))
+		/* Moving one register into another register (TFR):
+		Doesn't alter the cc's, But moving to X or Y via LEAX/LEAY do alter the cc's. */
+		if (REG_P (SET_DEST (exp)) && (REG_P (SET_SRC (exp)))
+			&& (REGSET_CONTAINS_P (REGNO (SET_DEST (exp)), (A_REGBIT | B_REGBIT | DP_REGBIT | D_REGBIT | U_REGBIT | S_REGBIT | PC_REGBIT))))
 			return;
 
 		/* Moving memory into a register (load): Sets cc's. */
