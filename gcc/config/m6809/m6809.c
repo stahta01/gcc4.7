@@ -2341,6 +2341,13 @@ m6809_cpu_cpp_builtins (void)
 
 	if (flag_omit_frame_pointer)
 		builtin_define_std ("__OMIT_FRAME_POINTER__");
+
+	/* byte order macro */
+	builtin_define_std ("__ORDER_LITTLE_ENDIAN__=1234");
+	builtin_define_std ("__ORDER_PDP_ENDIAN__=3412");
+	builtin_define_std ("__ORDER_BIG_ENDIAN__=4321");
+	builtin_define_std ("__BYTE_ORDER__=__ORDER_BIG_ENDIAN__");
+	builtin_define_std ("__FLOAT_WORD_ORDER__=__ORDER_BIG_ENDIAN__");
 }
 
 
