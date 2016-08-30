@@ -1322,10 +1322,6 @@ maybe_mode_change (enum machine_mode orig_mode, enum machine_mode copy_mode,
 		   enum machine_mode new_mode, unsigned int regno,
 		   unsigned int copy_regno ATTRIBUTE_UNUSED)
 {
-/* Added this check to work around bad register move problem.
-   TODO find the cause of the issue. Not sure if it's a bug in GGC
-   or a bug in the m6809 target. */
-#ifndef HAVE_m6809_sync
   if (GET_MODE_SIZE (copy_mode) < GET_MODE_SIZE (orig_mode)
       && GET_MODE_SIZE (copy_mode) < GET_MODE_SIZE (new_mode))
     return NULL_RTX;
@@ -1350,7 +1346,6 @@ maybe_mode_change (enum machine_mode orig_mode, enum machine_mode copy_mode,
 							   offset,
 							   new_mode));
     }
-#endif
   return NULL_RTX;
 }
 
@@ -1584,6 +1579,7 @@ copyprop_hardreg_forward_1 (basic_block bb, struct value_data *vd)
 {
   bool changed = false;
   rtx insn;
+  rtx link;
 
   for (insn = BB_HEAD (bb); ; insn = NEXT_INSN (insn))
     {
@@ -1642,6 +1638,23 @@ copyprop_hardreg_forward_1 (basic_block bb, struct value_data *vd)
       for (i = 0; i < n_ops; i++)
 	if (recog_op_alt[i][alt].earlyclobber)
 	  kill_value (recog_data.operand[i], vd);
+
+      /* If we have dead sets in the insn, then we need to note these as we
+         would clobbers.  */
+      for (link = REG_NOTES (insn); link; link = XEXP (link, 1))
+        {
+          if (REG_NOTE_KIND (link) == REG_UNUSED)
+            {
+              kill_value (XEXP (link, 0), vd);
+              /* Furthermore, if the insn looked like a single-set,
+                 but the dead store kills the source value of that
+                 set, then we can no-longer use the plain move
+                 special case below.  */
+              if (set
+                  && reg_overlap_mentioned_p (XEXP (link, 0), SET_SRC (set)))
+                set = NULL;
+            }
+        }
 
       /* Special-case plain move instructions, since we may well
 	 be able to do the move from a different register class.  */
