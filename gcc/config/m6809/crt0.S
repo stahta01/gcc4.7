@@ -83,6 +83,7 @@ supported machines. */
 	.area .direct
 #endif
 	.area .base             (BANK=prog)
+	.area .text.startup     (BANK=prog)
 	.area .text             (BANK=prog)
 	.area .romcall          (BANK=prog)
 	.area .rodata           (BANK=prog)
