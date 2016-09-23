@@ -403,10 +403,10 @@ do_umod:
 ;	modulus in d
 	.area	.text
 	.globl	_euclid
-left	.equ	5
-right	.equ	1		; word
-count	.equ	0		; byte
-carry	.equ	1		; alias
+left	=	5
+right	=	1		; word
+count	=	0		; byte
+carry	=	1		; alias
 _euclid:
 	leas	-3,s		; 2 local variables
 	clr	count,s		; prescale divisor
@@ -453,10 +453,10 @@ mod3:
 ;	modulus in d
 	.area	.text
 	.globl	_seuclid
-left	.equ	6
-right	.equ	2
-quo_sgn	.equ	1
-mod_sgn	.equ	0
+left	=	6
+right	=	2
+quo_sgn	=	1
+mod_sgn	=	0
 _seuclid:
 	leas	-4,s		; 3 local variables
 	std	right,s
