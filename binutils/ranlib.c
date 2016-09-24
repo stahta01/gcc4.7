@@ -18,10 +18,12 @@
  * <http://www.gnu.org/licenses/>.
  */
 
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
+#include <stdint.h>
 #include <time.h>
 #define ZLIBARCH_STATIC
 #include "zlibarch.h"
@@ -51,10 +53,11 @@
 #endif
 #define HEXBIT				4
 #define HEXLONGSZ			(sizeof(long)*2)
+#define DECINTSZ			11 /* -2^31 */
 #define MAX_SYMBOL_SIZE		512
 #define MAX_OBJECT_SIZE		256
 #define MAX_LINE_SIZE		\
-	(MAX_SYMBOL_SIZE + 1 + MAX_OBJECT_SIZE + 1 + HEXLONGSZ + 4)
+	(MAX_SYMBOL_SIZE + 1 + MAX_OBJECT_SIZE + 1 + HEXLONGSZ + 1 + DECINTSZ + 4)
 #define MIN_HASH_BIT		3
 #define MAX_HASH_BIT		16
 #define MAX_HASH_LINE_SIZE	80
@@ -67,6 +70,8 @@ typedef struct _symbol_t {
 	int digit;
 	char *pos;
 	char *nameend;
+	int lineno;
+	int linenodigit1;
 } symbol_t;
 
 typedef struct _file_t {
@@ -80,8 +85,9 @@ static symbol_t **symbols, **symtail;
 static file_t *files, *filtail;
 static char tmpfilename[sizeof(TMP_FILE)];
 static char *opt_arch, *opt_mach, *fname;
-static int hashsize, hashmask;
+static int hashsize, hashmask, as09;
 static int opt_nohash, opt_strip, opt_deterministic;
+static int linesheader;
 #ifdef ZLIBARCH
 static int opt_gzip;
 #endif
@@ -169,6 +175,23 @@ static char *estrdup(const char *s)
 	return str;
 }
 
+static char *escstring(const char *str, int escspace)
+{
+	char *newstr;
+	size_t i, j, len;
+	len = strlen(str);
+	newstr = (char*)emalloc(len * 2 + 1);
+	if (!newstr)
+		return NULL;
+	for (i=j=0; i<len;) {
+		if (escspace || (!escspace && str[i] != ' '))
+			newstr[j++] = '\\';
+		newstr[j++] = str[i++];
+	}
+	newstr[j] = 0;
+	return newstr;
+}
+
 static void add_file(char *filename)
 {
 	file_t *file;
@@ -205,6 +228,19 @@ static int gethexdigit(unsigned long number)
 	return digit;
 }
 
+static int getdecdigit(unsigned int number)
+{
+	int digit = 1;
+	if (number > INT_MAX) {
+		if (number != (unsigned int)INT_MIN)
+			number = abs(number);/*abs undefined for the most negative integer*/
+		digit++; /* negative sign */
+	}
+	while (number /= 10)
+		digit++;
+	return digit;
+}
+
 /* djb2 hash function */
 static int djb2hash(char *p)
 {
@@ -215,14 +251,15 @@ static int djb2hash(char *p)
 	return h & hashmask;
 }
 
-static long add_symbol(char *symbol, char *object, long offset)
+static long add_symbol(char *symbol, char *object, long offset, int lineno)
 {
 	symbol_t *sym;
 	char *name;
 	size_t len;
-	int namelen;
+	int namelen, linenodigit1;
 	namelen = strlen(symbol);
-	len = namelen + 1 + strlen(object) + 1 + HEXLONGSZ + 1;
+	linenodigit1 = lineno == -1 ? 0 : getdecdigit(lineno)+1;
+	len = namelen + 1 + strlen(object) + 1 + HEXLONGSZ + linenodigit1 + 1;
 	sym = (symbol_t *)ecalloc(1, sizeof(symbol_t));
 	name = (char *)emalloc(len + 1);
 	sprintf(name, "%s %s ", symbol, object);
@@ -232,8 +269,10 @@ static long add_symbol(char *symbol, char *object, long offset)
 		symtail[0] = symtail[0]->next = sym;
 	sym->offset = offset;
 	sym->name = name;
-	sym->pos = name + len - 1 - HEXLONGSZ;
+	sym->pos = name + len - 1 - linenodigit1 - HEXLONGSZ;
 	sym->nameend = name + namelen;
+	sym->lineno = lineno;
+	sym->linenodigit1 = linenodigit1;
 	return len;
 }
 
@@ -317,6 +356,7 @@ static void ranlib(char *filename)
 
 	/* Process header/metadata/comments and skip hash/symbol table if any. */
 	begin = 0;
+	linesheader = 0;
 	while (FGETS(line, MAX_LINE_SIZE, fp) != NULL) {
 		if (*line == '#') {
 			str = line+1;
@@ -341,14 +381,17 @@ static void ranlib(char *filename)
 					mach = strdup(str+sizeof(" MACH ")-1);
 			}
 			begin = FTELL(fp);
+			linesheader++;
 			continue;
 		}
 		do {
 			if (*line == '\n' || *line == '\r' || ((str = strchr(line, ' ')) && strchr(str+1, ' '))) {
 				begin = FTELL(fp);
+				linesheader++;
 				continue;
 			}
-			if (line[0] != 'L' || (line[1] >= '0' && line[1] <= '9'))
+			if ((!as09 && (line[0] != 'L' || (line[1] >= '0' && line[1] <= '9'))) ||
+				(as09 && (line[0] != '!' || line[1] != 'L' || line[2] != 'I' || line[3] != 'B')))
 				error("wrong archive format");
 			break;
 		} while (FGETS(line, MAX_LINE_SIZE, fp) != NULL);
@@ -385,41 +428,86 @@ static void ranlib(char *filename)
 		objoff = 0;
 		nsymbols = 0;
 		indexsize = 0;
-		offset = FTELL(fp);
-		while (FGETS(line, MAX_LINE_SIZE, fp) != NULL) {
-			if (line[0] == 'E')
-				break;
-			if (line[0] == 'L') {
-				if (line[1] == '0' && line[2] == ' ')
-					objoff = copy_object(object, &line[3]) ? offset - begin : 0;
-				else
-				if (line[1] == '1' && line[2] == ' ')
-					objoff = 0;
+		if (!as09) {
+			offset = FTELL(fp);
+			while (FGETS(line, MAX_LINE_SIZE, fp) != NULL) {
+				if (line[0] == 'E')
+					break;
+				if (line[0] == 'L') {
+					if (line[1] == '0' && line[2] == ' ')
+						objoff = copy_object(object, &line[3]) ? offset - begin : 0;
+					else
+					if (line[1] == '1' && line[2] == ' ')
+						objoff = 0;
+					offset = FTELL(fp);
+					continue;
+				}
+				if (objoff) {
+					if (line[0] == 'S' && line[1] == ' ') {
+						str = strchr(&line[2], ' ');
+						if (str && str != &line[2]) {
+							if (str[1] == 'D') {
+								*str = 0;
+								/* Add only '.__.ABS.' symbol if not defined to zero. */
+								if (!(!strcmp(&line[2], ".__.ABS.") &&
+									(str[2] == 'E' || str[2] == 'e') &&
+									(str[3] == 'F' || str[3] == 'f') &&
+									strtol(&str[4], NULL, 16) == 0)) {
+									indexsize += add_symbol(&line[2], object, objoff, -1);
+									nsymbols++;
+								}
+							}
+						}
+					}
+				}
 				offset = FTELL(fp);
-				continue;
 			}
-			if (objoff) {
-				if (line[0] == 'S' && line[1] == ' ') {
-					str = strchr(&line[2], ' ');
-					if (str && str != &line[2]) {
-						if (str[1] == 'D') {
-							*str = 0;
-							/* Add only '.__.ABS.' symbol if not defined to zero. */
-							if (!(!strcmp(&line[2], ".__.ABS.") &&
-								(str[2] == 'E' || str[2] == 'e') &&
-								(str[3] == 'F' || str[3] == 'f') &&
-								strtol(&str[4], NULL, 16) == 0)) {
-								indexsize += add_symbol(&line[2], object, objoff);
-								nsymbols++;
+			if (FERROR(fp))
+				error("cannot read file");
+		}
+		else {
+			FILE *fp;
+			size_t len;
+			char *command, *linker, *psymbol, *plineno, *poffset, *pobject, *fname;
+			linker = "as09link";
+			fname = escstring(filename, 1);
+/*fprintf(stderr, "%s\n", fname);*/
+			if (asprintf(&command, "%s -h -y -pe %s", linker, fname) == -1)
+				error("out of memory");
+			fp = popen(command, "r");
+			if (!fp)
+				error("cannot execute linker '%s'", linker);
+			while (fgets(line, MAX_LINE_SIZE, fp) != NULL) {
+				len = strlen(line);
+				if (len > 1 && line[len-1] == '\n')
+					line[len-1] = 0;
+/*fprintf(stderr, "%s\n", line);*/
+				if (len > 2) {
+					if (line[0] == 'e' && line[1] == ' ') {
+						psymbol = &line[2];
+						plineno = strchr(psymbol+1, ' ');
+						if (plineno) {
+							*plineno++ = 0;
+							poffset = strchr(plineno, ' ');
+							if (poffset) {
+								*poffset++ = 0;
+								pobject = strchr(poffset, ' ');
+								if (pobject) {
+									*pobject++ = 0;;
+									offset = strtol(poffset, NULL, 16);
+									indexsize += add_symbol(psymbol, pobject, offset - begin, atoi(plineno) - linesheader);
+									nsymbols++;
+								}
 							}
 						}
 					}
 				}
 			}
-			offset = FTELL(fp);
+			if (ferror(fp))
+				error("cannot read linker output");
+			pclose(fp);
+			free(fname);
 		}
-		if (FERROR(fp))
-			error("cannot read file");
 
 		/* If hashsize > 1 then compute hash function on symbols
 		   and fill bins. */
@@ -521,7 +609,7 @@ static void ranlib(char *filename)
 				err |= FPRINTF(tmpfp, " %lX", symbol ? size : 0) <= 0;
 				if (symbol) {
 					for (; symbol; symbol=symbol->next)
-						size += symbol->pos - symbol->name + symbol->digit + 1;
+						size += symbol->pos - symbol->name + symbol->digit + symbol->linenodigit1 + 1;
 					size++;
 				}
 			}
@@ -538,8 +626,8 @@ static void ranlib(char *filename)
 				symbol = symbols[i];
 				if (symbol) {
 					for (symbol = symbols[i]; symbol; symbol=symbol->next) {
-						if (sprintf(symbol->pos, "%lX\n", symbol->offset + indexsize)
-							!= symbol->digit+1)
+						if (sprintf(symbol->pos, symbol->linenodigit1 ? "%lX %d\n" : "%lX\n", symbol->offset + indexsize, symbol->lineno)
+							!= symbol->digit+symbol->linenodigit1+1)
 							error("something wrong with sprintf");
 						if (FPUTS(symbol->name, tmpfp) == EOF)
 							break;
@@ -631,6 +719,7 @@ static void ranlib(char *filename)
 
 int main(int argc, char **argv)
 {
+	char *env;
 	file_t *file;
 
 	/* No arguments? */
@@ -717,6 +806,9 @@ int main(int argc, char **argv)
 	/* No files? */
 	if (files == NULL)
 		error("no file given");
+
+	/* as09 */
+	as09 = ((env=getenv("USEAS09")) && *env) || ((env=getenv("AS09OPT")) && *env);
 
 	/* Do ranlib() on files. */
 	for (file=files; file; file=file->next)

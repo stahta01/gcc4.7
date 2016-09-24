@@ -51,6 +51,7 @@ error ()
 input_file=
 list_file=
 gen_list_file=
+incpath=
 verbose=
 version=
 
@@ -99,13 +100,11 @@ while [ $# -gt 0 ]; do
 			if [ $# -lt 1 ]; then
 				error "missing path after '$arg'"
 			fi
-#			include_file=$1
-#			echo "warning: include path '$include_file' ignored"
+			incpath="$incpath -I $1"
 			shift
 			;;
 		-I*)
-#			include_file=${arg#-I}
-#			echo "warning: include path '$include_file' ignored"
+			incpath="$incpath -I ${arg#-I}"
 			;;
 		-MD)
 			error "assembler option '$arg' not supported"
@@ -114,7 +113,7 @@ while [ $# -gt 0 ]; do
 			output_file=$1; shift
 			;;
 		-v|-verbose|--verbose)
-			verbose=X
+			verbose=-v
 			;;
 		-version|--version)
 			version=X
@@ -147,7 +146,11 @@ while [ $# -gt 0 ]; do
 done
 
 # Setup various file name.
-asoutput_file=${input_file%\.*}.rel
+if [ -n "$USEAS09" -o -n "$AS09OPT" ]; then
+	asoutput_file=$output_file
+else
+	asoutput_file=${input_file%\.*}.rel
+fi
 if [ -n "$gen_list_file" ]; then
 	aslist_file=${input_file%\.*}.lst
 	if [ -z "$list_file" ]; then
@@ -165,7 +168,11 @@ fi
 
 # Output more information when --verbose option is set.
 if [ -n "$verbose" ]; then
-	echo "$bindir/as6809 $options $input_file"
+	if [ -n "$USEAS09" -o -n "$AS09OPT" ]; then
+		echo "as09link $verbose $AS09OPT -c -h $incpath -o $asoutput_file $input_file"
+	else
+		echo "$bindir/as6809 $options $input_file"
+	fi
 	echo "Output file: '$output_file'"
 	if [ -n "$gen_list_file" ]; then
 		echo "List file: '$list_file'"
@@ -181,13 +188,18 @@ if [ -z "$input_file" ]; then
 	error "no input file specified"
 fi
 
-set +e
-
 # Invoke the real assembler with translated options.
-$bindir/as6809 $options "$input_file"
-rc=$?
-
-set -e
+if [ -n "$USEAS09" -o -n "$AS09OPT" ]; then
+	set +e
+	as09link $verbose $AS09OPT -c -h $incpath -o "$asoutput_file" "$input_file"
+	rc=$?
+	set -e
+else
+	set +e
+	$bindir/as6809 $options "$input_file"
+	rc=$?
+	set -e
+fi
 
 # OK, see if the assembler succeeded or not.
 # If it failed, the source is copied to /tmp/as6809_error.s

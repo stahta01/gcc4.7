@@ -21,6 +21,17 @@ static int verbose_action = 0;
 
 
 
+/* addprefix:
+ *  Add a character prefix to a string.
+ */
+static void addprefix(char *str)
+{
+	memmove(str+1, str, strlen(str)+1);
+	*str = '!';
+}
+
+
+
 /* basenam:
  *  Strips path from the filename.
  */
@@ -417,7 +428,7 @@ static void usage(void)
 
 int main(int argc, char *argv[])
 {
-	char *p, *arname = NULL, c, *name;
+	char *p, *arname = NULL, c, *name, *env;
 	struct lfile *lfp = NULL, *memberp = NULL;
 	int i, action = 0;
 
@@ -479,6 +490,16 @@ int main(int argc, char *argv[])
 
 	if (!arname)
 		usage();
+
+	if (((env=getenv("USEAS09")) && *env) || ((env=getenv("AS09OPT")) && *env))
+	{
+		addprefix(tag_libbeg);
+		addprefix(tag_libend);
+		addprefix(tag_objbeg);
+		addprefix(tag_objend);
+		tag_libsz++;
+		tag_objsz++;
+	}
 
 	switch (action) {
 	case 'd': replace(arname, memberp, 1); break;
