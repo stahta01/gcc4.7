@@ -314,7 +314,7 @@ binutils:
 		BINUTILS_LDFLAGS="$(BINUTILS_LDFLAGS)" \
 		&& $(SUDO) cp -f ranlib $(call run_binutil,ranlib)
 	for prog in ar as ld; do \
-		$(SUDO) sed -e "s!@AS_PREFIX@!${as_prefix}!" < ../binutils/$$prog > $(call run_binutil,$$prog); \
+		$(SUDO) sh -c "sed -e 's!@AS_PREFIX@!${as_prefix}!' < ../binutils/$$prog > $(call run_binutil,$$prog)"; \
 		$(SUDO) chmod a+x $(call run_binutil,$$prog); done
 
 .PHONY : binutils-clean
