@@ -198,7 +198,7 @@ install : post-install
 
 .PHONY : post-install
 post-install: gccinstall
-	cp $(SRCDIR)/gcc/config/m6809/crt0.S $(prefix)/lib/gcc/$(target)/$(GCC_VERSION)
+	$(SUDO) install -m 644 $(SRCDIR)/gcc/config/m6809/crt0.S $(prefix)/lib/gcc/$(target)/$(GCC_VERSION)
 
 ##########################################################################
 
