@@ -1,5 +1,4 @@
-#CFLAGS = -O2 -Wall -Wextra -s
-CFLAGS = -O2 -Wall -Wextra -s -ansi -pedantic -D_XOPEN_SOURCE=500
+CFLAGS = -O2 -Wall -Wextra -ansi -pedantic -D_XOPEN_SOURCE=700
 
 .PHONY: all
 all: ranlib
