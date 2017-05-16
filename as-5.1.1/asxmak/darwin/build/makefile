@@ -228,7 +228,7 @@ prep:
 
 CC=		gcc
 CCOPT=		-O3
-CCFLAGS=	-Wall -funsigned-char $(CCOPT) $(EXTRA_ASXXXX_CFLAGS) -O -g -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc
+CCFLAGS=	-Wall -funsigned-char $(CCOPT) $(EXTRA_ASXXXX_CFLAGS)
 
 LD=		gcc
 LDFLAGS=	-Wall $(EXTRA_ASXXXX_CFLAGS)
@@ -242,7 +242,7 @@ SRCLNK:=	$(ASXBAS)linksrc/
 SRCLIB:=	$(ASXBAS)libsrc/
 SRCMISC:=	$(ASXBAS)asxxmisc/
 SRCS19OS9:=	$(ASXBAS)s19os9/
-DSTEXE:=	$(ASXBAS)asxmak/linux/exe/
+DSTEXE:=	$(ASXBAS)asxmak/darwin/exe/
 
 SRC1802=	$(ASXBAS)as1802/
 SRC2650=	$(ASXBAS)as2650/
