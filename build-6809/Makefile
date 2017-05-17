@@ -30,6 +30,7 @@ ifeq ($(HOST_OS), Darwin)
    # Yes, we are on OSX.  Assume 'sudo' is available.
    SUDO ?= sudo
    AS_HOST = darwin
+   HOST_CONFIG_OPTS=--with-gmp=/opt/local
    EXE =
 else
    # It might be Cygwin or Linux.  Run with -o to find out.
@@ -224,7 +225,8 @@ $(BLDDIR)/config.status : $(BLDDIR) info
 		--srcdir=$(SRCDIR) --disable-threads --disable-nls \
 		--disable-libssp --enable-sjlj-exceptions \
 		--prefix=$(prefix) \
-		--with-as=$(call run_binutil,as) --with-ld=$(call run_binutil,ld)
+		--with-as=$(call run_binutil,as) --with-ld=$(call run_binutil,ld) \
+		$(HOST_CONFIG_OPTS)
 
 $(BLDDIR) :
 	mkdir -p $(BLDDIR)
