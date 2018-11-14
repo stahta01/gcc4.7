@@ -76,7 +76,8 @@ VOID SDCDBfopen(void)
 
 /*)Function	VOID	SDCDBcopy()
  * 
- *		char *	str		pointer to the file spec
+ *		char *	str             pointer to the file spec
+ *		lbfile	*lbfh		pointer to lbfile structure
  *
  *	The function SDCDBcopy() copies an existing cdb file
  *	into the linker cdb file.
@@ -86,6 +87,10 @@ VOID SDCDBfopen(void)
  *	local variables:
  *		FILE *	xfp		file handle
  *		char	line[]		line from file
+ *		char *	sep		filename separator
+ *		char *	filename	cdb file name
+ *		int	len		string length
+ *		int	len2		string length 2
  *
  *	global variables:
  *		int	yflag		SDCDB Debug flag
@@ -102,26 +107,55 @@ VOID SDCDBfopen(void)
  *		the linker cdb output file.
  */
 
-VOID SDCDBcopy(str)
+VOID SDCDBcopy(str, lbfh)
 char * str;
+struct lbfile *lbfh;
 {
 	FILE * xfp;
-	char line[NINPUT];
+	char line[NINPUT], *sep, *filename;
+	int len, len2;
 
 	/*
 	 * Copy cdb file if present and requested.
 	 */
 	if (yflag && yfp) {
-		xfp = afile(str,"cdb",0);
-		if (xfp) {
-			while (fgets(line, sizeof(line), xfp) != NULL) {
-				fprintf(yfp, "%s", line);
+
+		if (str == NULL && lbfh->filspc == NULL) {
+
+			filename = NULL;
+
+#ifdef __unix__
+			sep = strrchr(lbfh->libspc, '/');
+#else
+			sep = strrchr(lbfh->libspc, '\\');
+#endif
+			len = sep ? sep - lbfh->libspc + 1 : 0;
+			if (len < NINPUT-1) {
+				strncpy(line, lbfh->libspc, len);
+				len2 = snprintf(&line[len], NINPUT-len, "%s", lbfh->relfil);
+				if (len2 > 0 && len+len2 < NINPUT-1) {
+					filename = line;
+				}
 			}
-			fclose(xfp);
+
+		} else {
+
+			filename = str ? str : lbfh->filspc;
+
 		}
+
+		if (filename != NULL) {
+			xfp = afile(filename,"cdb",0);
+			if (xfp) {
+				while (fgets(line, sizeof(line), xfp) != NULL) {
+					fprintf(yfp, "%s", line);
+				}
+				fclose(xfp);
+			}
+		}
+
 	}
 }
-
 
 /*)Function	VOID	DefineSDCDB()
  * 

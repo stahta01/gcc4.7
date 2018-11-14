@@ -737,6 +737,10 @@ struct lbname {
 	char		*path;
 	char		*libfil;
 	char		*libspc;
+	FILE		*libfp;
+	long		begin;
+	long		*hashbin;
+	int		nhashbin;
 	int		f_obj;
 };
 
@@ -774,6 +778,8 @@ struct lbfile {
 	struct	lbfile	*next;
 	char		*libspc;
 	char		*relfil;
+	FILE		*libfp;
+	long		offset;
 	char		*filspc;
 	int		f_obj;
 };
@@ -1015,10 +1021,19 @@ extern	int	gcntr;		/*	LST file relocation active
 extern	struct lbpath *lbphead;	/*	pointer to the first
 				 *	library path structure
 				 */
+extern	struct lbpath *lbptail;	/*	pointer to the last
+				 *	library path structure
+				 */
 extern	struct lbname *lbnhead;	/*	pointer to the first
 				 *	library name structure
 				 */
+extern	struct lbname *lbntail;	/*	pointer to the last
+				 *	library name structure
+				 */
 extern	struct lbfile *lbfhead;	/*	pointer to the first
+				 *	library file structure
+				 */
+extern	struct lbfile *lbftail;	/*	pointer to the last
 				 *	library file structure
 				 */
 
@@ -1054,7 +1069,7 @@ extern	int		fndidx(char *str);
 extern	int		fndext(char *str);
 extern	VOID		gblsav(void);
 extern	int		intsiz(void);
-extern	VOID		link(void);
+extern	VOID		lklink(void);
 extern	VOID		lkexit(int i);
 extern	int		main(int argc, char *argv[]);
 extern	VOID		map(void);
@@ -1141,9 +1156,9 @@ extern	VOID		DefineEndFunction(a_uint value, struct bank *yp);
 extern	VOID		DefineLine(char *lineString, a_uint value, struct bank *yp);
 extern	VOID		PagedAddress(a_uint value, struct bank *yp);
 
-/* lkcdb.c */
+/* lksdcdb.c */
 extern	VOID		SDCDBfopen(void);
-extern	VOID		SDCDBcopy(char * str);
+extern	VOID		SDCDBcopy(char * str, struct lbfile *lbfh);
 extern	VOID		DefineSDCDB(char *name, a_uint value);
 
 /* lkrloc.c */
@@ -1201,7 +1216,7 @@ extern	VOID		addlib(void);
 extern	VOID		addpath(void);
 extern	int		fndsym(char *name);
 extern	VOID		library(void);
-extern	VOID		loadfile(char *filspc);
+extern	VOID		loadfile(struct lbfile *lbfh);
 extern	VOID		search(void);
 
 /* lkout.c */
@@ -1227,7 +1242,7 @@ extern	int		fndext();
 extern	int		fndidx();
 extern	VOID		gblsav();
 extern	int		intsiz();
-extern	VOID		link();
+extern	VOID		lklink();
 extern	VOID		lkexit();
 extern	int		main();
 extern	VOID		map();

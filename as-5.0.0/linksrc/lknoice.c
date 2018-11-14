@@ -240,7 +240,8 @@ void DefineNoICE( char *name, a_uint value, struct bank *yp )
 	char token2[NCPS];
 	char token3[NCPS];
 	char sep1, sep2;
-	int  j, k, level;
+	int  j, k;
+	unsigned int level;
 	struct noicefn *np;
 
 	/* no output if file is not open */
