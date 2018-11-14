@@ -1,5 +1,5 @@
-#define VERSION    "V05.10 (GCC6809)" /* Version number */
-#define COPYRIGHT  "2014"             /* Copyright year */
+#define VERSION    "V05.11 (GCC6809)" /* Version number */
+#define COPYRIGHT  "2015"             /* Copyright year */
 #define NCPS       512                /* Characters per symbol */
 #define NINPUT     (NCPS*2)           /* Input buffer size */
 #define FILSPC     (NINPUT+10)        /* File spec length */
