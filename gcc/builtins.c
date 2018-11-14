@@ -6057,6 +6057,7 @@ expand_builtin (tree exp, rtx target, rtx subtarget, enum machine_mode mode,
       expand_stack_restore (CALL_EXPR_ARG (exp, 0));
       return const0_rtx;
 
+    case BUILT_IN_BSWAP16:
     case BUILT_IN_BSWAP32:
     case BUILT_IN_BSWAP64:
       target = expand_builtin_bswap (exp, target, subtarget);
@@ -7853,6 +7854,7 @@ fold_builtin_bswap (tree fndecl, tree arg)
 
       switch (DECL_FUNCTION_CODE (fndecl))
 	{
+	  case BUILT_IN_BSWAP16:
 	  case BUILT_IN_BSWAP32:
 	  case BUILT_IN_BSWAP64:
 	    {

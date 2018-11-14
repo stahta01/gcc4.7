@@ -1,0 +1,120 @@
+<HEAD>
+<TITLE>
+ASxxxx Cross Assembler Updates
+</TITLE>
+</HEAD>
+<BODY BGCOLOR="#C0C0C0">
+
+<a href="../home.htm">
+<IMG width=343 heigth=58 border = 0 SRC="welcom.gif" ALT="Welcome"></a>
+
+<H2>ASxxxx Cross Assembler Updates</H2>
+
+<IMG width=576 height=5 border=0 SRC="rnbow.gif">
+
+<H3><B>Version 4.10</B></H3>
+
+<H4><B><PRE>
+
+   Version  4.10  of   the   ASxxxx  Cross  Assemblers
+features 4 additional assemblers:
+
+        Fujitsu F2MC8L/FX Microprocessors
+        Signetics 2650 processor
+        Zilog ez80 processor
+        Zilog z8 processor
+
+
+   A new option, -c, has been added to the assemblers.
+This option enables  the  listing  of  machine  cycles
+for each assembled instruction.  For instructions with
+variable execution times  the maximum  cycle  count is
+listed.
+
+   Additional conditional directives:   .ifeq,  .ifne,
+.ifgt, .iflt, .ifge, and .ifle  have been added to the
+assemblers.
+
+   A new linker option, -t,  produces  the Tandy Color
+Computer Disk Basic binary output format.
+
+
+   Version  4.00  of   the   ASxxxx  Cross  Assemblers
+featured 7 additional assemblers:
+
+        Rabbit 2000/3000 processors
+        Atmel AVR processors
+        Microchip PIC processors
+        Texas Instruments MPS430 processors
+
+        Sharp SC61860 processor
+        CDP1802 COSMAC processor
+        Mitsubishi 740 processors
+
+
+   Internally the assembler and linker cores have been
+rewritten to support  processor  architectures  having
+upto 32 bit addressing, independent program  and  data
+addressing,  and  a  new  linker  bit  merging  method
+allowing arbitrary positioning of  linking addresses /
+data  within  an  instruction  opcode.  The bit scheme
+allows simplified writing of assemblers for  the  AVR,
+PIC,  DS80cxxx, 8051  or  newer RISC style instruction
+processors  which  have  non contiguous address / data
+bits within the instruction opcode.  The  bit  merging
+definitions for any particular processor  are included
+in the  .rel file  output  by  the  assembler for that
+processor.  This method allows the linker  to  'learn'
+the merge method for each  .rel file as it  is linked.
+(The linker is also compatible with  Version 3  of the
+ASxxxx assemblers.)
+
+   One  of  the  additional  new  features  is  a  new
+construct called a bank.  The bank is a collection  of
+code and/or data areas which are linked as a group.  A
+bank has optional attributes of  base  address,  size,
+and of specifying a seperate linked output file.   The
+bank  is  useful in  defining  banked  overlay/program
+sections.
+
+   Other  new  features  include  the   .local   ( =: )
+directive which defines a local variable that  will not
+be output to the  .rel file  even when the -a (make all
+variables global) option is specified.  This feature is
+useful  when  defining  a  large  number  of  assembler
+constants  that  should   be  localized  to  a   single
+assembly  process.   Additional  directives  have  been
+added  which  are  synonyms  of   existing  directives:
+.byte (.fcb),  .word (.fdb),  .blkb (.rmb, .rs), .ascii
+(.fcc, .str), .ascis (.strs), and .asciz (.strz).   And,
+the addition of many  new directives:   .equ,   .gblequ,
+.lclequ, .end, .ifdef, .ifndef, .define,  and .undefine.
+
+   The .define directive defines a  substitution  string
+for a keyword in an assembly  input  line.  The  keyword
+substitution is recursive  for  additional  flexibility.
+The .undefine  directive  removes  the  definition  of a
+defined keyword.  The .ifdef and .ifndef directives test
+the existance of a .define keyword definition or  symbol
+definition to assist in conditional assembly processing.
+
+   The  assembler/linker  -z  option has been changed to
+specify case insensitivity.
+
+</PRE></B></H4>
+
+<IMG width=576 height=5 border=0 SRC="rnbow.gif">
+
+<H4>
+<P><A HREF="asxxxx.htm#JUMP">
+<IMG width=32 height=32 border=0 SRC="spcshp.gif" ALIGN=bottom></A>
+<B>...  Return to the ASxxxx Assembler Index</B></A></P>
+
+<P><a href="../home.htm">
+<IMG width=32 height=32 border=0 SRC="home.gif" ALIGN=BOTTOM></a>
+<B>...  Home Page</B></P>
+</H4>
+
+<H6><P><B>Last Updated: January 2006</B></P></H6>
+</BODY>
+</HTML>

@@ -1,0 +1,297 @@
+.appendix ASZ80 Assembler
+
+
+.header level 1;.\z80 Directive
+
+.break
+Format:
+.skip;.indent 8
+_.z80
+.skip
+The .z80 directive enables processing of only the z80 specific
+mnemonics. HD64180/Z180 mnemonics encountered without the
+_.hd64 directive will be flagged with an 'o' error.
+
+The .z80 directive also selects the Z80 specific
+cycles count output when the -c command line option is specified.
+
+
+.header level 1;.\h\d64 Directive
+
+.break
+Format:
+.skip;.indent 8
+_.hd64
+.skip
+The .hd64 directive enables processing of the HD64180/Z180
+specific mnemonics not included in the Z80 instruction set.
+HD64180/Z180 mnemonics encountered without the .hd64
+directive will be flagged with an 'o' error.  A synonym
+of .hd64 is .z180.
+
+The .hd64 directive also selects the HD64180/Z180 specific
+cycles count output when the -c command line option is specified.
+
+
+.header level 1;The .____.CPU. Variable
+
+The value of the pre-defined symbol '.____.CPU.' corresponds
+to the selected processor type.  The default value is 0
+which corresponds to the default processor type.  The
+following table lists the processor types and associated
+values for the ASZ80 assembler:
+
+.skip 1
+.literal
+	Processor Type		  .__.CPU. Value
+	--------------		  --------------
+	    .z80			 0
+	.hd64 / .z180			 1
+.end literal
+
+.skip 1
+  The variable '.____.CPU.' is by default defined as local
+and will not be output to the created .rel file.  The
+assembler command line options -g or -a will not cause the
+local symbol to be output to the created .rel file.
+
+  The assembler .globl directive may be used to change the
+the variable type to global causing its definition to be
+output to the .rel file.  The inclusion of the definition
+of the variable '.____.CPU.' might be a useful means of
+validating that seperately assembled files have been
+compiled for the same processor type.  The linker will
+report an error for variables with multiple non equal
+definitions.
+
+
+.header level 1;Z80 Register Set and Conditions
+
+The following is a complete list of register designations
+and condition mnemonics:
+
+.skip
+.literal
+	byte registers	-	a,b,c,d,e,h,l,i,r
+	register pairs	-	af,af',bc,de,hl
+	word registers	-	pc,sp,ix,iy
+
+	C -	carry bit set
+	M -	sign bit set
+	NC -	carry bit clear
+	NZ -	zero bit clear
+	P -	sign bit clear
+	PE -	parity even
+	PO -	parity odd
+	Z -	zero bit set
+.end literal
+
+
+.header level 1;Z80 Instruction Set
+
+The following list specifies the format for
+each addressing mode supported by ASZ80:
+
+.skip
+.literal
+	#data		immediate data
+			byte or word data
+
+	n		byte value
+
+	rg		a byte register
+			a,b,c,d,e,h,l
+
+	rp		a register pair
+			bc,de,hl
+
+	(hl)		implied addressing or
+			register indirect addressing
+
+	(label)		direct addressing
+
+	offset(ix)	indexed addressing with
+			an offset
+
+	label		call/jmp/jr label
+.end literal
+
+.skip
+The terms data, n, label, and offset may all be expressions.
+
+Note that not all addressing modes are valid with every instruction,
+refer to the Z80/HD64180/Z180 technical data for valid modes.
+
+The following tables list all Z80/HD64180/Z180 mnemonics recognized by the
+ASZ80 assembler. The designation [] refers to a required addressing mode
+argument.
+
+.test page 18
+.header level 2;Inherent Instructions
+
+.literal
+	ccf		cpd
+	cpdr		cpi
+	cpir		cpl
+	daa		di
+	ei		exx
+	halt		neg
+	nop		reti
+	retn		rla
+	rlca		rld
+	rra		rrca
+	rrd		scf
+.end literal
+
+
+.test page 24
+.header level 2;Implicit Operand Instructions
+
+.literal
+	adc	a,[]		adc	[]
+	add	a,[]		add	[]
+	and	a,[]		and	[]
+	cp	a,[]		cp	[]
+	dec	a,[]		dec	[]
+	inc	a,[]		inc	[]
+	or	a,[]		or	[]
+	rl	a,[]		rl	[]
+	rlc	a,[]		rlc	[]
+	rr	a,[]		rr	[]
+	rrc	a,[]		rrc	[]
+	sbc	a,[]		sbc	[]
+	sla	a,[]		sla	[]
+	sra	a,[]		sra	[]
+	srl	a,[]		srl	[]
+	sub	a,[]		sub	[]
+	xor	a,[]		xor	[]
+.end literal
+
+
+.test page 19
+.header level 2;Load Instruction
+
+.literal
+	ld	rg,[]		ld	[],rg
+	ld	(bc),a		ld	a,(bc)
+	ld	(de),a		ld	a,(de)
+	ld	(label),a	ld	a,(label)
+	ld	(label),rp	ld	rp,(label)
+	ld	i,a		ld	r,a
+	ld	a,i		ld	a,r
+	ld	sp,hl		ld	sp,ix
+	ld	sp,iy		ld	rp,#data
+
+	ldd			lddr
+	ldi			ldir
+.end literal
+
+
+.test page 16
+.header level 2;Call/Return Instructions
+
+.literal
+	call	C,label		ret	C
+	call	M,label		ret	M
+	call	NC,label	ret	NC
+	call	NZ,label	ret	NZ
+	call	P,label		ret	P
+	call	PE,label	ret	PE
+	call	PO,label	ret	PO
+	call	Z,label		ret	Z
+	call	label		ret
+.end literal
+
+
+.test page 20
+.header level 2;Jump and Jump to Subroutine Instructions
+
+.literal
+	jp	C,label		jp	M,label
+	jp	NC,label	jp	NZ,label
+	jp	P,label		jp	PE,label
+	jp	PO,label	jp	Z,label
+
+	jp	(hl)		jp	(ix)
+	jp	(iy)		jp	label
+
+	djnz	label
+
+	jr	C,label		jr	NC,label
+	jr	NZ,label	jr	Z,label
+	jr	label
+.end literal
+
+
+.test page 10
+.header level 2;Bit Manipulation Instructions
+
+.literal
+	bit	n,[]
+	res	n,[]
+	set	n,[]
+.end literal
+
+
+.test page 11
+.header level 2;Interrupt Mode and Reset Instructions
+
+.literal
+	im	n
+	im	n
+	im	n
+	rst	n
+.end literal
+
+
+.test page 14
+.header level 2;Input and Output Instructions
+
+.literal
+	in	a,(n)		in	rg,(c)
+	ind			indr
+	ini			inir
+
+	out	(n),a		out	(c),rg
+	outd			otdr
+	outi			otir
+.end literal
+
+
+.test page 18
+.header level 2;Register Pair Instructions
+
+.literal
+	add	hl,rp		add	ix,rp
+	add	iy,rp
+
+	adc	hl,rp		sbc	hl,rp
+
+	ex	(sp),hl		ex	(sp),ix
+	ex	(sp),iy
+	ex	de,hl
+	ex	af,af'
+
+	push	rp		pop	rp
+.end literal
+
+
+
+.test page 20
+.header level 2;HD64180/Z180 Specific Instructions
+
+.literal
+	in0	rg,(n)
+	out0	(n),rg
+
+	otdm			otdmr
+	otim			otimr
+
+	mlt	bc		mlt	de
+	mlt	hl		mlt	sp
+
+	slp
+
+	tst	a
+	tstio	#data
+.end literal
