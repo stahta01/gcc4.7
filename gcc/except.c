@@ -3014,6 +3014,7 @@ output_one_function_exception_table (int section)
 		       * tt_format_size));
 
       disp = after_disp;
+#if BIGGEST_ALIGNMENT/BITS_PER_UNIT > 1
       do
 	{
 	  unsigned int disp_size, pad;
@@ -3028,6 +3029,7 @@ output_one_function_exception_table (int section)
 	  disp = after_disp + pad;
 	}
       while (disp != last_disp);
+#endif
 
       dw2_asm_output_data_uleb128 (disp, "@TType base offset");
 #endif

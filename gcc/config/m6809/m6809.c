@@ -211,8 +211,10 @@ m6809_override_options (void)
       m6809_abi_version = M6809_ABI_VERSION_STACK;
    }
 
+#if !CONFIG_SJLJ_EXCEPTIONS
 	/* -fexceptions is unsupported */
 	flag_exceptions = 0;
+#endif
 	flag_non_call_exceptions = 0;
 	flag_unwind_tables = 0;
 }

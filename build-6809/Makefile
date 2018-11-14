@@ -167,7 +167,7 @@ sim :
 ##########################################################################
 
 dfboard :
-	$(MAKE) everything prefix=/usr/src/gcc6809/build SUDO=
+	$(MAKE) sequential ACTIONS="everything cxx-install" prefix=/usr/src/gcc6809/build SUDO=
 
 ##########################################################################
 
@@ -211,12 +211,18 @@ $(BLDDIR)/config.status : $(BLDDIR) info
 		--enable-languages=$(GCC_LANGUAGES) \
 		--target=$(target) --program-prefix=$(program_prefix) --enable-obsolete \
 		--srcdir=$(SRCDIR) --disable-threads --disable-nls \
-		--disable-libssp \
+		--disable-libssp --enable-sjlj-exceptions \
 		--prefix=$(prefix) \
 		--with-as=$(call run_binutil,as) --with-ld=$(call run_binutil,ld)
 
 $(BLDDIR) :
 	mkdir -p $(BLDDIR)
+
+##########################################################################
+
+.PHONY : cxx-build cxx-install cxx-uninstall cxx-clean cxx-distclean
+cxx-build cxx-install cxx-uninstall cxx-clean cxx-distclean :
+	@cd cxx && $(MAKE) $(subst cxx-,,$@) target=$(target) prefix=$(prefix) program_prefix=$(program_prefix) SRCDIR=$(SRCDIR) SUDO=$(SUDO)
 
 ##########################################################################
 
