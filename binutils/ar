@@ -49,6 +49,20 @@ error ()
 	fi
 }
 
+# Strip directory from path.
+basename()
+{
+	printf "%s" "${1##*/}"
+}
+
+# Strip filename from path.
+dirname()
+{
+	name=${1##*/}
+	name=${1%$name}
+	printf "%s" "${name:-.}"
+}
+
 # Install or uninstall library cache.
 libcachetool ()
 {
