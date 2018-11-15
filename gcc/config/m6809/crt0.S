@@ -83,6 +83,7 @@ supported machines. */
 	.area .direct
 #endif
 	.area .base             (BANK=prog)
+	.area .text.startup     (BANK=prog)
 	.area .text             (BANK=prog)
 	.area .romcall          (BANK=prog)
 	.area .rodata           (BANK=prog)
@@ -208,8 +209,8 @@ __ctors_done:
 	;; Set up the environment
 	/* TODO */
 
-	;; Set up argc/argv arrays
-#ifdef TARGET_UNKNOWN
+	;; Set up argc/argv
+#ifndef TARGET_COCO
 	;;  __argc/__argv need to be defined elsewhere,
 	;;  for example from C code:
 	;;   int _argc = 1;
@@ -229,7 +230,7 @@ __ctors_done:
 	;; with -mdret, in which case it comes back in D.
 	CALL	_main
 
-#ifdef TARGET_UNKNOWN
+#ifndef TARGET_COCO
 #ifdef __ABI_STACK__
 	leas	4,s
 #else
