@@ -2065,7 +2065,7 @@ m6809_asm_file_start (void)
 {
 	const char *module_name;
 
-	fprintf (asm_out_file, "\n;;; gcc for m6809 : %s %s\n",
+	fprintf (asm_out_file, ";;; gcc for m6809 : %s %s\n",
 		__DATE__, __TIME__);
 	fprintf (asm_out_file, ";;; %s\n", version_string);
 
