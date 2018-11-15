@@ -30,6 +30,7 @@ ifeq ($(HOST_OS), Darwin)
    # Yes, we are on OSX.  Assume 'sudo' is available.
    SUDO ?= sudo
    AS_HOST = darwin
+   HOST_CONFIG_OPTS=--with-gmp=/opt/local
    EXE =
 else
    # It might be Cygwin or Linux.  Run with -o to find out.
@@ -198,7 +199,7 @@ install : post-install
 
 .PHONY : post-install
 post-install: gccinstall
-	cp $(SRCDIR)/gcc/config/m6809/crt0.S $(prefix)/lib/gcc/$(target)/$(GCC_VERSION)
+	$(SUDO) install -m 644 $(SRCDIR)/gcc/config/m6809/crt0.S $(prefix)/lib/gcc/$(target)/$(GCC_VERSION)
 
 ##########################################################################
 
@@ -222,7 +223,8 @@ $(BLDDIR)/config.status : $(BLDDIR) info
 		--srcdir=$(SRCDIR) --disable-threads --disable-nls \
 		--disable-libssp --enable-sjlj-exceptions \
 		--prefix=$(prefix) \
-		--with-as=$(call run_binutil,as) --with-ld=$(call run_binutil,ld)
+		--with-as=$(call run_binutil,as) --with-ld=$(call run_binutil,ld) \
+		$(HOST_CONFIG_OPTS)
 
 $(BLDDIR) :
 	mkdir -p $(BLDDIR)
@@ -314,7 +316,7 @@ binutils:
 		BINUTILS_LDFLAGS="$(BINUTILS_LDFLAGS)" \
 		&& $(SUDO) cp -f ranlib $(call run_binutil,ranlib)
 	for prog in ar as ld; do \
-		$(SUDO) sed -e "s!@AS_PREFIX@!${as_prefix}!" < ../binutils/$$prog > $(call run_binutil,$$prog); \
+		$(SUDO) sh -c "sed -e 's!@AS_PREFIX@!${as_prefix}!' < ../binutils/$$prog > $(call run_binutil,$$prog)"; \
 		$(SUDO) chmod a+x $(call run_binutil,$$prog); done
 
 .PHONY : binutils-clean
