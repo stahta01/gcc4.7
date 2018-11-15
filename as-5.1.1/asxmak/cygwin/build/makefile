@@ -45,9 +45,8 @@ ASXXXX =	as1802		\
 		asz8		\
 		asz80		\
 		aslink		\
-		asxscn		\
 		aslib		\
-		as6309		\
+		asxscn		\
 		asxcnv		\
 		s19os9
 	
@@ -56,8 +55,8 @@ ASXXXX =	as1802		\
 ####################################################################
 
 CC=		gcc
-CCOPT=		-O3 $(EXTRA_ASXXXX_CFLAGS)
-CCFLAGS=	-Wall -funsigned-char $(CCOPT)
+CCOPT=		-O3
+CCFLAGS=	-Wall -funsigned-char $(CCOPT) $(EXTRA_ASXXXX_CFLAGS)
 
 LD=		gcc
 LDFLAGS=	-Wall $(EXTRA_ASXXXX_CFLAGS)
@@ -915,11 +914,11 @@ aslink :	$(ASLINK)
 # ASLIB
 ####################################################################
 
-ASLIB =		ardata.o armain.o
+ASLIB =		armain.o ardata.o
 
-ardata.o :	$(SRCLIB)ardata.c $(SRCLIB)aslib.h
+armain.o :	$(SRCLIB)armain.c $(SRCLIB)common.c $(SRCLIB)aslib.h
 		$(CC) $(CCFLAGS) -I$(SRCMISC) -c $< -o $(@F)
-armain.o :	$(SRCLIB)armain.c $(SRCLIB)aslib.h
+ardata.o :	$(SRCLIB)ardata.c $(SRCLIB)common.c $(SRCLIB)aslib.h
 		$(CC) $(CCFLAGS) -I$(SRCMISC) -c $< -o $(@F)
 
 aslib :		$(ASLIB)

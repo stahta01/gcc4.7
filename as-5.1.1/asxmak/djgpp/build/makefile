@@ -45,6 +45,7 @@ ASXXXX =	as1802		\
 		asz8		\
 		asz80		\
 		aslink		\
+		aslib		\
 		asxscn		\
 		asxcnv		\
 		s19os9
@@ -55,10 +56,10 @@ ASXXXX =	as1802		\
 
 CC=		gcc
 CCOPT=		-O3
-CCFLAGS=	-Wall -funsigned-char $(CCOPT)
+CCFLAGS=	-Wall -funsigned-char $(CCOPT) $(EXTRA_ASXXXX_CFLAGS)
 
 LD=		gcc
-LDFLAGS=	-Wall
+LDFLAGS=	-Wall $(EXTRA_ASXXXX_CFLAGS)
 
 
 ####################################################################
@@ -71,6 +72,7 @@ ASXBAS=		../../../
 
 SRCASX=		$(ASXBAS)asxxsrc/
 SRCLNK=		$(ASXBAS)linksrc/
+SRCLIB=		$(ASXBAS)libsrc/
 SRCMISC=	$(ASXBAS)asxxmisc/
 SRCS19OS9=	$(ASXBAS)s19os9/
 DSTEXE=		../exe/
@@ -903,9 +905,26 @@ lkout.o  :	$(SRCLNK)lkout.c  $(SRCLNK)aslink.h
 		$(CC) $(CCFLAGS) -I$(SRCMISC) -c $< -o $(@F)
 
 aslink :	$(ASLINK)
-		$(LD) $(LDFLAGS) -o aslink $(ASLINK)
+		$(LD) $(LDFLAGS) $(ASLINK) $(EXTRA_ASXXXX_LDFLAGS) -o aslink
 		mv aslink.exe $(DSTEXE)aslink.exe
 		strip $(DSTEXE)aslink.exe
+
+
+####################################################################
+# ASLIB
+####################################################################
+
+ASLIB =		armain.o ardata.o
+
+armain.o :	$(SRCLIB)armain.c $(SRCLIB)common.c $(SRCLIB)aslib.h
+		$(CC) $(CCFLAGS) -I$(SRCMISC) -c $< -o $(@F)
+ardata.o :	$(SRCLIB)ardata.c $(SRCLIB)common.c $(SRCLIB)aslib.h
+		$(CC) $(CCFLAGS) -I$(SRCMISC) -c $< -o $(@F)
+
+aslib :		$(ASLIB)
+		$(LD) $(LDFLAGS) $(ASLIB) $(EXTRA_ASXXXX_LDFLAGS) -o aslib
+		mv aslib.exe $(DSTEXE)aslib.exe
+		strip $(DSTEXE)aslib.exe
 
 
 ####################################################################

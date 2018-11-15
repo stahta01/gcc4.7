@@ -347,7 +347,7 @@ asm-clean:
 asm-install:
 	@echo "Installing assembler files..." && \
 		$(SUDO) mkdir -p $(as_bindir) && \
-		cd $(ASBUILD) && $(SUDO) cp -p $(AS_EXES) $(as_bindir)
+		cd $(ASBUILD)/../exe && $(SUDO) cp -p $(AS_EXES) $(as_bindir)
 
 ##########################################################################
 
