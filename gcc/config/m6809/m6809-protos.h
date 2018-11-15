@@ -56,6 +56,7 @@ void              m6809_split_shift (int code, rtx *operands);
 int               m6809_can_eliminate (int from, int to);
 int               m6809_initial_elimination_offset (int from, int to);
 const char *      m6809_abi_version_to_str (int version);
+bool              m6809_allocate_stack_slots_for_args (void);
 
 #ifdef TREE_CODE
 int m6809_init_cumulative_args (CUMULATIVE_ARGS cum, tree fntype, rtx libname);
