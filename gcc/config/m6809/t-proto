@@ -1,0 +1,6 @@
+# For a few minor differences in code generation on a custom prototype.
+T_CFLAGS = -DTARGET_PROTO
+
+# For doing the startup differently on a custom prototype.
+CRT0STUFF_T_CFLAGS += -DTARGET_PROTO
+# vim: set filetype=make:
