@@ -485,6 +485,7 @@ __ashrdi3 (DWtype u, shift_count_type b)
 #endif
 
 #ifdef L_bswapsi2
+#if MIN_UNITS_PER_WORD > 1
 SItype
 __bswapsi2 (SItype u)
 {
@@ -494,7 +495,9 @@ __bswapsi2 (SItype u)
 	  | (((u) & 0x000000ff) << 24));
 }
 #endif
+#endif
 #ifdef L_bswapdi2
+#if LONG_LONG_TYPE_SIZE > 32
 DItype
 __bswapdi2 (DItype u)
 {
@@ -507,6 +510,7 @@ __bswapdi2 (DItype u)
 	  | (((u) & 0x000000000000ff00ull) << 40)
 	  | (((u) & 0x00000000000000ffull) << 56));
 }
+#endif
 #endif
 #ifdef L_ffssi2
 #undef int
@@ -1280,7 +1284,7 @@ __fixdfdi (DFtype a)
 UDWtype
 __fixunssfDI (SFtype a)
 {
-#if LIBGCC2_HAS_DF_MODE
+#if LIBGCC2_HAS_DF_MODE || (FLT_MANT_DIG >= W_TYPE_SIZE)
   /* Convert the SFtype to a DFtype, because that is surely not going
      to lose any bits.  Some day someone else can write a faster version
      that avoids converting to DFtype, and verify it really works right.  */
@@ -1298,7 +1302,7 @@ __fixunssfDI (SFtype a)
 
   /* Assemble result from the two parts.  */
   return ((UDWtype) hi << W_TYPE_SIZE) | lo;
-#elif FLT_MANT_DIG < W_TYPE_SIZE
+#else
   if (a < 1)
     return 0;
   if (a < Wtype_MAXp1_F)
@@ -1334,8 +1338,6 @@ __fixunssfDI (SFtype a)
       return (DWtype)counter << shift;
     }
   return -1;
-#else
-# error
 #endif
 }
 #endif
