@@ -42,8 +42,7 @@ else
       EXE = .exe
    else
       # We are probably on Linux.  Assume 'sudo' is available.
-#      SUDO ?= sudo
-      SUDO =
+      SUDO ?= sudo
       AS_HOST = linux
       EXE =
    endif
@@ -67,8 +66,7 @@ AS_EXES = $(AS_TARGET)
 endif
 
 # Set the prefix for installing the compiler
-#prefix ?= /usr/local
-prefix = /usr/src/gcc6809/build
+prefix ?= /usr/local
 
 # Set the prefix for installing the asxxxx tools.
 # This need not be the same as $(prefix), since multiple target types
