@@ -30,7 +30,7 @@ ifeq ($(HOST_OS), Darwin)
    # Yes, we are on OSX.  Assume 'sudo' is available.
    SUDO ?= sudo
    AS_HOST = darwin
-   HOST_CONFIG_OPTS=--with-gmp=/opt/local
+   HOST_CONFIG_OPTS ?= --with-gmp=/opt/local
    EXE =
 else
    # It might be Cygwin or Linux.  Run with -o to find out.
