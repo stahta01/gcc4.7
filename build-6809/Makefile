@@ -182,7 +182,12 @@ sim :
 ##########################################################################
 
 dfboard :
-	$(MAKE) sequential ACTIONS="everything cxx-install" prefix=/usr/src/gcc6809/build SUDO=
+	set -e ;\
+	prefix=/usr/src/gcc6809/build ;\
+	$(MAKE) everything prefix=$$prefix SUDO= ;\
+	if [ -f $$prefix/$(target)/include/stdlib.h ]; then \
+		$(MAKE) cxx-install prefix=$$prefix SUDO= ;\
+	fi
 
 ##########################################################################
 
