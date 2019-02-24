@@ -189,19 +189,19 @@ while [ $# -gt 0 ]; do
 		-L|--library-path)
 			path=$1; shift
 			checkfilename "invalid library path" "$path" $path
-			libpaths="$libpaths -k $path"
+			libpaths="$libpaths -k ${path%/}/"
 			libpaths_as09="$libpaths_as09 -L$path"
 			;;
 		-L*)
 			path=${arg#-L}
 			checkfilename "invalid library path" "$path" $path
-			libpaths="$libpaths -k $path"
+			libpaths="$libpaths -k ${path%/}/"
 			libpaths_as09="$libpaths_as09 -L$path"
 			;;
 		--library-path=*)
 			path=${arg#*=}
 			checkfilename "invalid library name" "$path" $path
-			libpaths="$libpaths -k $path"
+			libpaths="$libpaths -k ${path%/}/"
 			libpaths_as09="$libpaths_as09 -L$path"
 			;;
 		-l|--library)
